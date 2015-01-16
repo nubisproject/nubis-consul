@@ -16,7 +16,7 @@ resource "aws_launch_configuration" "consul" {
 }
 
 resource "aws_autoscaling_group" "consul" {
-  availability_zones = ["us-east-1a", "us-east-1b", "us-east-1c", "us-east-1d", "us-east-1e"]
+  availability_zones = ["us-east-1b", "us-east-1c", "us-east-1d", "us-east-1e"]
   name = "consul"
   max_size = "${var.servers}"
   min_size = "${var.servers}"
