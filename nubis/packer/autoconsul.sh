@@ -21,13 +21,14 @@ cat <<EOF | tee /etc/consul/zzz-join.json
 EOF
 fi
 
-if [ "$CONSUL_PUBLIC" == "1" ]; then
+if [ "$CONSUL_PUBLIC" -eq "1" ]; then
 PUBLIC_IP=`ec2metadata --public-ipv4`
 
 cat <<EOF | tee /etc/consul/zzz-public.json
 {
   "advertise_addr": "$PUBLIC_IP"
 }
+EOF
 fi
 
 service consul restart
