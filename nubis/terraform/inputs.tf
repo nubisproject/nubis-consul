@@ -29,3 +29,8 @@ variable "servers" {
   default = "2"
   description = "The number of Consul servers to launch minus one (bootstrap node)."
 }
+
+variable "public" {
+  default = true
+  description = "Should this consul cluster be publicly accesible"
+}
