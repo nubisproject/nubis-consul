@@ -1,7 +1,9 @@
+# nubis-consul release 10
+
 variable "ami" {
   default = {
-    us-east-1 = "ami-1ad9a572"
-    us-west-2 = "ami-efa8f7df"
+    us-east-1 = "ami-4ec8b426"
+    us-west-2 = "ami-cda7f8fd"
   }
 }
 
@@ -31,7 +33,7 @@ variable "servers" {
 }
 
 variable "release" {
-  default = "0"
+  default = "10"
   description = "Release number of this architecture"
 }
 

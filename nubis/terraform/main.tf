@@ -37,7 +37,7 @@ resource "aws_instance" "bootstrap" {
   security_groups = ["${aws_security_group.consul.name}"]
   
   tags {
-        Name = "Consul boostrap node (${var.release})"
+        Name = "Consul boostrap node (v/${var.release})"
         Release = "${var.release}"
   }
 
