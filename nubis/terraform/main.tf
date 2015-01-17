@@ -6,18 +6,18 @@ provider "aws" {
 }
 
 resource "aws_launch_configuration" "consul" {
-    name = "consul"
+    name = "consul-${var.release}"
     image_id = "${lookup(var.ami, var.region)}"
     instance_type = "m3.medium"
     key_name = "${var.key_name}"
     security_groups = ["${aws_security_group.consul.name}"]
 
-    user_data = "CONSUL_PUBLIC=${var.public}\nCONSUL_DC=${var.region}\nCONSUL_TOKEN=${var.token}\nCONSUL_JOIN=${aws_instance.bootstrap.private_dns}\nCONSUL_BOOTSTRAP_EXPECT=$(( 1 + ${var.servers} ))"
+    user_data = "CONSUL_PUBLIC=${var.public}\nCONSUL_DC=${var.region}\nCONSUL_SECRET=${var.secret}\nCONSUL_JOIN=${aws_instance.bootstrap.private_dns}\nCONSUL_BOOTSTRAP_EXPECT=$(( 1 + ${var.servers} ))"
 }
 
 resource "aws_autoscaling_group" "consul" {
   availability_zones = ["us-east-1b", "us-east-1c", "us-east-1d", "us-east-1e"]
-  name = "consul"
+  name = "consul-${var.release}"
   max_size = "${var.servers}"
   min_size = "${var.servers}"
   health_check_grace_period = 10
@@ -37,14 +37,15 @@ resource "aws_instance" "bootstrap" {
   security_groups = ["${aws_security_group.consul.name}"]
   
   tags {
-        Name = "Consul boostrap node"
+        Name = "Consul boostrap node (${var.release})"
+        Release = "${var.release}"
   }
 
-  user_data = "CONSUL_PUBLIC=${var.public}\nCONSUL_DC=${var.region}\nCONSUL_TOKEN=${var.token}\nCONSUL_BOOTSTRAP_EXPECT=$(( 1 + ${var.servers} ))\n"
+  user_data = "CONSUL_PUBLIC=${var.public}\nCONSUL_DC=${var.region}\nCONSUL_SECRET=${var.secret}\nCONSUL_BOOTSTRAP_EXPECT=$(( 1 + ${var.servers} ))\n"
 }
 
 resource "aws_security_group" "consul" {
-  name = "consul"
+  name = "consul-${var.release}"
   description = "Consul internal traffic + maintenance."
   
   // These are for internal traffic

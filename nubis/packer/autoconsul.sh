@@ -7,7 +7,7 @@ eval `ec2metadata --user-data`
 cat <<EOF | tee /etc/consul/zzz-startup.json
 {
   "bootstrap_expect": $CONSUL_BOOTSTRAP_EXPECT,
-  "token": "$CONSUL_TOKEN",
+  "encrypt": "$CONSUL_SECRET",
   "datacenter": "$CONSUL_DC"
 }
 EOF
