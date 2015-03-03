@@ -10,10 +10,6 @@ variable "ami" {
 variable "aws_access_key" {}
 variable "aws_secret_key" {}
 
-variable "aws_region" {
-  default = "us-east-1"
-}
-
 variable "key_name" {
   description = "SSH key name in your AWS account for AWS instances."
 }
@@ -40,4 +36,14 @@ variable "release" {
 variable "public" {
   default = true
   description = "Should this consul cluster be publicly accesible"
+}
+
+variable "domain" {
+  default = "consul.nubis.allizom.org"
+  description = "Name of the zone used for publication"
+}
+
+variable "zone_id" {
+  default = "Z991V3TA43J7I"
+  description = "ID of the zone used for publication"
 }

@@ -2,7 +2,7 @@
 provider "aws" {
     access_key = "${var.aws_access_key}"
     secret_key = "${var.aws_secret_key}"
-    region = "${var.aws_region}"
+    region = "${var.region}"
 }
 
 resource "aws_launch_configuration" "consul" {
@@ -16,7 +16,8 @@ resource "aws_launch_configuration" "consul" {
 }
 
 resource "aws_autoscaling_group" "consul" {
-  availability_zones = [ "us-east-1b", "us-east-1c", "us-east-1d", "us-east-1e" ]
+  #availability_zones = [ "us-east-1b", "us-east-1c", "us-east-1d", "us-east-1e" ]
+  availability_zones = [ "us-west-2b", "us-west-2c", "us-west-2d", "us-west-2e" ]
 
   name = "consul-${var.release}"
   max_size = "${var.servers}"
@@ -51,18 +52,18 @@ resource "aws_security_group" "consul" {
   
   // These are for internal traffic
   ingress {
-    from_port = 0
-    to_port = 65535
+    from_port = 8300
+    to_port = 8303
     protocol = "tcp"
-    self = true
+    cidr_blocks = ["0.0.0.0/0"]
   }
   
   // This is for the gossip traffic
   ingress {
-    from_port = 0
-    to_port = 65535
+    from_port = 8300
+    to_port = 8303
     protocol = "udp"
-    self = true
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   // These are for maintenance
@@ -72,5 +73,19 @@ resource "aws_security_group" "consul" {
     protocol = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
+  
+  ingress {
+    from_port = 8500
+    to_port = 8500
+    protocol = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 }
 
+resource "aws_route53_record" "discovery" {
+   zone_id = "${var.zone_id}"
+   name = "${var.region}.${var.domain}"
+   type = "A"
+   ttl = "300"
+   records = ["${aws_instance.bootstrap.public_ip}"]
+}
