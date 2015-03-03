@@ -12,12 +12,12 @@ resource "aws_launch_configuration" "consul" {
     key_name = "${var.key_name}"
     security_groups = ["${aws_security_group.consul.name}"]
 
-    user_data = "CONSUL_PUBLIC=${var.public}\nCONSUL_DC=${var.region}\nCONSUL_SECRET=${var.consul_secret}\nCONSUL_JOIN=${aws_instance.bootstrap.private_dns}\nCONSUL_BOOTSTRAP_EXPECT=$(( 1 + ${var.servers} ))"
+    user_data = "CONSUL_PUBLIC=${var.public}\nCONSUL_DC=${var.region}\nCONSUL_SECRET=${var.consul_secret}\nCONSUL_JOIN=${aws_instance.bootstrap.public_dns}\nCONSUL_BOOTSTRAP_EXPECT=$(( 1 + ${var.servers} ))"
 }
 
 resource "aws_autoscaling_group" "consul" {
   #availability_zones = [ "us-east-1b", "us-east-1c", "us-east-1d", "us-east-1e" ]
-  availability_zones = [ "us-west-2b", "us-west-2c", "us-west-2d", "us-west-2e" ]
+  availability_zones = [ "us-west-2a", "us-west-2b", "us-west-2c" ]
 
   name = "consul-${var.release}"
   max_size = "${var.servers}"
@@ -86,6 +86,6 @@ resource "aws_route53_record" "discovery" {
    zone_id = "${var.zone_id}"
    name = "${var.region}.${var.domain}"
    type = "A"
-   ttl = "300"
+   ttl = "30"
    records = ["${aws_instance.bootstrap.public_ip}"]
 }
