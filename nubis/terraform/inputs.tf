@@ -2,8 +2,8 @@
 
 variable "ami" {
   default = {
-    us-east-1 = "ami-4ec8b426"
-    us-west-2 = "ami-cda7f8fd"
+    us-east-1 = "ami-d00b53b8"
+    us-west-2 = "ami-47644777"
   }
 }
 
@@ -23,7 +23,7 @@ variable "region" {
   description = "The region of AWS, for AMI lookups."
 }
 
-variable "secret" {
+variable "consul_secret" {
   description = "Security shared secret for consul membership (consul keygen)"
 }
 
@@ -33,7 +33,7 @@ variable "servers" {
 }
 
 variable "release" {
-  default = "10"
+  default = "15"
   description = "Release number of this architecture"
 }
 
