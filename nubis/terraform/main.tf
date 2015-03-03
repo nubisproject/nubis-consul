@@ -12,11 +12,12 @@ resource "aws_launch_configuration" "consul" {
     key_name = "${var.key_name}"
     security_groups = ["${aws_security_group.consul.name}"]
 
-    user_data = "CONSUL_PUBLIC=${var.public}\nCONSUL_DC=${var.region}\nCONSUL_SECRET=${var.secret}\nCONSUL_JOIN=${aws_instance.bootstrap.private_dns}\nCONSUL_BOOTSTRAP_EXPECT=$(( 1 + ${var.servers} ))"
+    user_data = "CONSUL_PUBLIC=${var.public}\nCONSUL_DC=${var.region}\nCONSUL_SECRET=${var.consul_secret}\nCONSUL_JOIN=${aws_instance.bootstrap.private_dns}\nCONSUL_BOOTSTRAP_EXPECT=$(( 1 + ${var.servers} ))"
 }
 
 resource "aws_autoscaling_group" "consul" {
-  availability_zones = ["us-east-1b", "us-east-1c", "us-east-1d", "us-east-1e"]
+  availability_zones = [ "us-east-1b", "us-east-1c", "us-east-1d", "us-east-1e" ]
+
   name = "consul-${var.release}"
   max_size = "${var.servers}"
   min_size = "${var.servers}"
@@ -41,7 +42,7 @@ resource "aws_instance" "bootstrap" {
         Release = "${var.release}"
   }
 
-  user_data = "CONSUL_PUBLIC=${var.public}\nCONSUL_DC=${var.region}\nCONSUL_SECRET=${var.secret}\nCONSUL_BOOTSTRAP_EXPECT=$(( 1 + ${var.servers} ))\n"
+  user_data = "CONSUL_PUBLIC=${var.public}\nCONSUL_DC=${var.region}\nCONSUL_SECRET=${var.consul_secret}\nCONSUL_BOOTSTRAP_EXPECT=$(( 1 + ${var.servers} ))\n"
 }
 
 resource "aws_security_group" "consul" {

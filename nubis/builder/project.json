@@ -1,0 +1,13 @@
+{
+  "variables": {
+    "automatic_version_bump": "1",
+    "automatic_version_verify": "1",
+    "builders": [
+      "amazon-ebs-ubuntu"
+    ],
+    "project_description": "Consul",
+    "project_name": "nubis-consul",
+    "project_version": "0.16",
+    "source_ami_project_name": "nubis-base"
+  }
+}
