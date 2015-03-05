@@ -39,11 +39,17 @@ variable "public" {
 }
 
 variable "domain" {
-  default = "consul.nubis.allizom.org"
   description = "Name of the zone used for publication"
 }
 
 variable "zone_id" {
-  default = "Z991V3TA43J7I"
   description = "ID of the zone used for publication"
+}
+
+variable "ssl_cert" {
+  description = "SSL Certificate file"
+}
+
+variable "ssl_key" {
+  description = "SSL Key file"
 }
