@@ -2,17 +2,13 @@
 
 variable "ami" {
   default = {
-    us-east-1 = "ami-d00b53b8"
-    us-west-2 = "ami-47644777"
+    us-east-1 = "ami-a63d65ce"
+    us-west-2 = "ami-b76e4d87"
   }
 }
 
 variable "aws_access_key" {}
 variable "aws_secret_key" {}
-
-variable "aws_region" {
-  default = "us-east-1"
-}
 
 variable "key_name" {
   description = "SSH key name in your AWS account for AWS instances."
@@ -40,4 +36,20 @@ variable "release" {
 variable "public" {
   default = true
   description = "Should this consul cluster be publicly accesible"
+}
+
+variable "domain" {
+  description = "Name of the zone used for publication"
+}
+
+variable "zone_id" {
+  description = "ID of the zone used for publication"
+}
+
+variable "ssl_cert" {
+  description = "SSL Certificate file"
+}
+
+variable "ssl_key" {
+  description = "SSL Key file"
 }

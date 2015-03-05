@@ -1,0 +1,22 @@
+#!/bin/bash
+
+DIRNAME=`dirname $0`
+DIR=`cd $DIRNAME && pwd`
+OPENSSL_CFG=$DIR/openssl.cnf
+
+DROPDIR=`cd $DIRNAME/../.. && pwd`
+
+KEY=$DROPDIR/consul.key
+CERT=$DROPDIR/consul.pem
+
+if [ ! -f "$KEY" ] || [ ! -f "$CERT" ]; then
+ echo "Generating SSL key"
+  openssl req -new \
+    -x509 -nodes \
+    -extensions consul \
+    -config $OPENSSL_CFG \
+     -out  consul.pem \
+     -keyout consul.key \
+     -days 3650 \
+     -subj '/CN=consul.nubis.allizom.org'
+fi

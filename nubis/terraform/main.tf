@@ -2,7 +2,7 @@
 provider "aws" {
     access_key = "${var.aws_access_key}"
     secret_key = "${var.aws_secret_key}"
-    region = "${var.aws_region}"
+    region = "${var.region}"
 }
 
 resource "aws_launch_configuration" "consul" {
@@ -12,11 +12,12 @@ resource "aws_launch_configuration" "consul" {
     key_name = "${var.key_name}"
     security_groups = ["${aws_security_group.consul.name}"]
 
-    user_data = "CONSUL_PUBLIC=${var.public}\nCONSUL_DC=${var.region}\nCONSUL_SECRET=${var.consul_secret}\nCONSUL_JOIN=${aws_instance.bootstrap.private_dns}\nCONSUL_BOOTSTRAP_EXPECT=$(( 1 + ${var.servers} ))"
+    user_data = "CONSUL_PUBLIC=${var.public}\nCONSUL_DC=${var.region}\nCONSUL_SECRET=${var.consul_secret}\nCONSUL_JOIN=${aws_instance.bootstrap.public_dns}\nCONSUL_BOOTSTRAP_EXPECT=$(( 1 +${var.servers} ))\nCONSUL_KEY=\"${file("${var.ssl_key}")}\"\nCONSUL_CERT=\"${file("${var.ssl_cert}")}\""
 }
 
 resource "aws_autoscaling_group" "consul" {
   availability_zones = [ "us-east-1b", "us-east-1c", "us-east-1d", "us-east-1e" ]
+  #availability_zones = [ "us-west-2a", "us-west-2b", "us-west-2c" ]
 
   name = "consul-${var.release}"
   max_size = "${var.servers}"
@@ -42,7 +43,7 @@ resource "aws_instance" "bootstrap" {
         Release = "${var.release}"
   }
 
-  user_data = "CONSUL_PUBLIC=${var.public}\nCONSUL_DC=${var.region}\nCONSUL_SECRET=${var.consul_secret}\nCONSUL_BOOTSTRAP_EXPECT=$(( 1 + ${var.servers} ))\n"
+  user_data = "CONSUL_PUBLIC=${var.public}\nCONSUL_DC=${var.region}\nCONSUL_SECRET=${var.consul_secret}\nCONSUL_BOOTSTRAP_EXPECT=$(( 1 + ${var.servers} ))\nCONSUL_KEY=\"${file("${var.ssl_key}")}\"\nCONSUL_CERT=\"${file("${var.ssl_cert}")}\""
 }
 
 resource "aws_security_group" "consul" {
@@ -51,18 +52,18 @@ resource "aws_security_group" "consul" {
   
   // These are for internal traffic
   ingress {
-    from_port = 0
-    to_port = 65535
+    from_port = 8300
+    to_port = 8303
     protocol = "tcp"
-    self = true
+    cidr_blocks = ["0.0.0.0/0"]
   }
   
   // This is for the gossip traffic
   ingress {
-    from_port = 0
-    to_port = 65535
+    from_port = 8300
+    to_port = 8303
     protocol = "udp"
-    self = true
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   // These are for maintenance
@@ -72,5 +73,19 @@ resource "aws_security_group" "consul" {
     protocol = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
+  
+  ingress {
+    from_port = 8500
+    to_port = 8500
+    protocol = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 }
 
+resource "aws_route53_record" "discovery" {
+   zone_id = "${var.zone_id}"
+   name = "${var.region}.${var.domain}"
+   type = "A"
+   ttl = "30"
+   records = ["${aws_instance.bootstrap.public_ip}"]
+}
