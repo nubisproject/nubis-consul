@@ -1,0 +1,9 @@
+[ req ]
+default_bits           = 1024
+distinguished_name     = req_distinguished_name
+
+[ req_distinguished_name ]
+
+[consul]
+extendedKeyUsage = serverAuth, clientAuth
+basicConstraints = CA:true
