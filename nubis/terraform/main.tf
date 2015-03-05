@@ -16,8 +16,8 @@ resource "aws_launch_configuration" "consul" {
 }
 
 resource "aws_autoscaling_group" "consul" {
-  availability_zones = [ "us-east-1b", "us-east-1c", "us-east-1d", "us-east-1e" ]
-  #availability_zones = [ "us-west-2a", "us-west-2b", "us-west-2c" ]
+  #availability_zones = [ "us-east-1b", "us-east-1c", "us-east-1d", "us-east-1e" ]
+  availability_zones = [ "us-west-2a", "us-west-2b", "us-west-2c" ]
 
   name = "consul-${var.release}"
   max_size = "${var.servers}"

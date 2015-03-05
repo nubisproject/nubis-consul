@@ -1,4 +1,4 @@
-class { 'consul'=>
+class { 'consul':
   version => '0.5.0',
   
   config_hash => {
