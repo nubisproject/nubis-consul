@@ -2,8 +2,8 @@
 
 variable "ami" {
   default = {
-    us-east-1 = "ami-a63d65ce"
-    us-west-2 = "ami-b76e4d87"
+    us-east-1 = "ami-66cf940e"
+    us-west-2 = "ami-2beac91b"
   }
 }
 
