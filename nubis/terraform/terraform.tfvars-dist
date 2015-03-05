@@ -1,6 +1,6 @@
 aws_access_key = "XXXXXXXXXXX"
 aws_secret_key = "YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY"
-consul_secret = "fdsfsdfsdfsdsfsdsd4324fds=="
+consul_secret = "generate with consul keygen"
 key_name = "user"
 key_path = "/home/user/.ssh/id_rsa"
 ssh_user = "ubuntu"
