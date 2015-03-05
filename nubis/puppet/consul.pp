@@ -7,12 +7,6 @@ class { 'consul'=>
       'ui_dir'          => '/var/lib/consul/ui',
       'client_addr'     => '0.0.0.0',
       'server'          => true,
-      'enable_syslog'   => true,
-      'ca_file'         => '/etc/consul/consul.pem',
-      'cert_file'       => '/etc/consul/consul.pem',
-      'key_file'        => '/etc/consul/consul.key',
-      'verify_incoming' => true,
-      'verify_outgoing' => true
-
+      'enable_syslog'   => true
   }
 }
