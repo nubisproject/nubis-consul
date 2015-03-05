@@ -7,7 +7,7 @@
     ],
     "project_description": "Consul",
     "project_name": "nubis-consul",
-    "project_version": "0.20",
+    "project_version": "0.22",
     "source_ami_project_name": "nubis-base"
   }
 }
