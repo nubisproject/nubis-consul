@@ -1,0 +1,13 @@
+#XXX: Can't have arrays as input variables until TF 0.4
+resource "aws_elb" "consul" {
+  subnets = [ "subnet-dc139cb9", "subnet-ea3a979d", "subnet-3f7fbc66" ]
+}
+
+resource "aws_autoscaling_group" "consul" {
+  availability_zones = [ "us-west-2a","us-west-2b","us-west-2c" ]
+  vpc_zone_identifier = [ "subnet-a9139ccc", "subnet-cb3a97bc", "subnet-227fbc7b" ]
+}
+
+resource "aws_instance" "bootstrap" {
+  subnet_id = "subnet-dc139cb9"
+}
