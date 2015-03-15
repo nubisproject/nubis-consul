@@ -6,20 +6,20 @@ provider "aws" {
 }
 
 resource "aws_launch_configuration" "consul" {
-    name = "consul-${var.release}"
-    image_id = "${lookup(var.ami, var.region)}"
+    name = "consul-${var.release}-${var.build}"
+    image_id = "${var.ami}"
     instance_type = "m3.medium"
     key_name = "${var.key_name}"
-    security_groups = ["${aws_security_group.consul.name}"]
+    security_groups = ["${aws_security_group.consul.id}"]
 
-    user_data = "CONSUL_PUBLIC=${var.public}\nCONSUL_DC=${var.region}\nCONSUL_SECRET=${var.consul_secret}\nCONSUL_JOIN=${aws_instance.bootstrap.public_dns}\nCONSUL_BOOTSTRAP_EXPECT=$(( 1 +${var.servers} ))\nCONSUL_KEY=\"${file("${var.ssl_key}")}\"\nCONSUL_CERT=\"${file("${var.ssl_cert}")}\""
+    user_data = "CONSUL_PUBLIC=${var.public}\nCONSUL_DC=${var.region}\nCONSUL_SECRET=${var.consul_secret}\nCONSUL_JOIN=${aws_instance.bootstrap.private_dns}\nCONSUL_BOOTSTRAP_EXPECT=$(( 1 +${var.servers} ))\nCONSUL_KEY=\"${file("${var.ssl_key}")}\"\nCONSUL_CERT=\"${file("${var.ssl_cert}")}\""
 }
 
 resource "aws_autoscaling_group" "consul" {
-  #availability_zones = [ "us-east-1b", "us-east-1c", "us-east-1d", "us-east-1e" ]
-  availability_zones = [ "us-west-2a", "us-west-2b", "us-west-2c" ]
+  vpc_zone_identifier = []
+  availability_zones  = []
 
-  name = "consul-${var.release}"
+  name = "consul-${var.release}-${var.build}"
   max_size = "${var.servers}"
   min_size = "${var.servers}"
   health_check_grace_period = 10
@@ -32,14 +32,14 @@ resource "aws_autoscaling_group" "consul" {
 # Single node necessary for bootstrap and self-discovery
 # XXX: Problematic if it fails
 resource "aws_instance" "bootstrap" {
-  ami = "${lookup(var.ami, var.region)}"
+  ami = "${var.ami}"
   
   instance_type = "m3.medium"
   key_name = "${var.key_name}"
-  security_groups = ["${aws_security_group.consul.name}"]
+  security_groups = ["${aws_security_group.consul.id}"]
   
   tags {
-        Name = "Consul boostrap node (v/${var.release})"
+        Name = "Consul boostrap node (v/${var.release}.${var.build})"
         Release = "${var.release}"
   }
 
@@ -47,8 +47,10 @@ resource "aws_instance" "bootstrap" {
 }
 
 resource "aws_security_group" "consul" {
-  name = "consul-${var.release}"
+  name = "consul-${var.release}-${var.build}"
   description = "Consul internal traffic + maintenance."
+  
+  vpc_id = "${var.vpc_id}"
   
   // These are for internal traffic
   ingress {
@@ -82,10 +84,64 @@ resource "aws_security_group" "consul" {
   }
 }
 
+# Create a new load balancer
+resource "aws_elb" "consul" {
+  name = "elb-${var.project}-${var.release}-${var.build}"
+  subnets = [ ]
+  
+  instances = [
+    "${aws_instance.bootstrap.id}"
+  ]
+
+  listener {
+    instance_port = 8500
+    instance_protocol = "http"
+    lb_port = 80
+    lb_protocol = "http"
+  }
+
+  health_check {
+    healthy_threshold = 2
+    unhealthy_threshold = 2
+    timeout = 3
+    target = "HTTP:8500/v1/status/peers"
+    interval = 5
+  }
+
+  cross_zone_load_balancing = true
+
+  security_groups = [
+    "${aws_security_group.elb.id}"
+  ]
+}
+
+resource "aws_security_group" "elb" {
+  name = "elb-${var.project}-${var.release}-${var.build}"
+  description = "Allow inbound traffic for consul"
+
+  vpc_id = "${var.vpc_id}"
+
+  ingress {
+      from_port = 80
+      to_port = 80
+      protocol = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+
 resource "aws_route53_record" "discovery" {
    zone_id = "${var.zone_id}"
    name = "${var.region}.${var.domain}"
    type = "A"
    ttl = "30"
-   records = ["${aws_instance.bootstrap.public_ip}"]
+   records = ["${aws_instance.bootstrap.private_ip}"]
+}
+
+resource "aws_route53_record" "ui" {
+   zone_id = "${var.zone_id}"
+   name = "ui.${var.region}.${var.domain}"
+   type = "CNAME"
+   ttl = "30"
+   records = ["dualstack.${aws_elb.consul.dns_name}"]
 }

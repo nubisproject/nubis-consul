@@ -1,11 +1,6 @@
 # nubis-consul release 10
 
-variable "ami" {
-  default = {
-    us-east-1 = "ami-66cf940e"
-    us-west-2 = "ami-2beac91b"
-  }
-}
+variable "ami" { }
 
 variable "aws_access_key" {}
 variable "aws_secret_key" {}
@@ -29,8 +24,17 @@ variable "servers" {
 }
 
 variable "release" {
-  default = "15"
+  default = "0"
   description = "Release number of this architecture"
+}
+
+variable "build" {
+  default = "35"
+  description = "Build number of this architecture"
+}
+
+variable "project" {
+  default = "consul"
 }
 
 variable "public" {
@@ -44,6 +48,10 @@ variable "domain" {
 
 variable "zone_id" {
   description = "ID of the zone used for publication"
+}
+
+variable "vpc_id" {
+  description = "ID of the VPC to launch into"
 }
 
 variable "ssl_cert" {
