@@ -37,6 +37,10 @@ variable "project" {
   default = "consul"
 }
 
+variable "environment" {
+  default = "sandbox"
+}
+
 variable "public" {
   default = true
   description = "Should this consul cluster be publicly accesible"
