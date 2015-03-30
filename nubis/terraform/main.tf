@@ -27,6 +27,9 @@ resource "aws_autoscaling_group" "consul" {
   desired_capacity = "${var.servers}"
   force_delete = true
   launch_configuration = "${aws_launch_configuration.consul.name}"
+  load_balancers = [
+    "${aws_elb.consul.name}"
+  ]
 }
 
 # Single node necessary for bootstrap and self-discovery
