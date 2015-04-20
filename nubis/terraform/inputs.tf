@@ -65,3 +65,12 @@ variable "ssl_cert" {
 variable "ssl_key" {
   description = "SSL Key file"
 }
+
+variable "internet_security_group_id" {
+  description = "ID of that SG"
+}
+
+variable "shared_services_security_group_id" {
+  description = "ID of that SG"
+}
+

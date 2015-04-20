@@ -10,7 +10,11 @@ resource "aws_launch_configuration" "consul" {
     image_id = "${var.ami}"
     instance_type = "m3.medium"
     key_name = "${var.key_name}"
-    security_groups = ["${aws_security_group.consul.id}"]
+    security_groups = [
+      "${aws_security_group.consul.id}",
+      "${var.internet_security_group_id}",
+      "${var.shared_services_security_group_id}",
+    ]
 
     user_data = "NUBIS_PROJECT=${var.project}\nNUBIS_ENVIRONMENT=${var.environment}\nCONSUL_PUBLIC=${var.public}\nCONSUL_DC=${var.region}\nCONSUL_SECRET=${var.consul_secret}\nCONSUL_JOIN=${aws_instance.bootstrap.private_dns}\nCONSUL_BOOTSTRAP_EXPECT=$(( 1 +${var.servers} ))\nCONSUL_KEY=\"${file("${var.ssl_key}")}\"\nCONSUL_CERT=\"${file("${var.ssl_cert}")}\""
 }
@@ -39,7 +43,11 @@ resource "aws_instance" "bootstrap" {
   
   instance_type = "m3.medium"
   key_name = "${var.key_name}"
-  security_groups = ["${aws_security_group.consul.id}"]
+  security_groups = [
+    "${aws_security_group.consul.id}",
+    "${var.internet_security_group_id}",
+    "${var.shared_services_security_group_id}",
+  ]
   
   tags {
         Name = "Consul boostrap node (v/${var.release}.${var.build})"
@@ -131,7 +139,6 @@ resource "aws_security_group" "elb" {
       cidr_blocks = ["0.0.0.0/0"]
   }
 }
-
 
 resource "aws_route53_record" "discovery" {
    zone_id = "${var.zone_id}"
