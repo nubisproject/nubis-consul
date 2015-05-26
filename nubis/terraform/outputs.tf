@@ -10,6 +10,7 @@ output "discovery" {
 provider "consul" {
     address = "${aws_route53_record.ui.name}:80"
     datacenter = "${var.region}"
+    scheme = "http"
 }
 
 resource "consul_keys" "consul" {

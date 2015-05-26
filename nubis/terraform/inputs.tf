@@ -50,6 +50,11 @@ variable "domain" {
   description = "Name of the zone used for publication"
 }
 
+variable "nubis_domain" {
+  description = "Top-level nubis domain for this environment"
+  default = "nubis.allizom.org"
+}
+
 variable "zone_id" {
   description = "ID of the zone used for publication"
 }

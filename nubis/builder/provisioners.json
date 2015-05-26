@@ -1,0 +1,9 @@
+{
+  "provisioners": [
+   {
+    "type": "shell",
+    "inline" : ["sudo rm -rf /var/lib/consul /usr/local/bin/consul /opt/staging/consul/consul.zip"],
+    "order" : 5 
+  }
+  ]
+}
