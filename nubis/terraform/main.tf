@@ -16,7 +16,7 @@ resource "aws_launch_configuration" "consul" {
       "${var.shared_services_security_group_id}",
     ]
 
-    user_data = "NUBIS_PROJECT=${var.project}\nNUBIS_ENVIRONMENT=${var.environment}\nCONSUL_PUBLIC=${var.public}\nCONSUL_DC=${var.region}\nCONSUL_SECRET=${var.consul_secret}\nCONSUL_JOIN=${aws_instance.bootstrap.private_dns}\nCONSUL_BOOTSTRAP_EXPECT=$(( 1 +${var.servers} ))\nCONSUL_KEY=\"${file("${var.ssl_key}")}\"\nCONSUL_CERT=\"${file("${var.ssl_cert}")}\""
+    user_data = "NUBIS_PROJECT=${var.project}\nNUBIS_ENVIRONMENT=${var.environment}\nNUBIS_DOMAIN=${var.nubis_domain}\nCONSUL_SECRET=${var.consul_secret}\nCONSUL_BOOTSTRAP_EXPECT=$(( 1 +${var.servers} ))\nCONSUL_KEY=\"${file("${var.ssl_key}")}\"\nCONSUL_CERT=\"${file("${var.ssl_cert}")}\""
 }
 
 resource "aws_autoscaling_group" "consul" {
@@ -34,6 +34,12 @@ resource "aws_autoscaling_group" "consul" {
   load_balancers = [
     "${aws_elb.consul.name}"
   ]
+
+  tag {
+    key = "Name"
+    value = "Consul member node (v/${var.release}.${var.build})"
+    propagate_at_launch = true
+  }
 }
 
 # Single node necessary for bootstrap and self-discovery
@@ -54,7 +60,7 @@ resource "aws_instance" "bootstrap" {
         Release = "${var.release}"
   }
 
-  user_data = "NUBIS_PROJECT=${var.project}\nNUBIS_ENVIRONMENT=${var.environment}\nCONSUL_PUBLIC=${var.public}\nCONSUL_DC=${var.region}\nCONSUL_SECRET=${var.consul_secret}\nCONSUL_BOOTSTRAP_EXPECT=$(( 1 + ${var.servers} ))\nCONSUL_KEY=\"${file("${var.ssl_key}")}\"\nCONSUL_CERT=\"${file("${var.ssl_cert}")}\""
+  user_data = "NUBIS_PROJECT=${var.project}\nNUBIS_ENVIRONMENT=${var.environment}\nNUBIS_DOMAIN=${var.nubis_domain}\nCONSUL_SECRET=${var.consul_secret}\nCONSUL_BOOTSTRAP_EXPECT=$(( 1 + ${var.servers} ))\nCONSUL_KEY=\"${file("${var.ssl_key}")}\"\nCONSUL_CERT=\"${file("${var.ssl_cert}")}\""
 }
 
 resource "aws_security_group" "consul" {
@@ -92,6 +98,14 @@ resource "aws_security_group" "consul" {
     to_port = 8500
     protocol = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # Put back Amazon Default egress all rule
+  egress {
+      from_port = 0
+      to_port = 0
+      protocol = "-1"
+      cidr_blocks = ["0.0.0.0/0"]
   }
 }
 
