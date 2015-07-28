@@ -2,6 +2,8 @@
 
 variable "ami" { }
 
+variable "https_cert_arn" {}
+
 variable "aws_access_key" {}
 variable "aws_secret_key" {}
 
