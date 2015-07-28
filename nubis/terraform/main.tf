@@ -6,7 +6,7 @@ provider "aws" {
 }
 
 resource "aws_launch_configuration" "consul" {
-    name = "consul-${var.release}-${var.build}"
+    name = "${var.project}-${var.release}-${var.build}"
     image_id = "${var.ami}"
     instance_type = "m3.medium"
     key_name = "${var.key_name}"
@@ -15,7 +15,7 @@ resource "aws_launch_configuration" "consul" {
       "${var.internet_security_group_id}",
       "${var.shared_services_security_group_id}",
     ]
-
+    lifecycle { create_before_destroy = true }
     user_data = "NUBIS_PROJECT=${var.project}\nNUBIS_ENVIRONMENT=${var.environment}\nNUBIS_DOMAIN=${var.nubis_domain}\nCONSUL_SECRET=${var.consul_secret}\nCONSUL_BOOTSTRAP_EXPECT=$(( 1 +${var.servers} ))\nCONSUL_KEY=\"${file("${var.ssl_key}")}\"\nCONSUL_CERT=\"${file("${var.ssl_cert}")}\""
 }
 
@@ -23,7 +23,7 @@ resource "aws_autoscaling_group" "consul" {
   vpc_zone_identifier = []
   availability_zones  = []
 
-  name = "consul-${var.release}-${var.build}"
+  name = "${var.project}"
   max_size = "${var.servers}"
   min_size = "${var.servers}"
   health_check_grace_period = 10
@@ -64,7 +64,7 @@ resource "aws_instance" "bootstrap" {
 }
 
 resource "aws_security_group" "consul" {
-  name = "consul-${var.release}-${var.build}"
+  name = "${var.project}"
   description = "Consul internal traffic + maintenance."
   
   vpc_id = "${var.vpc_id}"
@@ -111,13 +111,9 @@ resource "aws_security_group" "consul" {
 
 # Create a new load balancer
 resource "aws_elb" "consul" {
-  name = "elb-${var.project}-${var.release}-${var.build}"
+  name = "elb-${var.project}"
   subnets = [ ]
   
-  instances = [
-    "${aws_instance.bootstrap.id}"
-  ]
-
   listener {
     instance_port = 8500
     instance_protocol = "http"
@@ -141,7 +137,7 @@ resource "aws_elb" "consul" {
 }
 
 resource "aws_security_group" "elb" {
-  name = "elb-${var.project}-${var.release}-${var.build}"
+  name = "elb-${var.project}"
   description = "Allow inbound traffic for consul"
 
   vpc_id = "${var.vpc_id}"
@@ -152,6 +148,15 @@ resource "aws_security_group" "elb" {
       protocol = "tcp"
       cidr_blocks = ["0.0.0.0/0"]
   }
+
+  # Put back Amazon Default egress all rule
+  egress {
+      from_port = 0
+      to_port = 0
+      protocol = "-1"
+      cidr_blocks = ["0.0.0.0/0"]
+  }
+
 }
 
 resource "aws_route53_record" "discovery" {
@@ -169,3 +174,4 @@ resource "aws_route53_record" "ui" {
    ttl = "30"
    records = ["dualstack.${aws_elb.consul.dns_name}"]
 }
+
