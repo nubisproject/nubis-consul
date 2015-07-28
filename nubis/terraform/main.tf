@@ -6,17 +6,19 @@ provider "aws" {
 }
 
 resource "aws_launch_configuration" "consul" {
-    name = "${var.project}-${var.release}-${var.build}"
+    depends_on = "aws_s3_bucket.consul_acl"
     image_id = "${var.ami}"
     instance_type = "m3.medium"
     key_name = "${var.key_name}"
+    iam_instance_profile = "${aws_iam_instance_profile.consul.name}"
+
     security_groups = [
       "${aws_security_group.consul.id}",
       "${var.internet_security_group_id}",
       "${var.shared_services_security_group_id}",
     ]
     lifecycle { create_before_destroy = true }
-    user_data = "NUBIS_PROJECT=${var.project}\nNUBIS_ENVIRONMENT=${var.environment}\nNUBIS_DOMAIN=${var.nubis_domain}\nCONSUL_SECRET=${var.consul_secret}\nCONSUL_BOOTSTRAP_EXPECT=$(( 1 +${var.servers} ))\nCONSUL_KEY=\"${file("${var.ssl_key}")}\"\nCONSUL_CERT=\"${file("${var.ssl_cert}")}\""
+    user_data = "NUBIS_PROJECT=${var.project}\nNUBIS_ENVIRONMENT=${var.environment}\nNUBIS_DOMAIN=${var.nubis_domain}\nCONSUL_CONFIG_BUCKET=${aws_s3_bucket.consul_acl.id}\nCONSUL_SECRET=${var.consul_secret}\nCONSUL_BOOTSTRAP_EXPECT=$(( 1 +${var.servers} ))\nCONSUL_KEY=\"${file("${var.ssl_key}")}\"\nCONSUL_CERT=\"${file("${var.ssl_cert}")}\""
 }
 
 resource "aws_autoscaling_group" "consul" {
@@ -31,6 +33,7 @@ resource "aws_autoscaling_group" "consul" {
   desired_capacity = "${var.servers}"
   force_delete = true
   launch_configuration = "${aws_launch_configuration.consul.name}"
+
   load_balancers = [
     "${aws_elb.consul.name}"
   ]
@@ -46,7 +49,8 @@ resource "aws_autoscaling_group" "consul" {
 # XXX: Problematic if it fails
 resource "aws_instance" "bootstrap" {
   ami = "${var.ami}"
-  
+  depends_on = "aws_s3_bucket.consul_acl"
+
   instance_type = "m3.medium"
   key_name = "${var.key_name}"
   security_groups = [
@@ -55,12 +59,14 @@ resource "aws_instance" "bootstrap" {
     "${var.shared_services_security_group_id}",
   ]
   
+  iam_instance_profile = "${aws_iam_instance_profile.consul.name}"
+
   tags {
         Name = "Consul boostrap node (v/${var.release}.${var.build})"
         Release = "${var.release}"
   }
 
-  user_data = "NUBIS_PROJECT=${var.project}\nNUBIS_ENVIRONMENT=${var.environment}\nNUBIS_DOMAIN=${var.nubis_domain}\nCONSUL_SECRET=${var.consul_secret}\nCONSUL_BOOTSTRAP_EXPECT=$(( 1 + ${var.servers} ))\nCONSUL_KEY=\"${file("${var.ssl_key}")}\"\nCONSUL_CERT=\"${file("${var.ssl_cert}")}\""
+  user_data = "NUBIS_PROJECT=${var.project}\nNUBIS_ENVIRONMENT=${var.environment}\nNUBIS_DOMAIN=${var.nubis_domain}\nCONSUL_CONFIG_BUCKET=${aws_s3_bucket.consul_acl.id}\nCONSUL_SECRET=${var.consul_secret}\nCONSUL_BOOTSTRAP_EXPECT=$(( 1 + ${var.servers} ))\nCONSUL_KEY=\"${file("${var.ssl_key}")}\"\nCONSUL_CERT=\"${file("${var.ssl_cert}")}\""
 }
 
 resource "aws_security_group" "consul" {
@@ -121,6 +127,14 @@ resource "aws_elb" "consul" {
     lb_protocol = "http"
   }
 
+ listener {
+    instance_port = 8500
+    instance_protocol = "http"
+    lb_port = 443
+    lb_protocol = "https"
+    ssl_certificate_id = "${var.https_cert_arn}"
+  }
+
   health_check {
     healthy_threshold = 2
     unhealthy_threshold = 2
@@ -149,6 +163,13 @@ resource "aws_security_group" "elb" {
       cidr_blocks = ["0.0.0.0/0"]
   }
 
+  ingress {
+      from_port = 443
+      to_port = 443
+      protocol = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+  }
+
   # Put back Amazon Default egress all rule
   egress {
       from_port = 0
@@ -173,5 +194,77 @@ resource "aws_route53_record" "ui" {
    type = "CNAME"
    ttl = "30"
    records = ["dualstack.${aws_elb.consul.dns_name}"]
+}
+
+resource "aws_s3_bucket" "consul_acl" {
+    bucket = "${var.project}-${var.region}-${var.release}-${var.build}"
+
+    acl = "private"
+    force_destroy = true
+
+    provisioner "local-exec" {
+        command = "aws --profile ${var.environment} --region ${var.region} s3 cp zzz-acl.json s3://${aws_s3_bucket.consul_acl.id}/${var.project}/zzz-acl.json"
+    }
+}
+
+resource "aws_iam_instance_profile" "consul" {
+    name = "${var.project}"
+    roles = ["${aws_iam_role.consul.name}"]
+}
+
+resource "aws_iam_role" "consul" {
+    name = "${var.project}"
+    path = "/"
+    assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "ec2.amazonaws.com"
+      },
+      "Effect": "Allow",
+      "Sid": ""
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy" "consul" {
+    name = "${var.project}"
+    role = "${aws_iam_role.consul.id}"
+    policy = <<EOF
+{
+    "Version": "2008-10-17",
+    "Statement": [
+        {
+            "Action": "autoscaling:DescribeAutoScalingInstances",
+            "Resource": "*",
+            "Effect": "Allow",
+            "Sid": ""
+        },
+        {
+            "Action": "autoscaling:DescribeAutoScalingGroups",
+            "Resource": "*",
+            "Effect": "Allow",
+            "Sid": ""
+        },
+        {
+            "Action": "ec2:DescribeInstances",
+            "Resource": "*",
+            "Effect": "Allow",
+            "Sid": ""
+        },
+        {
+            "Action": "s3:*",
+            "Resource": [ "arn:aws:s3:::${aws_s3_bucket.consul_acl.id}", "arn:aws:s3:::${aws_s3_bucket.consul_acl.id}/*" ],
+            "Effect": "Allow",
+            "Sid": ""
+        }
+    ]
+}
+EOF
 }
 

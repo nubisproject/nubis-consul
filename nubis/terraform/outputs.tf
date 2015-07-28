@@ -5,6 +5,10 @@ output "address" {
 output "discovery" {
   value = "${aws_route53_record.discovery.name}/${var.consul_secret}"
 }
+
+output "acl_bucket" {
+  value = "${aws_s3_bucket.consul_acl.id}"
+}
  
 # Configure the Consul provider
 provider "consul" {

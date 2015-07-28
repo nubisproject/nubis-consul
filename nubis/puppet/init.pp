@@ -14,3 +14,7 @@ file { "/usr/local/bin/consul-replicate":
   group =>  0,
   mode  => '0555',
 }
+
+package { 'awscli':
+  ensure => present,
+}
