@@ -51,7 +51,7 @@ This assumes you are in the project directory
 * Profit
 
 ### NOTE
-Terraform needs http_cert_arn for it to build, in order to get your Cert ARN run the following command
+Terraform needs `http_cert_arn` for it to build, in order to get your Cert ARN run the following command
 
 ```bash
 aws iam get-server-certificate --server-certificate-name <certname>
