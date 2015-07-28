@@ -202,9 +202,9 @@ resource "aws_s3_bucket" "consul_acl" {
     acl = "private"
     force_destroy = true
 
-    #provisioner "local-exec" {
-    #    command = "aws --profile ${var.environment} --region ${var.region} s3 cp zzz-acl.json s3://${aws_s3_bucket.consul_acl.id}/${var.project}/zzz-acl.json"
-    #}
+    provisioner "local-exec" {
+        command = "aws --profile ${var.environment} --region ${var.region} s3 cp zzz-acl.json s3://${aws_s3_bucket.consul_acl.id}/${var.project}/zzz-acl.json"
+    }
 }
 
 resource "aws_iam_instance_profile" "consul" {
