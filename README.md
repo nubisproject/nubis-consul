@@ -13,7 +13,7 @@ Before deploying, to generate the SSL key and cert
 ### Building project
 This assumes you are in the project directory
 
-* Build AMI
+* Build AMI and make note of AMI ID
 
     ```bash
     nubis-builder build
@@ -31,7 +31,7 @@ This assumes you are in the project directory
     ```bash
     cd nubis/terraform
     cp terraform.tfvars-dist terraform.tfvars
-    <edit tfvar files with appropriate info
+    <edit tfvar files with appropriate info>
     ```
 
 * Check if terraform plan gives you the right info (for sanity sake)
