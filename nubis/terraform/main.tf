@@ -17,7 +17,7 @@ resource "aws_launch_configuration" "consul" {
       "${var.shared_services_security_group_id}",
     ]
     lifecycle { create_before_destroy = true }
-    user_data = "NUBIS_PROJECT=${var.project}\nNUBIS_ENVIRONMENT=${var.environment}\nNUBIS_DOMAIN=${var.nubis_domain}\nCONSUL_SECRET=${var.consul_secret}\nCONSUL_BOOTSTRAP_EXPECT=$(( 1 +${var.servers} ))\nCONSUL_KEY=\"${file("${var.ssl_key}")}\"\nCONSUL_CERT=\"${file("${var.ssl_cert}")}\""
+    user_data = "NUBIS_PROJECT=${var.project}\nNUBIS_ENVIRONMENT=${var.environment}\nNUBIS_DOMAIN=${var.nubis_domain}\nCONSUL_MASTER_ACL_TOKEN=${var.master_acl_token}\nCONSUL_ACL_DEFAULT_POLICY=${var.acl_default_policy}\nCONSUL_ACL_DOWN_POLICY=${var.acl_down_policy}\nCONSUL_SECRET=${var.consul_secret}\nCONSUL_BOOTSTRAP_EXPECT=$(( 1 +${var.servers} ))\nCONSUL_KEY=\"${file("${var.ssl_key}")}\"\nCONSUL_CERT=\"${file("${var.ssl_cert}")}\""
 }
 
 resource "aws_autoscaling_group" "consul" {
@@ -64,7 +64,7 @@ resource "aws_instance" "bootstrap" {
         Release = "${var.release}"
   }
 
-  user_data = "NUBIS_PROJECT=${var.project}\nNUBIS_ENVIRONMENT=${var.environment}\nNUBIS_DOMAIN=${var.nubis_domain}\nCONSUL_SECRET=${var.consul_secret}\nCONSUL_BOOTSTRAP_EXPECT=$(( 1 + ${var.servers} ))\nCONSUL_KEY=\"${file("${var.ssl_key}")}\"\nCONSUL_CERT=\"${file("${var.ssl_cert}")}\""
+  user_data = "NUBIS_PROJECT=${var.project}\nNUBIS_ENVIRONMENT=${var.environment}\nNUBIS_DOMAIN=${var.nubis_domain}\nCONSUL_MASTER_ACL_TOKEN=${var.master_acl_token}\nCONSUL_ACL_DEFAULT_POLICY=${var.acl_default_policy}\nCONSUL_ACL_DOWN_POLICY=${var.acl_down_policy}\nCONSUL_SECRET=${var.consul_secret}\nCONSUL_BOOTSTRAP_EXPECT=$(( 1 + ${var.servers} ))\nCONSUL_KEY=\"${file("${var.ssl_key}")}\"\nCONSUL_CERT=\"${file("${var.ssl_cert}")}\""
 }
 
 resource "aws_security_group" "consul" {
