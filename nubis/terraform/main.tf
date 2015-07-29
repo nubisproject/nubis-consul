@@ -6,7 +6,6 @@ provider "aws" {
 }
 
 resource "aws_launch_configuration" "consul" {
-    depends_on = "aws_s3_bucket.consul_acl"
     image_id = "${var.ami}"
     instance_type = "m3.medium"
     key_name = "${var.key_name}"
@@ -18,7 +17,7 @@ resource "aws_launch_configuration" "consul" {
       "${var.shared_services_security_group_id}",
     ]
     lifecycle { create_before_destroy = true }
-    user_data = "NUBIS_PROJECT=${var.project}\nNUBIS_ENVIRONMENT=${var.environment}\nNUBIS_DOMAIN=${var.nubis_domain}\nCONSUL_CONFIG_BUCKET=${aws_s3_bucket.consul_acl.id}\nCONSUL_SECRET=${var.consul_secret}\nCONSUL_BOOTSTRAP_EXPECT=$(( 1 +${var.servers} ))\nCONSUL_KEY=\"${file("${var.ssl_key}")}\"\nCONSUL_CERT=\"${file("${var.ssl_cert}")}\""
+    user_data = "NUBIS_PROJECT=${var.project}\nNUBIS_ENVIRONMENT=${var.environment}\nNUBIS_DOMAIN=${var.nubis_domain}\nCONSUL_SECRET=${var.consul_secret}\nCONSUL_BOOTSTRAP_EXPECT=$(( 1 +${var.servers} ))\nCONSUL_KEY=\"${file("${var.ssl_key}")}\"\nCONSUL_CERT=\"${file("${var.ssl_cert}")}\""
 }
 
 resource "aws_autoscaling_group" "consul" {
@@ -49,7 +48,6 @@ resource "aws_autoscaling_group" "consul" {
 # XXX: Problematic if it fails
 resource "aws_instance" "bootstrap" {
   ami = "${var.ami}"
-  depends_on = "aws_s3_bucket.consul_acl"
 
   instance_type = "m3.medium"
   key_name = "${var.key_name}"
@@ -66,7 +64,7 @@ resource "aws_instance" "bootstrap" {
         Release = "${var.release}"
   }
 
-  user_data = "NUBIS_PROJECT=${var.project}\nNUBIS_ENVIRONMENT=${var.environment}\nNUBIS_DOMAIN=${var.nubis_domain}\nCONSUL_CONFIG_BUCKET=${aws_s3_bucket.consul_acl.id}\nCONSUL_SECRET=${var.consul_secret}\nCONSUL_BOOTSTRAP_EXPECT=$(( 1 + ${var.servers} ))\nCONSUL_KEY=\"${file("${var.ssl_key}")}\"\nCONSUL_CERT=\"${file("${var.ssl_cert}")}\""
+  user_data = "NUBIS_PROJECT=${var.project}\nNUBIS_ENVIRONMENT=${var.environment}\nNUBIS_DOMAIN=${var.nubis_domain}\nCONSUL_SECRET=${var.consul_secret}\nCONSUL_BOOTSTRAP_EXPECT=$(( 1 + ${var.servers} ))\nCONSUL_KEY=\"${file("${var.ssl_key}")}\"\nCONSUL_CERT=\"${file("${var.ssl_cert}")}\""
 }
 
 resource "aws_security_group" "consul" {
@@ -196,17 +194,6 @@ resource "aws_route53_record" "ui" {
    records = ["dualstack.${aws_elb.consul.dns_name}"]
 }
 
-resource "aws_s3_bucket" "consul_acl" {
-    bucket = "${var.project}-${var.region}-${var.release}-${var.build}"
-
-    acl = "private"
-    force_destroy = true
-
-    provisioner "local-exec" {
-        command = "aws --profile ${var.environment} --region ${var.region} s3 cp zzz-acl.json s3://${aws_s3_bucket.consul_acl.id}/${var.project}/zzz-acl.json"
-    }
-}
-
 resource "aws_iam_instance_profile" "consul" {
     name = "${var.project}"
     roles = ["${aws_iam_role.consul.name}"]
@@ -254,12 +241,6 @@ resource "aws_iam_role_policy" "consul" {
         {
             "Action": "ec2:DescribeInstances",
             "Resource": "*",
-            "Effect": "Allow",
-            "Sid": ""
-        },
-        {
-            "Action": "s3:*",
-            "Resource": [ "arn:aws:s3:::${aws_s3_bucket.consul_acl.id}", "arn:aws:s3:::${aws_s3_bucket.consul_acl.id}/*" ],
             "Effect": "Allow",
             "Sid": ""
         }
