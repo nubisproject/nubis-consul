@@ -51,12 +51,12 @@ resource "aws_instance" "bootstrap" {
 
   instance_type = "m3.medium"
   key_name = "${var.key_name}"
-  security_groups = [
+  vpc_security_group_ids = [
     "${aws_security_group.consul.id}",
     "${var.internet_security_group_id}",
     "${var.shared_services_security_group_id}",
   ]
-  
+
   iam_instance_profile = "${aws_iam_instance_profile.consul.name}"
 
   tags {
@@ -70,9 +70,9 @@ resource "aws_instance" "bootstrap" {
 resource "aws_security_group" "consul" {
   name = "${var.project}"
   description = "Consul internal traffic + maintenance."
-  
+
   vpc_id = "${var.vpc_id}"
-  
+
   // These are for internal traffic
   ingress {
     from_port = 8300
@@ -80,7 +80,7 @@ resource "aws_security_group" "consul" {
     protocol = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
-  
+
   // This is for the gossip traffic
   ingress {
     from_port = 8300
@@ -96,7 +96,7 @@ resource "aws_security_group" "consul" {
     protocol = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
-  
+
   ingress {
     from_port = 8500
     to_port = 8500
@@ -117,7 +117,7 @@ resource "aws_security_group" "consul" {
 resource "aws_elb" "consul" {
   name = "elb-${var.project}"
   subnets = [ ]
-  
+
   listener {
     instance_port = 8500
     instance_protocol = "http"
