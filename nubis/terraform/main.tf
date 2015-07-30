@@ -180,7 +180,7 @@ resource "aws_security_group" "elb" {
 
 resource "aws_route53_record" "discovery" {
    zone_id = "${var.zone_id}"
-   name = "${var.region}.${var.domain}"
+   name = "${var.region}"
    type = "A"
    ttl = "30"
    records = ["${aws_instance.bootstrap.private_ip}"]
@@ -188,7 +188,7 @@ resource "aws_route53_record" "discovery" {
 
 resource "aws_route53_record" "ui" {
    zone_id = "${var.zone_id}"
-   name = "ui.${var.region}.${var.domain}"
+   name = "ui.${var.region}"
    type = "CNAME"
    ttl = "30"
    records = ["dualstack.${aws_elb.consul.dns_name}"]
