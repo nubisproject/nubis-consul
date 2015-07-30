@@ -94,3 +94,11 @@ variable "acl_default_policy" {
   description = "Default ACL action for anonymous users"
   default = "allow"
 }
+
+variable "manage_iam" {
+  description = "IAM roles should be managed in which region"
+  default = {
+    us-east-1 = "1"
+    us-west-2 = "0"
+  }
+}

@@ -9,7 +9,7 @@ resource "aws_launch_configuration" "consul" {
     image_id = "${var.ami}"
     instance_type = "m3.medium"
     key_name = "${var.key_name}"
-    iam_instance_profile = "${aws_iam_instance_profile.consul.name}"
+    iam_instance_profile = "${var.project}"
 
     security_groups = [
       "${aws_security_group.consul.id}",
@@ -57,7 +57,7 @@ resource "aws_instance" "bootstrap" {
     "${var.shared_services_security_group_id}",
   ]
 
-  iam_instance_profile = "${aws_iam_instance_profile.consul.name}"
+  iam_instance_profile = "${var.project}"
 
   tags {
         Name = "Consul boostrap node (v/${var.release}.${var.build})"
@@ -195,11 +195,13 @@ resource "aws_route53_record" "ui" {
 }
 
 resource "aws_iam_instance_profile" "consul" {
+    count = "${lookup(var.manage_iam, var.region)}"
     name = "${var.project}"
     roles = ["${aws_iam_role.consul.name}"]
 }
 
 resource "aws_iam_role" "consul" {
+    count = "${lookup(var.manage_iam, var.region)}"
     name = "${var.project}"
     path = "/"
     assume_role_policy = <<EOF
@@ -220,6 +222,7 @@ EOF
 }
 
 resource "aws_iam_role_policy" "consul" {
+    count = "${lookup(var.manage_iam, var.region)}"
     name = "${var.project}"
     role = "${aws_iam_role.consul.id}"
     policy = <<EOF
