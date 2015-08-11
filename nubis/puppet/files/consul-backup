@@ -8,29 +8,24 @@ hash jq 2>/dev/null || echo "Please install jq to use this tool. https://github.
 hash aws 2>/dev/null || echo "Please install the AWS CLI API to use this tool. https://aws.amazon.com/cli/"
 hash curl 2>/dev/null || echo "Please install curl"
 
+# Logging
 LOGGER_BIN='/usr/bin/logger'
 LOGGER="$LOGGER_BIN --stderr --priority local7.info --tag consul-backup"
 
-# Only consul leader can backup KV store
-consul_leader=$(curl -s -fq http://localhost:8500/v1/status/leader | sed -r 's/^"(.+)\:8300"$/\1/g')
-my_ip=$(curl -s -fq http://169.254.169.254/latest/meta-data/local-ipv4)
-if [[ '$consul_leader' != '$my_ip' ]]; then
-    $LOGGER "Consul leader is ${consul_leader}, not backing up KV store"
-    exit 0
-fi
-
 # Get userdata
 eval `curl -s -fq http://169.254.169.254/latest/user-data`
-
-# some configurable variables here
-instance_id=$(curl -s -fq http://169.254.169.254/latest/meta-data/instance-id)
+INSTANCE_ID=$(curl -s -fq http://169.254.169.254/latest/meta-data/instance-id)
+REGION=`curl -s http://169.254.169.254/latest/dynamic/instance-identity/document | jq '.region' -r`
 backup_bucket=${CONSUL_BACKUP_BUCKET}
+
+# Only 1 member of the cluster needs to run this
+# if you are not the leader then just forget about it
+consul-do consul-backup-${NUBIS_PROJECT} ${INSTANCE_ID} || exit
 
 # How do we want to represent the backup file
 date_stamp=$(date +\%Y\%m\%d_\%H:\%M:\%S)
 backup_file="consul_backup.${instance_id}.${date_stamp}.json"
 
-REGION=`curl -s http://169.254.169.254/latest/dynamic/instance-identity/document | jq '.region' -r`
 
 # Backup to /tmp
 # We probably can do a little better here to check if the backup actually worked
