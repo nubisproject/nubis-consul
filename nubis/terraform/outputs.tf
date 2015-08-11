@@ -1,5 +1,5 @@
 output "address" {
-  value = "http://${aws_route53_record.ui.name}/"
+  value = "http://ui.${var.region}.${var.domain}/"
 }
 
 output "discovery" {
@@ -8,7 +8,7 @@ output "discovery" {
 
 # Configure the Consul provider
 provider "consul" {
-    address = "${aws_route53_record.ui.name}:80"
+    address = "ui.${var.region}.${var.domain}:80"
     datacenter = "${var.region}"
     scheme = "http"
 }
