@@ -48,10 +48,6 @@ variable "public" {
   description = "Should this consul cluster be publicly accesible"
 }
 
-variable "domain" {
-  description = "Name of the zone used for publication"
-}
-
 variable "nubis_domain" {
   description = "Top-level nubis domain for this environment"
   default = "nubis.allizom.org"
