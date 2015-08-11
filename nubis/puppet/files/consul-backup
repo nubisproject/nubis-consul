@@ -1,7 +1,5 @@
 #!/bin/bash
 # Simple script that will backup consul
-#
-# TODO: If userdata doesn't have the bucket name we should figure out how to guess it
 
 # Check pre-reqs
 hash jq 2>/dev/null || echo "Please install jq to use this tool. https://github.com/stedolan/jq"
@@ -16,26 +14,26 @@ LOGGER="$LOGGER_BIN --stderr --priority local7.info --tag consul-backup"
 eval `curl -s -fq http://169.254.169.254/latest/user-data`
 INSTANCE_ID=$(curl -s -fq http://169.254.169.254/latest/meta-data/instance-id)
 REGION=`curl -s http://169.254.169.254/latest/dynamic/instance-identity/document | jq '.region' -r`
-backup_bucket="nubis-${NUBIS_PROJECT}-backupbucket-${NUBIS_ENVIRONMENT}-${REGION}"
+BACKUP_BUCKET="nubis-${NUBIS_PROJECT}-backupbucket-${NUBIS_ENVIRONMENT}-${REGION}"
+
+# How do we want to represent the backup file
+DATE_STAMP=$(date +\%Y\%m\%d_\%H:\%M:\%S)
+BACKUP_FILE="consul_backup.${INSTANCE_ID}.${DATE_STAMP}.json"
 
 # Only 1 member of the cluster needs to run this
 # if you are not the leader then just forget about it
 consul-do consul-backup-${NUBIS_PROJECT} ${INSTANCE_ID} || exit
 
-# How do we want to represent the backup file
-date_stamp=$(date +\%Y\%m\%d_\%H:\%M:\%S)
-backup_file="consul_backup.${INSTANCE_ID}.${date_stamp}.json"
-
 # Backup to /tmp
 # We probably can do a little better here to check if the backup actually worked
-$LOGGER "Backing up KV store to /tmp/${backup_file}.$$"
-consulate kv backup > /tmp/${backup_file}.$$
+$LOGGER "Backing up KV store to /tmp/${BACKUP_FILE}.$$"
+consulate kv backup > /tmp/${BACKUP_FILE}.$$
 
 # Copy to s3
-if [[ -s /tmp/${backup_file}.$$ ]]; then
-    $LOGGER "Copying ${backup_file}.$$ to s3 (BucketName: ${backup_bucket})"
-    aws s3 cp /tmp/${backup_file}.$$ s3://${backup_bucket}/${backup_file} --region ${REGION}
+if [[ -s /tmp/${BACKUP_FILE}.$$ ]]; then
+    $LOGGER "Copying ${BACKUP_FILE}.$$ to s3 (BucketName: ${BACKUP_BUCKET})"
+    aws s3 cp /tmp/${BACKUP_FILE}.$$ s3://${BACKUP_BUCKET}/${backup_file} --region ${REGION}
 fi
 
 # Cleanup
-rm -f /tmp/${backup_file}.$$
+rm -f /tmp/${BACKUP_FILE}.$$
