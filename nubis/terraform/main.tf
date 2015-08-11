@@ -194,6 +194,17 @@ resource "aws_route53_record" "ui" {
    records = ["dualstack.${aws_elb.consul.dns_name}"]
 }
 
+resource "aws_s3_bucket" "consul_backups" {
+    bucket = "nubis-${var.project}-backupbucket-${var.environment}-${var.region}"
+    acl = "private"
+
+    tags = {
+        Name = "nubis-${var.project}-backupbucket-${var.environment}-${var.region}"
+        Region = "${var.region}"
+        Environment = "${var.environment}"
+    }
+}
+
 resource "aws_iam_instance_profile" "consul" {
     count = "${lookup(var.manage_iam, var.region)}"
     name = "${var.project}"
