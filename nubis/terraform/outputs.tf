@@ -1,14 +1,14 @@
 output "address" {
-  value = "http://ui.${var.region}.${var.domain}/"
+  value = "http://${aws_route53_record.ui.fqdn}/"
 }
 
 output "discovery" {
-  value = "${aws_route53_record.discovery.name}/${var.consul_secret}"
+  value = "${aws_route53_record.discovery.qfdn}"
 }
 
 # Configure the Consul provider
 provider "consul" {
-    address = "ui.${var.region}.${var.domain}:80"
+    address = "${aws_route53_record.ui.fqdn}:80"
     datacenter = "${var.region}"
     scheme = "http"
 }
