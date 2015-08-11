@@ -1,0 +1,47 @@
+#!/bin/bash
+# Simple script that will backup consul
+#
+# TODO: If userdata doesn't have the bucket name we should figure out how to guess it
+
+# Check pre-reqs
+hash jq 2>/dev/null || echo "Please install jq to use this tool. https://github.com/stedolan/jq"
+hash aws 2>/dev/null || echo "Please install the AWS CLI API to use this tool. https://aws.amazon.com/cli/"
+hash curl 2>/dev/null || echo "Please install curl"
+
+LOGGER_BIN='/usr/bin/logger'
+LOGGER="$LOGGER_BIN --stderr --priority local7.info --tag consul-backup"
+
+# Only consul leader can backup KV store
+consul_leader=$(curl -s -fq http://localhost:8500/v1/status/leader | sed -r 's/^"(.+)\:8300"$/\1/g')
+my_ip=$(curl -s -fq http://169.254.169.254/latest/meta-data/local-ipv4)
+if [[ '$consul_leader' != '$my_ip' ]]; then
+    $LOGGER "Consul leader is ${consul_leader}, not backing up KV store"
+    exit 0
+fi
+
+# Get userdata
+eval `curl -s -fq http://169.254.169.254/latest/user-data`
+
+# some configurable variables here
+instance_id=$(curl -s -fq http://169.254.169.254/latest/meta-data/instance-id)
+backup_bucket=${CONSUL_BACKUP_BUCKET}
+
+# How do we want to represent the backup file
+date_stamp=$(date +\%Y\%m\%d_\%H:\%M:\%S)
+backup_file="consul_backup.${instance_id}.${date_stamp}.json"
+
+REGION=`curl -s http://169.254.169.254/latest/dynamic/instance-identity/document | jq '.region' -r`
+
+# Backup to /tmp
+# We probably can do a little better here to check if the backup actually worked
+$LOGGER "Backing up KV store to /tmp/${backup_file}.$$"
+consulate kv backup > /tmp/${backup_file}.$$
+
+# Copy to s3
+if [[ -s /tmp/${backup_file}.$$ ]]; then
+    $LOGGER "Copying ${backup_file}.$$ to s3 (BucketName: ${backup_bucket})"
+    aws s3 cp /tmp/${backup_file}.$$ s3://${backup_bucket}/${backup_file} --region ${REGION}
+fi
+
+# Cleanup
+rm -f /tmp/${backup_file}.$$
