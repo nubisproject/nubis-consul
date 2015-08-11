@@ -16,7 +16,7 @@ LOGGER="$LOGGER_BIN --stderr --priority local7.info --tag consul-backup"
 eval `curl -s -fq http://169.254.169.254/latest/user-data`
 INSTANCE_ID=$(curl -s -fq http://169.254.169.254/latest/meta-data/instance-id)
 REGION=`curl -s http://169.254.169.254/latest/dynamic/instance-identity/document | jq '.region' -r`
-backup_bucket=${CONSUL_BACKUP_BUCKET}
+backup_bucket="nubis-${NUBIS_PROJECT}-backupbucket-${NUBIS_ENVIRONMENT}-${REGION}"
 
 # Only 1 member of the cluster needs to run this
 # if you are not the leader then just forget about it
