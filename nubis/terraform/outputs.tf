@@ -1,5 +1,5 @@
 output "address" {
-  value = "http://ui.${var.region}.${var.domain}/"
+  value = "http://ui.${var.region}.${var.project}.${var.environment}.${var.nubis_domain}/"
 }
 
 output "discovery" {
@@ -8,7 +8,7 @@ output "discovery" {
 
 # Configure the Consul provider
 provider "consul" {
-    address = "ui.${var.region}.${var.domain}:80"
+    address = "ui.${var.region}.${var.project}.${var.environment}.${var.nubis_domain}:80"
     datacenter = "${var.region}"
     scheme = "http"
 }
