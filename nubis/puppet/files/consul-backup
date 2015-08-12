@@ -32,7 +32,7 @@ consulate kv backup > /tmp/${BACKUP_FILE}.$$
 # Copy to s3
 if [[ -s /tmp/${BACKUP_FILE}.$$ ]]; then
     $LOGGER "Copying ${BACKUP_FILE}.$$ to s3 (BucketName: ${BACKUP_BUCKET})"
-    aws s3 cp /tmp/${BACKUP_FILE}.$$ s3://${BACKUP_BUCKET}/${backup_file} --region ${REGION}
+    aws s3 cp /tmp/${BACKUP_FILE}.$$ s3://${BACKUP_BUCKET}/${BACKUP_FILE} --region ${REGION}
 fi
 
 # Cleanup
