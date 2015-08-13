@@ -35,5 +35,11 @@ consulate kv backup -f $BACKUP_FILE
 # Copy to s3
 if [[ -s $BACKUP_FILE ]]; then
     $LOGGER "Copying ${BACKUP_FILE_NAME} to s3 (BucketName: ${BACKUP_BUCKET})"
-    aws s3 cp $BACKUP_FILE s3://${BACKUP_BUCKET}/${BACKUP_FILE_NAME} --region ${REGION}
+    aws s3 cp $BACKUP_FILE s3://${BACKUP_BUCKET}/${BACKUP_FILE_NAME} --region ${REGION} --quiet
+    RV=$?
+    if [[ $RV -ne 0 ]]; then
+        $LOGGER "Error: RV value is ${RV}, and unable to copy ${BACKUP_FILE_NAME} to s3 bucket"
+    fi
+
+
 fi
