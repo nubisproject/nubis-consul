@@ -26,6 +26,7 @@ consul-do consul-backup-${NUBIS_PROJECT} ${INSTANCE_ID} || exit
 
 # Backup to temporary file
 BACKUP_FILE=`mktemp`
+trap "rm -f $BACKUP_FILE" EXIT
 
 # We probably can do a little better here to check if the backup actually worked
 $LOGGER "Backing up KV store to $BACKUP_FILE"
@@ -36,6 +37,3 @@ if [[ -s $BACKUP_FILE ]]; then
     $LOGGER "Copying ${BACKUP_FILE_NAME} to s3 (BucketName: ${BACKUP_BUCKET})"
     aws s3 cp $BACKUP_FILE s3://${BACKUP_BUCKET}/${BACKUP_FILE_NAME} --region ${REGION}
 fi
-
-# Cleanup
-rm -f /tmp/${BACKUP_FILE}.$$
