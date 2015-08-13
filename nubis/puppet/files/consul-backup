@@ -8,7 +8,7 @@ hash curl 2>/dev/null || echo "Please install curl"
 
 # Logging
 LOGGER_BIN='/usr/bin/logger'
-LOGGER="$LOGGER_BIN --stderr --priority local7.info --tag consul-backup"
+LOGGER="$LOGGER_BIN --priority local7.info --tag consul-backup"
 
 # Get userdata
 eval `curl -s -fq http://169.254.169.254/latest/user-data`
