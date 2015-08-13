@@ -34,18 +34,12 @@ consulate kv backup -f $BACKUP_FILE
 
 # Copy to s3
 if [[ -s $BACKUP_FILE ]]; then
-    $LOGGER "Copying ${BACKUP_FILE_NAME} to s3 (BucketName: ${BACKUP_BUCKET})"
-    aws s3 cp $BACKUP_FILE s3://${BACKUP_BUCKET}/${BACKUP_FILE_NAME} --region ${REGION} --quiet
-    RV=$?
-    if [[ $RV -ne 0 ]]; then
-        $LOGGER "Error: RV value is ${RV}, and unable to copy ${BACKUP_FILE_NAME} to s3 bucket"
-    fi
-
-    $LOGGER "Copying latest.json to s3 (BucketName: ${BACKUP_BUCKET})"
-    aws s3 cp $BACKUP_FILE s3://${BACKUP_BUCKET}/latest.json --region ${REGION} --quiet
-    RV=$?
-    if [[ $RV -ne 0 ]]; then
-        $LOGGER "Error: RV value is ${RV}, and unable to copy latest.json to s3 bucket"
-    fi
-
+    for DEST in ${BACKUP_FILE_NAME} latest.json; do
+        $LOGGER "Copying ${DEST} to s3 (BucketName: ${BACKUP_BUCKET})"
+        aws s3 cp $BACKUP_FILE s3://${BACKUP_BUCKET}/${DEST} --region ${REGION} --quiet
+        RV=$?
+        if [[ $RV -ne 0 ]]; then
+            $LOGGER "Error: RV value is ${RV}, and unable to copy ${DEST} to s3 bucket"
+        fi
+    done
 fi
