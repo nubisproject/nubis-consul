@@ -28,7 +28,7 @@ file { '/usr/local/sbin/consul-backup':
 cron::hourly { 'consul_backup':
     minute      => '0',
     user        => 'root',
-    command     => '/usr/local/sbin/consul-backup > /dev/null > 2>&1',
+    command     => '/usr/local/sbin/consul-backup',
     environment => [ 'PATH="/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin"', 'SHELL=/bin/bash' ],
     require     => File['/usr/local/sbin/consul-backup']
 }
