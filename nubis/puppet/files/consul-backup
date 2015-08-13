@@ -18,21 +18,23 @@ BACKUP_BUCKET="nubis-${NUBIS_PROJECT}-backupbucket-${NUBIS_ENVIRONMENT}-${REGION
 
 # How do we want to represent the backup file
 DATE_STAMP=$(date +\%Y\%m\%d_\%H:\%M:\%S)
-BACKUP_FILE="consul_backup.${INSTANCE_ID}.${DATE_STAMP}.json"
+BACKUP_FILE_NAME="consul_backup.${INSTANCE_ID}.${DATE_STAMP}.json"
 
 # Only 1 member of the cluster needs to run this
 # if you are not the leader then just forget about it
 consul-do consul-backup-${NUBIS_PROJECT} ${INSTANCE_ID} || exit
 
-# Backup to /tmp
+# Backup to temporary file
+BACKUP_FILE=`mktemp`
+
 # We probably can do a little better here to check if the backup actually worked
-$LOGGER "Backing up KV store to /tmp/${BACKUP_FILE}.$$"
-consulate kv backup > /tmp/${BACKUP_FILE}.$$
+$LOGGER "Backing up KV store to $BACKUP_FILE"
+consulate kv backup -f $BACKUP_FILE
 
 # Copy to s3
-if [[ -s /tmp/${BACKUP_FILE}.$$ ]]; then
-    $LOGGER "Copying ${BACKUP_FILE}.$$ to s3 (BucketName: ${BACKUP_BUCKET})"
-    aws s3 cp /tmp/${BACKUP_FILE}.$$ s3://${BACKUP_BUCKET}/${BACKUP_FILE} --region ${REGION}
+if [[ -s $BACKUP_FILE ]]; then
+    $LOGGER "Copying ${BACKUP_FILE_NAME} to s3 (BucketName: ${BACKUP_BUCKET})"
+    aws s3 cp $BACKUP_FILE s3://${BACKUP_BUCKET}/${BACKUP_FILE_NAME} --region ${REGION}
 fi
 
 # Cleanup
