@@ -124,6 +124,9 @@ resource "aws_elb" "consul" {
   name = "elb-${var.project}"
   subnets = [ ]
 
+  # This is an internal ELB, only accessible form inside the VPC
+  internal = true
+
   listener {
     instance_port = 8500
     instance_protocol = "http"
