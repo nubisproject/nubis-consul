@@ -1,4 +1,5 @@
 import 'consul.pp'
+import 'consulate.pp'
 
 # XXX: need to move to puppet-consul-replicate proper
 staging::file { 'consul-replicate.tar.gz':
