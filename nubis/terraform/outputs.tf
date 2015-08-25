@@ -3,7 +3,7 @@ output "address" {
 }
 
 output "discovery" {
-  value = "${aws_route53_record.discovery.qfdn}"
+  value = "${aws_route53_record.discovery.fqdn}"
 }
 
 # Configure the Consul provider
