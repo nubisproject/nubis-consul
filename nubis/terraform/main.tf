@@ -78,7 +78,9 @@ resource "aws_security_group" "consul" {
     from_port = 8300
     to_port = 8303
     protocol = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    security_groups = [
+      "${var.shared_services_security_group_id}",
+    ]
   }
 
   // This is for the gossip traffic
@@ -86,7 +88,9 @@ resource "aws_security_group" "consul" {
     from_port = 8300
     to_port = 8303
     protocol = "udp"
-    cidr_blocks = ["0.0.0.0/0"]
+    security_groups = [
+      "${var.shared_services_security_group_id}",
+    ]
   }
 
   // These are for maintenance
@@ -101,7 +105,9 @@ resource "aws_security_group" "consul" {
     from_port = 8500
     to_port = 8500
     protocol = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    security_groups = [
+      "${aws_security_group.elb.id}"
+    ]
   }
 
   # Put back Amazon Default egress all rule
@@ -117,6 +123,9 @@ resource "aws_security_group" "consul" {
 resource "aws_elb" "consul" {
   name = "elb-${var.project}"
   subnets = [ ]
+
+  # This is an internal ELB, only accessible form inside the VPC
+  internal = true
 
   listener {
     instance_port = 8500
