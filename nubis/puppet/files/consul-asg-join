@@ -1,0 +1,27 @@
+#!/bin/bash
+
+MY_INSTANCE_ID=$(curl -s http://169.254.169.254/latest/meta-data/instance-id)
+
+REGION=$(curl -s http://169.254.169.254/latest/dynamic/instance-identity/document | grep region | sed 's/  "region" : "\(.*\)",\?/\1/')
+ASG_NAME=$(aws autoscaling describe-auto-scaling-instances --region $REGION --instance $MY_INSTANCE_ID --query 'AutoScalingInstances[0].AutoScalingGroupName' --output text)
+
+if [ -z "$ASG_NAME" ]; then
+  echo "We are not part of an Auto Scaling Group"
+  exit 1
+fi
+
+# XXX: We know our bootstrap expect value, we should wait until we have quorum here
+
+# Block until we can find another member of the group
+while [ -z "$OTHER_INSTANCE_ID" ]; do
+ OTHER_INSTANCE_ID=$(aws autoscaling describe-auto-scaling-groups --region $REGION --auto-scaling-group-name $ASG_NAME --query "AutoScalingGroups[0].Instances[].InstanceId" --output text)
+done
+
+TARGET=$(aws ec2 describe-instances --region $REGION --instance $OTHER_INSTANCE_ID --query 'Reservations[].Instances[].PrivateDnsName' --output text)
+
+# XXX: Ideally here, we should compare against existing peers and only join new nodes
+
+for peer in $TARGET; do
+  consul join $peer
+done
+
