@@ -10,10 +10,11 @@ if [ -z "$ASG_NAME" ]; then
   exit 1
 fi
 
-# XXX: We know our bootstrap expect value, we should wait until we have quorum here
+# Figure out what the ASG desired capacity (i.e. cluster size) is set at
+EXPECTED_MEMBERS=`aws autoscaling describe-auto-scaling-groups --region us-east-1 --auto-scaling-group-name consul --query 'AutoScalingGroups[0].DesiredCapacity'`
 
-# Block until we can find another member of the group
-while [ -z "$OTHER_INSTANCE_ID" ]; do
+# Block until we can find all all our peers
+while [ "`echo $OTHER_INSTANCE_ID | wc -w`" -lt "$EXPECTED_MEMBERS" ]; do
  OTHER_INSTANCE_ID=$(aws autoscaling describe-auto-scaling-groups --region $REGION --auto-scaling-group-name $ASG_NAME --query "AutoScalingGroups[0].Instances[].InstanceId" --output text)
 done
 
@@ -24,4 +25,3 @@ TARGET=$(aws ec2 describe-instances --region $REGION --instance $OTHER_INSTANCE_
 for peer in $TARGET; do
   consul join $peer
 done
-
