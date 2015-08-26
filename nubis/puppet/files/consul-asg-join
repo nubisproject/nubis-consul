@@ -16,9 +16,10 @@ fi
 # Figure out what the ASG desired capacity (i.e. cluster size) is set at
 EXPECTED_MEMBERS=`aws autoscaling describe-auto-scaling-groups --region us-east-1 --auto-scaling-group-name consul --query 'AutoScalingGroups[0].DesiredCapacity'`
 
-# Block until we can find all all our peers
+# Block until we can find all all our peers, on purpose, we can't progress if we are not all here
 while [ "`echo $OTHER_INSTANCE_ID | wc -w`" -lt "$EXPECTED_MEMBERS" ]; do
  OTHER_INSTANCE_ID=$(aws autoscaling describe-auto-scaling-groups --region $REGION --auto-scaling-group-name $ASG_NAME --query "AutoScalingGroups[0].Instances[].InstanceId" --output text)
+ sleep 3
 done
 
 TARGET=$(aws ec2 describe-instances --region $REGION --instance $OTHER_INSTANCE_ID --query 'Reservations[].Instances[].PrivateDnsName' --output text)
