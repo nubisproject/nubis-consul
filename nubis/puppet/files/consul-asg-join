@@ -1,0 +1,30 @@
+#!/bin/bash
+
+# /usr/local/bin isn't set yet in our PATH
+export PATH=/usr/local/bin:$PATH
+
+MY_INSTANCE_ID=$(curl -s http://169.254.169.254/latest/meta-data/instance-id)
+
+REGION=$(curl -s http://169.254.169.254/latest/dynamic/instance-identity/document | grep region | sed 's/  "region" : "\(.*\)",\?/\1/')
+ASG_NAME=$(aws autoscaling describe-auto-scaling-instances --region $REGION --instance $MY_INSTANCE_ID --query 'AutoScalingInstances[0].AutoScalingGroupName' --output text)
+
+if [ -z "$ASG_NAME" ]; then
+  echo "We are not part of an Auto Scaling Group"
+  exit 1
+fi
+
+# Figure out what the ASG desired capacity (i.e. cluster size) is set at
+EXPECTED_MEMBERS=`aws autoscaling describe-auto-scaling-groups --region us-east-1 --auto-scaling-group-name consul --query 'AutoScalingGroups[0].DesiredCapacity'`
+
+# Block until we can find all all our peers
+while [ "`echo $OTHER_INSTANCE_ID | wc -w`" -lt "$EXPECTED_MEMBERS" ]; do
+ OTHER_INSTANCE_ID=$(aws autoscaling describe-auto-scaling-groups --region $REGION --auto-scaling-group-name $ASG_NAME --query "AutoScalingGroups[0].Instances[].InstanceId" --output text)
+done
+
+TARGET=$(aws ec2 describe-instances --region $REGION --instance $OTHER_INSTANCE_ID --query 'Reservations[].Instances[].PrivateDnsName' --output text)
+
+# XXX: Ideally here, we should compare against existing peers and only join new nodes
+
+for peer in $TARGET; do
+  consul join $peer
+done

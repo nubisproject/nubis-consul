@@ -7,7 +7,7 @@ provider "aws" {
 
 resource "aws_launch_configuration" "consul" {
     image_id = "${var.ami}"
-    instance_type = "m3.medium"
+    instance_type = "t2.micro"
     key_name = "${var.key_name}"
     iam_instance_profile = "${var.project}"
 
@@ -17,7 +17,7 @@ resource "aws_launch_configuration" "consul" {
       "${var.shared_services_security_group_id}",
     ]
     lifecycle { create_before_destroy = true }
-    user_data = "NUBIS_PROJECT=${var.project}\nNUBIS_ENVIRONMENT=${var.environment}\nNUBIS_DOMAIN=${var.nubis_domain}\nCONSUL_MASTER_ACL_TOKEN=${var.master_acl_token}\nCONSUL_ACL_DEFAULT_POLICY=${var.acl_default_policy}\nCONSUL_ACL_DOWN_POLICY=${var.acl_down_policy}\nCONSUL_SECRET=${var.consul_secret}\nCONSUL_BOOTSTRAP_EXPECT=$(( 1 +${var.servers} ))\nCONSUL_KEY=\"${file("${var.ssl_key}")}\"\nCONSUL_CERT=\"${file("${var.ssl_cert}")}\""
+    user_data = "NUBIS_PROJECT=${var.project}\nNUBIS_ENVIRONMENT=${var.environment}\nNUBIS_DOMAIN=${var.nubis_domain}\nCONSUL_MASTER_ACL_TOKEN=${var.master_acl_token}\nCONSUL_ACL_DEFAULT_POLICY=${var.acl_default_policy}\nCONSUL_ACL_DOWN_POLICY=${var.acl_down_policy}\nCONSUL_SECRET=${var.consul_secret}\nCONSUL_BOOTSTRAP_EXPECT=${var.servers}\nCONSUL_KEY=\"${file("${var.ssl_key}")}\"\nCONSUL_CERT=\"${file("${var.ssl_cert}")}\""
 }
 
 resource "aws_autoscaling_group" "consul" {
@@ -42,29 +42,6 @@ resource "aws_autoscaling_group" "consul" {
     value = "Consul member node (v/${var.release}.${var.build})"
     propagate_at_launch = true
   }
-}
-
-# Single node necessary for bootstrap and self-discovery
-# XXX: Problematic if it fails
-resource "aws_instance" "bootstrap" {
-  ami = "${var.ami}"
-
-  instance_type = "m3.medium"
-  key_name = "${var.key_name}"
-  vpc_security_group_ids = [
-    "${aws_security_group.consul.id}",
-    "${var.internet_security_group_id}",
-    "${var.shared_services_security_group_id}",
-  ]
-
-  iam_instance_profile = "${var.project}"
-
-  tags {
-        Name = "Consul boostrap node (v/${var.release}.${var.build})"
-        Release = "${var.release}"
-  }
-
-  user_data = "NUBIS_PROJECT=${var.project}\nNUBIS_ENVIRONMENT=${var.environment}\nNUBIS_DOMAIN=${var.nubis_domain}\nCONSUL_MASTER_ACL_TOKEN=${var.master_acl_token}\nCONSUL_ACL_DEFAULT_POLICY=${var.acl_default_policy}\nCONSUL_ACL_DOWN_POLICY=${var.acl_down_policy}\nCONSUL_SECRET=${var.consul_secret}\nCONSUL_BOOTSTRAP_EXPECT=$(( 1 + ${var.servers} ))\nCONSUL_KEY=\"${file("${var.ssl_key}")}\"\nCONSUL_CERT=\"${file("${var.ssl_cert}")}\""
 }
 
 resource "aws_security_group" "consul" {
@@ -185,14 +162,6 @@ resource "aws_security_group" "elb" {
       cidr_blocks = ["0.0.0.0/0"]
   }
 
-}
-
-resource "aws_route53_record" "discovery" {
-   zone_id = "${var.zone_id}"
-   name = "${var.region}"
-   type = "A"
-   ttl = "30"
-   records = ["${aws_instance.bootstrap.private_ip}"]
 }
 
 resource "aws_route53_record" "ui" {

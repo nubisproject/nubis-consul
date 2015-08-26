@@ -1,0 +1,68 @@
+#!/usr/bin/env perl
+
+use strict;
+use URI;
+use JSON qw(decode_json);
+use MIME::Base64 qw(decode_base64);
+
+use LWP::UserAgent::Determined;
+my $ua =  LWP::UserAgent::Determined->new();
+
+my $path = shift @ARGV;
+
+my $url = URI->new($path);
+if (not $url->scheme) {
+  $url = URI->new("http://localhost:8500/v1/kv$path");
+}
+
+my $value = get_value($url);
+
+if (not $value) {
+  my $output = get_output(@ARGV);
+  
+  set_value($url, $output);
+
+  $value = get_value($url);
+}
+
+print $value, "\n";
+
+sub set_value {
+  my ($u, $value) = @_;
+  my $url = $u->clone;
+  
+  $url->query_form(cas => 0);
+  
+  my $resp = $ua->put($url, Content => $value);
+  
+  
+}
+
+sub get_value {
+  my $url = shift;
+  my $resp = $ua->get($url);
+
+  if ($resp->is_success) {
+    my $json = decode_json($resp->content);
+    
+    my $value = decode_base64($json->[0]{Value});
+    
+    return $value;
+  }
+}
+
+sub get_output {
+  my (@cmd) = @_;
+  
+  my $output = `@cmd`;
+  my $status = $?;
+  
+  if ($status != 0) {
+    exit $status;
+  }
+  
+  chomp $output;
+  
+  return $output;
+}
+

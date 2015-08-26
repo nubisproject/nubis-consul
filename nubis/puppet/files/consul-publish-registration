@@ -1,0 +1,25 @@
+#!/bin/bash
+
+USER_DATA=`curl -fqs http://169.254.169.254/latest/user-data`
+
+eval $USER_DATA
+
+KEY_PREFIX="/environments/$NUBIS_ENVIRONMENT/global/$NUBIS_PROJECT"
+
+echo "Attempting to find initial peers"
+/usr/local/bin/consul-asg-join
+
+echo "Waiting for a Consul leader, possibly forever"
+
+LEADER=""
+
+while [ "$LEADER" == "" ]; do 
+  sleep 1;
+  LEADER=`curl -fqs http://localhost:8500/v1/status/leader | jq -r .`
+done
+
+echo "Finally, leader is '$LEADER'"
+
+/usr/local/bin/consul-get-or-set $KEY_PREFIX/cert   "cat /etc/consul/consul.pem"
+/usr/local/bin/consul-get-or-set $KEY_PREFIX/key    "cat /etc/consul/consul.key"
+/usr/local/bin/consul-get-or-set $KEY_PREFIX/secret "cat /etc/consul/zzz-startup.json | jq -r .encrypt"
