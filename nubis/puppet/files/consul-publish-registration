@@ -6,6 +6,9 @@ eval $USER_DATA
 
 KEY_PREFIX="/environments/$NUBIS_ENVIRONMENT/global/$NUBIS_PROJECT"
 
+echo "Attempting to find initial peers"
+/usr/local/bin/consul-asg-join
+
 echo "Waiting for a Consul leader, possibly forever"
 
 LEADER=""
