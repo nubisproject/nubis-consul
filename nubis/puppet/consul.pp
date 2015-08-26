@@ -16,6 +16,39 @@ class { 'consul':
   }
 }
 
+package { 'libwww-perl':
+  ensure => present,
+}
+
+package { 'libjson-perl':
+  ensure => present,
+}
+
+package { 'liblwp-useragent-determined-perl':
+  ensure => present,
+}
+
+file { '/usr/local/bin/consul-get-or-set':
+    ensure => file,
+    owner  => root,
+    group  => root,
+    mode   => '0755',
+    source => 'puppet:///nubis/files/consul-get-or-set',
+    require => [
+      Package['libwww-perl'],
+      Package['libjson-perl'],
+      Package['liblwp-useragent-determined-perl'],
+    ],
+}
+
+file { '/etc/nubis.d/consul-publish-registration':
+    ensure => file,
+    owner  => root,
+    group  => root,
+    mode   => '0755',
+    source => 'puppet:///nubis/files/consul-publish-registration',
+}
+
 # Install consul backup script and create cron for it
 file { '/usr/local/sbin/consul-backup':
     ensure => file,
