@@ -21,8 +21,8 @@ variable "consul_secret" {
 }
 
 variable "servers" {
-  default = "2"
-  description = "The number of Consul servers to launch minus one (bootstrap node)."
+  default = "3"
+  description = "The number of Consul servers to launch"
 }
 
 variable "release" {
