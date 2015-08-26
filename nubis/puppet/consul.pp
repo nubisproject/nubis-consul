@@ -49,6 +49,26 @@ file { '/etc/nubis.d/consul-publish-registration':
     source => 'puppet:///nubis/files/consul-publish-registration',
 }
 
+file { '/usr/local/bin/consul-asg-join':
+    ensure => file,
+    owner  => root,
+    group  => root,
+    mode   => '0755',
+    source => 'puppet:///nubis/files/consul-asg-join',
+}
+
+cron::job {
+  'consul-asg-join':
+    minute      => '*/5',
+    hour        => '*',
+    date        => '*',
+    month       => '*',
+    weekday     => '*',
+    user        => 'root',
+    command     => '/usr/local/bin/consul-asg-join',
+    environment => [ 'PATH="/usr/local/bin:/usr/bin:/bin"', 'SHELL=/bin/bash' ],
+}
+
 # Install consul backup script and create cron for it
 file { '/usr/local/sbin/consul-backup':
     ensure => file,
