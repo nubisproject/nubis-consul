@@ -43,18 +43,13 @@ variable "environment" {
   default = "sandbox"
 }
 
-variable "public" {
-  default = true
-  description = "Should this consul cluster be publicly accesible"
-}
-
-variable "nubis_domain" {
+variable "domain" {
   description = "Top-level nubis domain for this environment"
   default = "nubis.allizom.org"
 }
 
-variable "zone_id" {
-  description = "ID of the zone used for publication"
+variable "service_name" {
+  description = "Service this is deployed for (i.e. dpaste)"
 }
 
 variable "vpc_id" {
@@ -89,12 +84,4 @@ variable "acl_down_policy" {
 variable "acl_default_policy" {
   description = "Default ACL action for anonymous users"
   default = "allow"
-}
-
-variable "manage_iam" {
-  description = "IAM roles should be managed in which region"
-  default = {
-    us-east-1 = "1"
-    us-west-2 = "0"
-  }
 }
