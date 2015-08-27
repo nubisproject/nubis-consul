@@ -7,7 +7,3 @@ resource "aws_autoscaling_group" "consul" {
   availability_zones = [ "us-west-2a","us-west-2b","us-west-2c" ]
   vpc_zone_identifier = [ "subnet-xyz", "subnet-xyz", "subnet-xyz" ]
 }
-
-resource "aws_instance" "bootstrap" {
-  subnet_id = "subnet-xyz"
-}
