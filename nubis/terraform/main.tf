@@ -18,6 +18,7 @@ resource "aws_launch_configuration" "consul" {
     ]
     lifecycle { create_before_destroy = true }
     user_data = <<EOF
+NUBIS_SERVER=1
 NUBIS_PROJECT=${var.project}
 NUBIS_ENVIRONMENT=${var.environment}
 NUBIS_ACCOUNT=${var.service_name}
@@ -51,7 +52,7 @@ resource "aws_autoscaling_group" "consul" {
 
   tag {
     key = "Name"
-    value = "Consul member node (v/${var.release}.${var.build})"
+    value = "Consul server node (v/${var.release}.${var.build}) for ${var.service_name} in ${var.environment}"
     propagate_at_launch = true
   }
 }
