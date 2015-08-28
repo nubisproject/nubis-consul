@@ -34,9 +34,7 @@ EOF
 }
 
 resource "aws_autoscaling_group" "consul" {
-  vpc_zone_identifier = []
-  availability_zones  = []
-
+  vpc_zone_identifier = ["${split(",", var.private_subnets)}"]
   name = "${var.project}-${var.environment}"
   max_size = "${var.servers}"
   min_size = "${var.servers}"
@@ -58,7 +56,7 @@ resource "aws_autoscaling_group" "consul" {
 }
 
 resource "aws_security_group" "consul" {
-  name =   "${var.project}-${var.environment}"
+  name = "${var.project}-${var.environment}"
   description = "Consul internal traffic + maintenance."
 
   vpc_id = "${var.vpc_id}"
@@ -112,7 +110,7 @@ resource "aws_security_group" "consul" {
 # Create a new load balancer
 resource "aws_elb" "consul" {
   name = "elb-${var.project}-${var.environment}"
-  subnets = [ ]
+  subnets = ["${split(",", var.public_subnets)}"]
 
   # This is an internal ELB, only accessible form inside the VPC
   internal = true
