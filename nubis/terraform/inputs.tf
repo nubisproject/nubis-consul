@@ -43,6 +43,10 @@ variable "environment" {
   default = "sandbox"
 }
 
+variable "zone_id" {
+  description = "Route53 Zone ID"
+}
+
 variable "domain" {
   description = "Top-level nubis domain for this environment"
   default = "nubis.allizom.org"
