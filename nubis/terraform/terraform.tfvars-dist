@@ -11,6 +11,7 @@ public   = 0
 vpc_id = "vpc-XXXXXXXX"
 environment = "sandbox"
 domain   = "consul.sandbox.nubis.allizom.org"
+service_name = "account-name"
 ssl_key  = "consul.key"
 ssl_cert = "consul.pem"
 internet_security_group_id = "sg-XXXXXXXX"

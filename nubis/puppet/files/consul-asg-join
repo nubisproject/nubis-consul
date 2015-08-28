@@ -14,7 +14,7 @@ if [ -z "$ASG_NAME" ]; then
 fi
 
 # Figure out what the ASG desired capacity (i.e. cluster size) is set at
-EXPECTED_MEMBERS=`aws autoscaling describe-auto-scaling-groups --region us-east-1 --auto-scaling-group-name consul --query 'AutoScalingGroups[0].DesiredCapacity'`
+EXPECTED_MEMBERS=`aws autoscaling describe-auto-scaling-groups --region us-east-1 --auto-scaling-group-name $ASG_NAME --query 'AutoScalingGroups[0].DesiredCapacity'`
 
 # Block until we can find all all our peers, on purpose, we can't progress if we are not all here
 while [ "`echo $OTHER_INSTANCE_ID | wc -w`" -lt "$EXPECTED_MEMBERS" ]; do

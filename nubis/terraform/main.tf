@@ -9,7 +9,7 @@ resource "aws_launch_configuration" "consul" {
     image_id = "${var.ami}"
     instance_type = "t2.micro"
     key_name = "${var.key_name}"
-    iam_instance_profile = "${var.project}"
+    iam_instance_profile = "${aws_iam_instance_profile.consul.name}"
 
     security_groups = [
       "${aws_security_group.consul.id}",
@@ -17,14 +17,27 @@ resource "aws_launch_configuration" "consul" {
       "${var.shared_services_security_group_id}",
     ]
     lifecycle { create_before_destroy = true }
-    user_data = "NUBIS_PROJECT=${var.project}\nNUBIS_ENVIRONMENT=${var.environment}\nNUBIS_DOMAIN=${var.nubis_domain}\nCONSUL_MASTER_ACL_TOKEN=${var.master_acl_token}\nCONSUL_ACL_DEFAULT_POLICY=${var.acl_default_policy}\nCONSUL_ACL_DOWN_POLICY=${var.acl_down_policy}\nCONSUL_SECRET=${var.consul_secret}\nCONSUL_BOOTSTRAP_EXPECT=${var.servers}\nCONSUL_KEY=\"${file("${var.ssl_key}")}\"\nCONSUL_CERT=\"${file("${var.ssl_cert}")}\""
+    user_data = <<EOF
+NUBIS_PROJECT=${var.project}
+NUBIS_ENVIRONMENT=${var.environment}
+NUBIS_ACCOUNT=${var.service_name}
+NUBIS_DOMAIN=${var.domain}
+CONSUL_SERVER=1
+CONSUL_MASTER_ACL_TOKEN=${var.master_acl_token}
+CONSUL_ACL_DEFAULT_POLICY=${var.acl_default_policy}
+CONSUL_ACL_DOWN_POLICY=${var.acl_down_policy}
+CONSUL_SECRET=${var.consul_secret}
+CONSUL_BOOTSTRAP_EXPECT=${var.servers}
+CONSUL_KEY="${file("${var.ssl_key}")}"
+CONSUL_CERT="${file("${var.ssl_cert}")}"
+EOF
 }
 
 resource "aws_autoscaling_group" "consul" {
   vpc_zone_identifier = []
   availability_zones  = []
 
-  name = "${var.project}"
+  name = "${var.project}-${var.environment}"
   max_size = "${var.servers}"
   min_size = "${var.servers}"
   health_check_grace_period = 10
@@ -39,13 +52,13 @@ resource "aws_autoscaling_group" "consul" {
 
   tag {
     key = "Name"
-    value = "Consul member node (v/${var.release}.${var.build})"
+    value = "Consul server node (v/${var.release}.${var.build}) for ${var.service_name} in ${var.environment}"
     propagate_at_launch = true
   }
 }
 
 resource "aws_security_group" "consul" {
-  name = "${var.project}"
+  name =   "${var.project}-${var.environment}"
   description = "Consul internal traffic + maintenance."
 
   vpc_id = "${var.vpc_id}"
@@ -98,7 +111,7 @@ resource "aws_security_group" "consul" {
 
 # Create a new load balancer
 resource "aws_elb" "consul" {
-  name = "elb-${var.project}"
+  name = "elb-${var.project}-${var.environment}"
   subnets = [ ]
 
   # This is an internal ELB, only accessible form inside the VPC
@@ -135,7 +148,7 @@ resource "aws_elb" "consul" {
 }
 
 resource "aws_security_group" "elb" {
-  name = "elb-${var.project}"
+  name = "elb-${var.project}-${var.environment}"
   description = "Allow inbound traffic for consul"
 
   vpc_id = "${var.vpc_id}"
@@ -166,14 +179,14 @@ resource "aws_security_group" "elb" {
 
 resource "aws_route53_record" "ui" {
    zone_id = "${var.zone_id}"
-   name = "ui.${var.region}"
+   name = "ui.${var.project}.${var.environment}"
    type = "CNAME"
    ttl = "30"
    records = ["dualstack.${aws_elb.consul.dns_name}"]
 }
 
 resource "aws_s3_bucket" "consul_backups" {
-    bucket = "nubis-${var.project}-backupbucket-${var.environment}-${var.region}"
+    bucket = "nubis-${var.project}-backupbucket-${var.environment}-${var.region}-${var.service_name}"
     acl = "private"
 
     tags = {
@@ -184,14 +197,12 @@ resource "aws_s3_bucket" "consul_backups" {
 }
 
 resource "aws_iam_instance_profile" "consul" {
-    count = "${lookup(var.manage_iam, var.region)}"
-    name = "${var.project}"
+    name = "${var.project}-${var.environment}-${var.region}"
     roles = ["${aws_iam_role.consul.name}"]
 }
 
 resource "aws_iam_role" "consul" {
-    count = "${lookup(var.manage_iam, var.region)}"
-    name = "${var.project}"
+    name = "${var.project}-${var.environment}-${var.region}"
     path = "/"
     assume_role_policy = <<EOF
 {
@@ -211,8 +222,7 @@ EOF
 }
 
 resource "aws_iam_role_policy" "consul" {
-    count = "${lookup(var.manage_iam, var.region)}"
-    name = "${var.project}"
+    name = "${var.project}-${var.environment}-${var.region}"
     role = "${aws_iam_role.consul.id}"
     policy = <<EOF
 {
@@ -242,8 +252,7 @@ EOF
 }
 
 resource "aws_iam_role_policy" "consul_backups" {
-    count   = "${lookup(var.manage_iam, var.region)}"
-    name    = "${var.project}-backups"
+    name    = "${var.project}-${var.environment}-${var.region}-backups"
     role    = "${aws_iam_role.consul.id}"
     policy  = <<EOF
 {
