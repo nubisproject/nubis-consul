@@ -9,7 +9,7 @@ resource "aws_launch_configuration" "consul" {
     image_id = "${var.ami}"
     instance_type = "t2.micro"
     key_name = "${var.key_name}"
-    iam_instance_profile = "${var.project}-${var.region}"
+    iam_instance_profile = "${aws_iam_instance_profile.consul.name}"
 
     security_groups = [
       "${aws_security_group.consul.id}",
@@ -18,11 +18,11 @@ resource "aws_launch_configuration" "consul" {
     ]
     lifecycle { create_before_destroy = true }
     user_data = <<EOF
-NUBIS_SERVER=1
 NUBIS_PROJECT=${var.project}
 NUBIS_ENVIRONMENT=${var.environment}
 NUBIS_ACCOUNT=${var.service_name}
 NUBIS_DOMAIN=${var.domain}
+CONSUL_SERVER=1
 CONSUL_MASTER_ACL_TOKEN=${var.master_acl_token}
 CONSUL_ACL_DEFAULT_POLICY=${var.acl_default_policy}
 CONSUL_ACL_DOWN_POLICY=${var.acl_down_policy}
@@ -37,7 +37,7 @@ resource "aws_autoscaling_group" "consul" {
   vpc_zone_identifier = []
   availability_zones  = []
 
-  name = "${var.project}"
+  name = "${var.project}-${var.environment}"
   max_size = "${var.servers}"
   min_size = "${var.servers}"
   health_check_grace_period = 10
@@ -58,7 +58,7 @@ resource "aws_autoscaling_group" "consul" {
 }
 
 resource "aws_security_group" "consul" {
-  name = "${var.project}"
+  name =   "${var.project}-${var.environment}"
   description = "Consul internal traffic + maintenance."
 
   vpc_id = "${var.vpc_id}"
@@ -111,7 +111,7 @@ resource "aws_security_group" "consul" {
 
 # Create a new load balancer
 resource "aws_elb" "consul" {
-  name = "elb-${var.project}"
+  name = "elb-${var.project}-${var.environment}"
   subnets = [ ]
 
   # This is an internal ELB, only accessible form inside the VPC
@@ -148,7 +148,7 @@ resource "aws_elb" "consul" {
 }
 
 resource "aws_security_group" "elb" {
-  name = "elb-${var.project}"
+  name = "elb-${var.project}-${var.environment}"
   description = "Allow inbound traffic for consul"
 
   vpc_id = "${var.vpc_id}"
@@ -177,20 +177,16 @@ resource "aws_security_group" "elb" {
 
 }
 
-resource "aws_route53_zone" "consul" {
-  name = "${var.project}.${var.environment}.${var.service_name}.${var.domain}"
-}
-
 resource "aws_route53_record" "ui" {
-   zone_id = "${aws_route53_zone.consul.zone_id}"
-   name = "ui.${var.region}"
+   zone_id = "${var.zone_id}"
+   name = "ui.${var.project}.${var.environment}"
    type = "CNAME"
    ttl = "30"
    records = ["dualstack.${aws_elb.consul.dns_name}"]
 }
 
 resource "aws_s3_bucket" "consul_backups" {
-    bucket = "nubis-${var.project}-backupbucket-${var.environment}-${var.region}"
+    bucket = "nubis-${var.project}-backupbucket-${var.environment}-${var.region}-${var.service_name}"
     acl = "private"
 
     tags = {
@@ -201,12 +197,12 @@ resource "aws_s3_bucket" "consul_backups" {
 }
 
 resource "aws_iam_instance_profile" "consul" {
-    name = "${var.project}-${var.region}"
+    name = "${var.project}-${var.environment}-${var.region}"
     roles = ["${aws_iam_role.consul.name}"]
 }
 
 resource "aws_iam_role" "consul" {
-    name = "${var.project}"
+    name = "${var.project}-${var.environment}-${var.region}"
     path = "/"
     assume_role_policy = <<EOF
 {
@@ -226,7 +222,7 @@ EOF
 }
 
 resource "aws_iam_role_policy" "consul" {
-    name = "${var.project}"
+    name = "${var.project}-${var.environment}-${var.region}"
     role = "${aws_iam_role.consul.id}"
     policy = <<EOF
 {
@@ -256,7 +252,7 @@ EOF
 }
 
 resource "aws_iam_role_policy" "consul_backups" {
-    name    = "${var.project}-backups-${var.region}"
+    name    = "${var.project}-${var.environment}-${var.region}-backups"
     role    = "${aws_iam_role.consul.id}"
     policy  = <<EOF
 {
