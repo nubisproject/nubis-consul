@@ -22,4 +22,4 @@ echo "Finally, leader is '$LEADER'"
 
 /usr/local/bin/consul-get-or-set $KEY_PREFIX/cert   "cat /etc/consul/consul.pem"
 /usr/local/bin/consul-get-or-set $KEY_PREFIX/key    "cat /etc/consul/consul.key"
-/usr/local/bin/consul-get-or-set $KEY_PREFIX/secret "cat /etc/consul/zzz-startup.json | jq -r .encrypt"
+/usr/local/bin/consul-get-or-set $KEY_PREFIX/secret "cat /etc/consul/zzz-tls.json | jq -r .encrypt"
