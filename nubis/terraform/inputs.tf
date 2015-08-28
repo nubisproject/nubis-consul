@@ -89,3 +89,11 @@ variable "acl_default_policy" {
   description = "Default ACL action for anonymous users"
   default = "allow"
 }
+
+variable "public_subnets" {
+  description = "Public Subnets IDs, comma-separated"
+}
+
+variable "private_subnets" {
+  description = "Private Subnets IDs, comma-separated"
+}

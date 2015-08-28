@@ -34,14 +34,6 @@ This assumes you are in the project directory
     <edit tfvar files with appropriate info>
     ```
 
-* Configure override file
-
-    ```bash
-    cd nubis/terraform
-    cp override.tf-dist override.tf
-    <edit with appropriate subnet info>
-    ```
-
 * Check if terraform plan gives you the right info (for sanity sake)
 
     ```bash

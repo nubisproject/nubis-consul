@@ -1,9 +1,0 @@
-#XXX: Can't have arrays as input variables until TF 0.4
-resource "aws_elb" "consul" {
-  subnets = [ "subnet-xyz", "subnet-xyz", "subnet-xyz" ]
-}
-
-resource "aws_autoscaling_group" "consul" {
-  availability_zones = [ "us-west-2a","us-west-2b","us-west-2c" ]
-  vpc_zone_identifier = [ "subnet-xyz", "subnet-xyz", "subnet-xyz" ]
-}
