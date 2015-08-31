@@ -20,3 +20,4 @@ https_cert_arn = "arn:aws:iam::xxxxx"
 master_acl_token = "AAAAAAAA-BBBB-CCCC-DDDD-EEEEFFFF0000" # use uuidgen
 public_subnets = "subnet-abcd1234,subnet-deed3315"
 private_subnets = "subnet-ddee1122,subnet-eeff1100"
+public_allowed_cidrs = "10.22.33.44/32"

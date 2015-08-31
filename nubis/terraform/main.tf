@@ -45,7 +45,8 @@ resource "aws_autoscaling_group" "consul" {
   launch_configuration = "${aws_launch_configuration.consul.name}"
 
   load_balancers = [
-    "${aws_elb.consul.name}"
+    "${aws_elb.consul.name}",
+    "${aws_elb.consul-public.name}"
   ]
 
   tag {
@@ -94,7 +95,8 @@ resource "aws_security_group" "consul" {
     to_port = 8500
     protocol = "tcp"
     security_groups = [
-      "${aws_security_group.elb.id}"
+      "${aws_security_group.elb.id}",
+      "${aws_security_group.elb-public.id}"
     ]
   }
 
@@ -145,6 +147,38 @@ resource "aws_elb" "consul" {
   ]
 }
 
+# Create the public load-balancer
+
+resource "aws_elb" "consul-public" {
+  name = "elb-${var.project}-${var.environment}-public"
+  subnets = ["${split(",", var.public_subnets)}"]
+
+  # This is an internet facing ELB
+  internal = false
+
+ listener {
+    instance_port = 8500
+    instance_protocol = "http"
+    lb_port = 443
+    lb_protocol = "https"
+    ssl_certificate_id = "${var.https_cert_arn}"
+  }
+
+  health_check {
+    healthy_threshold = 2
+    unhealthy_threshold = 2
+    timeout = 3
+    target = "HTTP:8500/v1/status/peers"
+    interval = 5
+  }
+
+  cross_zone_load_balancing = true
+
+  security_groups = [
+    "${aws_security_group.elb-public.id}"
+  ]
+}
+
 resource "aws_security_group" "elb" {
   name = "elb-${var.project}-${var.environment}"
   description = "Allow inbound traffic for consul"
@@ -175,12 +209,44 @@ resource "aws_security_group" "elb" {
 
 }
 
+resource "aws_security_group" "elb-public" {
+  name = "elb-${var.project}-${var.environment}-public"
+  description = "Allow inbound traffic for consul"
+
+  vpc_id = "${var.vpc_id}"
+
+  ingress {
+      from_port = 443
+      to_port = 443
+      protocol = "tcp"
+      cidr_blocks = [ "${split(",", var.allowed_public_cidrs)}" ]
+  }
+
+  # Put back Amazon Default egress all rule
+  egress {
+      from_port = 0
+      to_port = 0
+      protocol = "-1"
+      cidr_blocks = ["0.0.0.0/0"]
+  }
+
+}
+
+
 resource "aws_route53_record" "ui" {
    zone_id = "${var.zone_id}"
    name = "ui.${var.project}.${var.environment}"
    type = "CNAME"
    ttl = "30"
    records = ["dualstack.${aws_elb.consul.dns_name}"]
+}
+
+resource "aws_route53_record" "public" {
+   zone_id = "${var.zone_id}"
+   name = "public.${var.project}.${var.environment}"
+   type = "CNAME"
+   ttl = "30"
+   records = ["dualstack.${aws_elb.consul-public.dns_name}"]
 }
 
 resource "aws_s3_bucket" "consul_backups" {

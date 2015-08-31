@@ -97,3 +97,8 @@ variable "public_subnets" {
 variable "private_subnets" {
   description = "Private Subnets IDs, comma-separated"
 }
+
+variable "allowed_public_cidrs" {
+  description = "Comma separated list of CIDRs with public access"
+  default = "127.0.0.1/32"
+}
