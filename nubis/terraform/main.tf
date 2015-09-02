@@ -16,7 +16,6 @@ resource "aws_launch_configuration" "consul" {
       "${var.internet_security_group_id}",
       "${var.shared_services_security_group_id}",
     ]
-    lifecycle { create_before_destroy = true }
 
     user_data = <<EOF
 NUBIS_PROJECT=${var.project}
@@ -61,7 +60,6 @@ resource "aws_security_group" "consul" {
   name = "${var.project}-${var.environment}"
   description = "Consul internal traffic + maintenance."
   
-  lifecycle { create_before_destroy = true }
 
   vpc_id = "${var.vpc_id}"
 
@@ -265,13 +263,11 @@ resource "aws_s3_bucket" "consul_backups" {
 
 resource "aws_iam_instance_profile" "consul" {
     name = "${var.project}-${var.environment}-${var.region}"
-    lifecycle { create_before_destroy = true }
     roles = ["${aws_iam_role.consul.name}"]
 }
 
 resource "aws_iam_role" "consul" {
     name = "${var.project}-${var.environment}-${var.region}"
-    lifecycle { create_before_destroy = true }
     path = "/"
     assume_role_policy = <<EOF
 {
@@ -292,7 +288,6 @@ EOF
 
 resource "aws_iam_role_policy" "consul" {
     name = "${var.project}-${var.environment}-${var.region}"
-    lifecycle { create_before_destroy = true }
     role = "${aws_iam_role.consul.id}"
     policy = <<EOF
 {
@@ -323,7 +318,6 @@ EOF
 
 resource "aws_iam_role_policy" "consul_backups" {
     name    = "${var.project}-${var.environment}-${var.region}-backups"
-    lifecycle { create_before_destroy = true }
     role    = "${aws_iam_role.consul.id}"
     policy  = <<EOF
 {
