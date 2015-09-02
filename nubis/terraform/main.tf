@@ -6,6 +6,7 @@ provider "aws" {
 }
 
 resource "aws_launch_configuration" "consul" {
+    lifecycle { create_before_destroy = true }
     image_id = "${var.ami}"
     instance_type = "t2.micro"
     key_name = "${var.key_name}"
@@ -34,6 +35,7 @@ EOF
 }
 
 resource "aws_autoscaling_group" "consul" {
+  lifecycle { create_before_destroy = true }
   vpc_zone_identifier = ["${split(",", var.private_subnets)}"]
   name = "${var.project}-${var.environment}"
   max_size = "${var.servers}"
@@ -253,6 +255,9 @@ resource "aws_route53_record" "public" {
 resource "aws_s3_bucket" "consul_backups" {
     bucket = "nubis-${var.project}-backupbucket-${var.environment}-${var.region}-${var.service_name}"
     acl = "private"
+
+    # Nuke the bucket content on deletion
+    force_destroy = true
 
     tags = {
         Name = "nubis-${var.project}-backupbucket-${var.environment}-${var.region}"
