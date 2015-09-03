@@ -59,7 +59,7 @@ resource "aws_autoscaling_group" "consul" {
 
   tag {
     key = "ServiceName"
-    value = "consul"
+    value = "${var.project}"
     propagate_at_launch = true
   }
 }
