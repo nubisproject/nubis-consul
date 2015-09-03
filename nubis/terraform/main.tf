@@ -56,6 +56,12 @@ resource "aws_autoscaling_group" "consul" {
     value = "Consul server node (v/${var.release}.${var.build}) for ${var.service_name} in ${var.environment}"
     propagate_at_launch = true
   }
+
+  tag {
+    key = "ServiceName"
+    value = "consul"
+    propagate_at_launch = true
+  }
 }
 
 resource "aws_security_group" "consul" {
@@ -253,7 +259,7 @@ resource "aws_route53_record" "public" {
 }
 
 resource "aws_s3_bucket" "consul_backups" {
-    bucket = "nubis-${var.project}-backupbucket-${var.environment}-${var.region}-${var.service_name}"
+    bucket = "nubis-${var.project}-backup-${var.environment}-${var.region}-${var.service_name}"
     acl = "private"
 
     # Nuke the bucket content on deletion
