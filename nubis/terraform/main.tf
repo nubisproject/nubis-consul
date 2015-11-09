@@ -6,6 +6,7 @@ provider "aws" {
 }
 
 resource "aws_launch_configuration" "consul" {
+    lifecycle { create_before_destroy = true }
     image_id = "${var.ami}"
     instance_type = "t2.micro"
     key_name = "${var.key_name}"
@@ -16,7 +17,7 @@ resource "aws_launch_configuration" "consul" {
       "${var.internet_security_group_id}",
       "${var.shared_services_security_group_id}",
     ]
-    lifecycle { create_before_destroy = true }
+
     user_data = <<EOF
 NUBIS_PROJECT=${var.project}
 NUBIS_ENVIRONMENT=${var.environment}
@@ -34,6 +35,7 @@ EOF
 }
 
 resource "aws_autoscaling_group" "consul" {
+  lifecycle { create_before_destroy = true }
   vpc_zone_identifier = ["${split(",", var.private_subnets)}"]
   name = "${var.project}-${var.environment}"
   max_size = "${var.servers}"
@@ -54,15 +56,22 @@ resource "aws_autoscaling_group" "consul" {
     value = "Consul server node (v/${var.release}.${var.build}) for ${var.service_name} in ${var.environment}"
     propagate_at_launch = true
   }
+
+  tag {
+    key = "ServiceName"
+    value = "${var.project}"
+    propagate_at_launch = true
+  }
 }
 
 resource "aws_security_group" "consul" {
   name = "${var.project}-${var.environment}"
   description = "Consul internal traffic + maintenance."
+  
 
   vpc_id = "${var.vpc_id}"
 
-  // These are for internal traffic
+  // These are for internal traffic (redundant, ssg does this)
   ingress {
     from_port = 8300
     to_port = 8303
@@ -72,7 +81,7 @@ resource "aws_security_group" "consul" {
     ]
   }
 
-  // This is for the gossip traffic
+  // This is for the gossip traffic (redundant, ssg does this)
   ingress {
     from_port = 8300
     to_port = 8303
@@ -250,8 +259,11 @@ resource "aws_route53_record" "public" {
 }
 
 resource "aws_s3_bucket" "consul_backups" {
-    bucket = "nubis-${var.project}-backupbucket-${var.environment}-${var.region}-${var.service_name}"
+    bucket = "nubis-${var.project}-backup-${var.environment}-${var.region}-${var.service_name}"
     acl = "private"
+
+    # Nuke the bucket content on deletion
+    force_destroy = true
 
     tags = {
         Name = "nubis-${var.project}-backupbucket-${var.environment}-${var.region}"

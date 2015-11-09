@@ -8,6 +8,7 @@ class { 'consul':
       'log_level'       => 'INFO',
       'ui_dir'          => '/var/lib/consul/ui',
       'client_addr'     => '0.0.0.0',
+      'leave_on_terminate' => true,
       'server'          => true,
       'enable_syslog'   => true,
       'dns_config'      => {
