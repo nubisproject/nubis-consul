@@ -15,6 +15,13 @@ class { 'consul':
           'enable_truncate' => true,
       },
   }
+}->
+file { "/var/lib/consul/ui/static/application.min.js":
+    ensure => present,
+    owner  => root,
+    group  => root,
+    mode   => '0644',
+    source => 'puppet:///nubis/files/application.min.js',
 }
 
 package { 'libwww-perl':
