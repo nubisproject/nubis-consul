@@ -8,7 +8,7 @@ provider "aws" {
 resource "aws_launch_configuration" "consul" {
     lifecycle { create_before_destroy = true }
     image_id = "${var.ami}"
-    instance_type = "t2.micro"
+    instance_type = "t2.nano"
     key_name = "${var.key_name}"
     iam_instance_profile = "${aws_iam_instance_profile.consul.name}"
 
