@@ -54,7 +54,7 @@ file { '/etc/nubis.d/00-consul-server':
     owner  => root,
     group  => root,
     mode   => '0755',
-    source => 'puppet:///nubis/files/consul-server",
+    source => 'puppet:///nubis/files/consul-server',
 }
 
 file { '/usr/local/bin/consul-asg-join':
