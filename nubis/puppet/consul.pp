@@ -42,12 +42,12 @@ file { '/usr/local/bin/consul-get-or-set':
     ],
 }
 
-file { '/etc/nubis.d/consul-publish-registration':
+file { '/etc/nubis.d/consul-server-bootstrap':
     ensure => file,
     owner  => root,
     group  => root,
     mode   => '0755',
-    source => 'puppet:///nubis/files/consul-publish-registration',
+    source => 'puppet:///nubis/files/consul-server-bootstrap',
 }
 
 file { '/usr/local/bin/consul-asg-join':
