@@ -49,12 +49,20 @@ file { '/usr/local/bin/consul-get-or-set':
     ],
 }
 
-file { '/etc/nubis.d/00-consul-server':
+file { '/etc/nubis.d/0-consul-server-bootstrap':
     ensure => file,
     owner  => root,
     group  => root,
     mode   => '0755',
-    source => 'puppet:///nubis/files/consul-server',
+    source => 'puppet:///nubis/files/consul-server-bootstrap',
+}
+
+file { '/etc/nubis.d/01-consul-server-join':
+    ensure => file,
+    owner  => root,
+    group  => root,
+    mode   => '0755',
+    source => 'puppet:///nubis/files/consul-server-join',
 }
 
 file { '/usr/local/bin/consul-asg-join':
