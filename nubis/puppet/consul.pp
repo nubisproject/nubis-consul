@@ -42,7 +42,7 @@ file { '/usr/local/bin/consul-get-or-set':
     ],
 }
 
-file { '/etc/nubis.d/consul-server-bootstrap':
+file { '/etc/nubis.d/01-consul-server-bootstrap':
     ensure => file,
     owner  => root,
     group  => root,
