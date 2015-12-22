@@ -1,25 +1,53 @@
 #!/bin/bash
 
-USER_DATA=`curl -fqs http://169.254.169.254/latest/user-data`
+USER_DATA=$(curl -fqs http://169.254.169.254/latest/user-data)
+eval "$USER_DATA"
 
-eval $USER_DATA
+REGION=$(curl -s http://169.254.169.254/latest/dynamic/instance-identity/document | jq '.region' -r)
 
-KEY_PREFIX="/environments/$NUBIS_ENVIRONMENT/global/$NUBIS_PROJECT"
+CONSUL_DC="${NUBIS_ENVIRONMENT}-${REGION}-${NUBIS_ACCOUNT}"
 
-echo "Attempting to find initial peers"
-/usr/local/bin/consul-asg-join
+if [ "$CONSUL_BOOTSTRAP_EXPECT" ]; then
+cat <<EOF | tee /etc/consul/zzz-bootstrap.json
+{
+  "bootstrap_expect": $CONSUL_BOOTSTRAP_EXPECT
+}
+EOF
+fi
 
-echo "Waiting for a Consul leader, possibly forever"
+if [ "$CONSUL_MASTER_ACL_TOKEN" ]; then
 
-LEADER=""
+  # Default to allow all
+  if [ -z "$CONSUL_ACL_DEFAULT_POLICY" ]; then
+    CONSUL_ACL_DEFAULT_POLICY="allow"
+  fi
 
-while [ "$LEADER" == "" ]; do 
-  sleep 1;
-  LEADER=`curl -fqs http://localhost:8500/v1/status/leader | jq -r .`
-done
+  # default to cached (and maybe stale) ACLs
+  if [ -z "$CONSUL_ACL_DOWN_POLICY" ]; then
+    CONSUL_ACL_DOWN_POLICY="extend-cache"
+  fi
 
-echo "Finally, leader is '$LEADER'"
+cat <<EOF | tee /etc/consul/zzz-acl.json
+{
+  "acl_datacenter": "$CONSUL_DC",
+  "acl_master_token": "$CONSUL_MASTER_ACL_TOKEN",
+  "acl_default_policy": "$CONSUL_ACL_DEFAULT_POLICY",
+  "acl_down_policy": "$CONSUL_ACL_DOWN_POLICY"
+}
+EOF
+fi
 
-/usr/local/bin/consul-get-or-set $KEY_PREFIX/cert   "cat /etc/consul/consul.pem"
-/usr/local/bin/consul-get-or-set $KEY_PREFIX/key    "cat /etc/consul/consul.key"
-/usr/local/bin/consul-get-or-set $KEY_PREFIX/secret "cat /etc/consul/zzz-tls.json | jq -r .encrypt"
+# Grab the secret from user_data
+if [ "$CONSUL_SECRET" ]; then
+  echo "$CONSUL_SECRET" > /etc/consul/consul.secret
+fi
+
+# Grab the cert from user_data
+if [ "$CONSUL_CERT" ]; then
+  echo "$CONSUL_CERT" | tr " " "\n" | perl -pe 's/--BEGIN\n/--BEGIN /g' | perl -pe 's/--END\n/--END /g' > /etc/consul/consul.pem
+fi
+
+# Grab the key from user_data (server case)
+if [ "$CONSUL_KEY" ]; then
+  echo "$CONSUL_KEY" | tr " " "\n" | perl -pe 's/--(BEGIN|END)\n/--$1 /m' | perl -pe 's/ RSA\n/ RSA /g' | perl -pe 's/ PRIVATE\n/ PRIVATE /g' > /etc/consul/consul.key
+fi
