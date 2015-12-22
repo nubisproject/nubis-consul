@@ -1,0 +1,10 @@
+forge "https://forgeapi.puppetlabs.com"
+
+####################### NOTE #############################
+# All modules *must* be pinned to a specific version/tag #
+##########################################################
+
+# modules from the puppet forge
+mod 'KyleAnderson/consul',
+    :git => 'https://github.com/solarkennedy/puppet-consul.git',
+    :ref => 'a84e75c33f71259455375065957ce27098e06d70'
