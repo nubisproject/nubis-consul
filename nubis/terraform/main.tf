@@ -6,6 +6,7 @@ provider "aws" {
 }
 
 resource "aws_launch_configuration" "consul" {
+    depends_on = [ "null_resource.credstash" ]
     lifecycle { create_before_destroy = true }
     image_id = "${var.ami}"
     instance_type = "t2.nano"
@@ -23,13 +24,9 @@ NUBIS_PROJECT=${var.project}
 NUBIS_ENVIRONMENT=${var.environment}
 NUBIS_ACCOUNT=${var.service_name}
 NUBIS_DOMAIN=${var.domain}
-CONSUL_MASTER_ACL_TOKEN=${var.master_acl_token}
 CONSUL_ACL_DEFAULT_POLICY=${var.acl_default_policy}
 CONSUL_ACL_DOWN_POLICY=${var.acl_down_policy}
-CONSUL_SECRET=${var.consul_secret}
 CONSUL_BOOTSTRAP_EXPECT=${var.servers}
-CONSUL_KEY="${file("${var.ssl_key}")}"
-CONSUL_CERT="${file("${var.ssl_cert}")}"
 EOF
 }
 
