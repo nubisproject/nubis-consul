@@ -6,6 +6,7 @@ provider "aws" {
 }
 
 resource "aws_launch_configuration" "consul" {
+    depends_on = [ "null_resource.credstash" ]
     lifecycle { create_before_destroy = true }
     image_id = "${var.ami}"
     instance_type = "t2.nano"
@@ -23,13 +24,9 @@ NUBIS_PROJECT=${var.project}
 NUBIS_ENVIRONMENT=${var.environment}
 NUBIS_ACCOUNT=${var.service_name}
 NUBIS_DOMAIN=${var.domain}
-CONSUL_MASTER_ACL_TOKEN=${var.master_acl_token}
 CONSUL_ACL_DEFAULT_POLICY=${var.acl_default_policy}
 CONSUL_ACL_DOWN_POLICY=${var.acl_down_policy}
-CONSUL_SECRET=${var.consul_secret}
 CONSUL_BOOTSTRAP_EXPECT=${var.servers}
-CONSUL_KEY="${file("${var.ssl_key}")}"
-CONSUL_CERT="${file("${var.ssl_cert}")}"
 EOF
 }
 
@@ -352,4 +349,81 @@ resource "aws_iam_role_policy" "consul_backups" {
     ]
 }
 EOF
+}
+
+resource "aws_iam_role_policy" "credstash" {
+    name    = "${var.project}-${var.environment}-${var.region}-credstash"
+    role    = "${aws_iam_role.consul.id}"
+    policy  = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "kms:Decrypt"
+      ],
+      "Resource": [
+        "arn:aws:kms:${var.region}:${var.aws_account_id}:key/${var.credstash_key}"
+      ],
+      "Condition": {
+        "StringEquals": {
+          "kms:EncryptionContext:environment": "${var.environment}",
+          "kms:EncryptionContext:service": "${var.project}",
+          "kms:EncryptionContext:region": "${var.region}"
+        }
+      }
+    },
+    {
+      "Resource": "arn:aws:dynamodb:${var.region}:${var.aws_account_id}:table/credential-store",
+      "Action": [
+        "dynamodb:BatchGetItem",
+        "dynamodb:DescribeTable",
+        "dynamodb:GetItem",
+        "dynamodb:ListTables",
+        "dynamodb:Query",
+        "dynamodb:Scan",
+        "dynamodb:DescribeReservedCapacity",
+        "dynamodb:DescribeReservedCapacityOfferings"
+      ],
+      "Effect": "Allow"
+    }
+  ]
+}
+EOF
+}
+
+# This null resource is responsible for publishing secrets to Credstash
+resource "null_resource" "credstash" {
+
+  # Important to list here every variable that affects what needs to be put into credstash
+  triggers {
+    secret = "${var.credstash_key}"
+    master_acl_token = "${var.master_acl_token}"
+    ssl_key = "${file("${var.ssl_key}")}"
+    ssl_cert = "${file("${var.ssl_cert}")}"
+    region = "${var.region}"
+    context = "region=${var.region} environment=${var.environment} service=${var.project}"
+    credstash = "AWS_ACCESS_KEY_ID=${var.aws_access_key} AWS_SECRET_ACCESS_KEY=${var.aws_secret_key} credstash -r ${var.region} put -k ${var.credstash_key} -a ${var.project}/${var.environment}"
+  }
+
+  # Consul gossip secret
+  provisioner "local-exec" {
+      command = "${self.triggers.credstash}/secret ${var.consul_secret} ${self.triggers.context}"
+  }
+
+  # Consul Master ACL Token
+  provisioner "local-exec" {
+      command = "${self.triggers.credstash}/master_acl_token ${var.master_acl_token} ${self.triggers.context}"
+  }
+
+  # Consul SSL key
+  provisioner "local-exec" {
+      command = "${self.triggers.credstash}/ssl/key @${var.ssl_key} ${self.triggers.context}"
+  }
+
+  # Consul SSL Certificate
+  provisioner "local-exec" {
+      command = "${self.triggers.credstash}/ssl/cert @${var.ssl_cert} ${self.triggers.context}"
+  }
 }

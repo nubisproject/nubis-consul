@@ -7,12 +7,22 @@ REGION=$(curl -s http://169.254.169.254/latest/dynamic/instance-identity/documen
 
 CONSUL_DC="${NUBIS_ENVIRONMENT}-${REGION}-${NUBIS_ACCOUNT}"
 
+# Setup credstash
+CREDSTASH="/usr/local/bin/credstash --region $REGION"
+CREDSTASH_CONTEXT="environment=$NUBIS_ENVIRONMENT region=$REGION service=$NUBIS_PROJECT"
+
 if [ "$CONSUL_BOOTSTRAP_EXPECT" ]; then
-cat <<EOF | tee /etc/consul/zzz-bootstrap.json
+cat <<EOF > /etc/consul/zzz-bootstrap.json
 {
   "bootstrap_expect": $CONSUL_BOOTSTRAP_EXPECT
 }
 EOF
+fi
+
+# Grab the master ACL token from credstash (if not in user-data)
+if [ ! "$CONSUL_MASTER_ACL_TOKEN" ]; then
+  # shellcheck disable=SC2086
+  CONSUL_MASTER_ACL_TOKEN=$($CREDSTASH get "$NUBIS_PROJECT/$NUBIS_ENVIRONMENT/master_acl_token" $CREDSTASH_CONTEXT)
 fi
 
 if [ "$CONSUL_MASTER_ACL_TOKEN" ]; then
@@ -27,7 +37,7 @@ if [ "$CONSUL_MASTER_ACL_TOKEN" ]; then
     CONSUL_ACL_DOWN_POLICY="extend-cache"
   fi
 
-cat <<EOF | tee /etc/consul/zzz-acl.json
+cat <<EOF > /etc/consul/zzz-acl.json
 {
   "acl_datacenter": "$CONSUL_DC",
   "acl_master_token": "$CONSUL_MASTER_ACL_TOKEN",
@@ -37,17 +47,30 @@ cat <<EOF | tee /etc/consul/zzz-acl.json
 EOF
 fi
 
-# Grab the secret from user_data
+
+# Grab the secret from credstash (if not in user-data)
 if [ "$CONSUL_SECRET" ]; then
   echo "$CONSUL_SECRET" > /etc/consul/consul.secret
+else
+  # shellcheck disable=SC2086
+  SECRET=$($CREDSTASH get "$NUBIS_PROJECT/$NUBIS_ENVIRONMENT/secret" $CREDSTASH_CONTEXT)
+  echo "$SECRET" > /etc/consul/consul.secret
 fi
 
-# Grab the cert from user_data
+# Grab the cert from credstash (if not in user-data)
 if [ "$CONSUL_CERT" ]; then
   echo "$CONSUL_CERT" | tr " " "\n" | perl -pe 's/--BEGIN\n/--BEGIN /g' | perl -pe 's/--END\n/--END /g' > /etc/consul/consul.pem
+else
+  # shellcheck disable=SC2086
+  CERT=$($CREDSTASH get "$NUBIS_PROJECT/$NUBIS_ENVIRONMENT/ssl/cert" $CREDSTASH_CONTEXT)
+  echo "$CERT" > /etc/consul/consul.pem
 fi
 
-# Grab the key from user_data (server case)
+# Grab the key from credstash (if not in user-data)
 if [ "$CONSUL_KEY" ]; then
   echo "$CONSUL_KEY" | tr " " "\n" | perl -pe 's/--(BEGIN|END)\n/--$1 /m' | perl -pe 's/ RSA\n/ RSA /g' | perl -pe 's/ PRIVATE\n/ PRIVATE /g' > /etc/consul/consul.key
+else
+  # shellcheck disable=SC2086
+  KEY=$($CREDSTASH get "$NUBIS_PROJECT/$NUBIS_ENVIRONMENT/ssl/key" $CREDSTASH_CONTEXT)
+  echo "$KEY" > /etc/consul/consul.key
 fi

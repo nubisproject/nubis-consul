@@ -4,3 +4,8 @@ nubis/terraform/override.tf
 nubis/terraform/terraform.tfstate
 nubis/terraform/terraform.tfstate.backup
 nubis/terraform/terraform.tfvars
+nubis/librarian-puppet.tar.gz
+nubis/librarian-puppet
+nubis/Puppetfile.lock
+nubis/.tmp
+nubis/.librarian
