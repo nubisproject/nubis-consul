@@ -1,5 +1,9 @@
 # nubis-consul
 
+### Dependencies
+
+You need [credstash](https://github.com/fugue/credstash) locally installed (in your PATH) to be able to deploy Consul
+
 Mozilla Nubis Consul
 
 You need to run
