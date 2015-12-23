@@ -51,3 +51,8 @@ fi
 if [ "$CONSUL_KEY" ]; then
   echo "$CONSUL_KEY" | tr " " "\n" | perl -pe 's/--(BEGIN|END)\n/--$1 /m' | perl -pe 's/ RSA\n/ RSA /g' | perl -pe 's/ PRIVATE\n/ PRIVATE /g' > /etc/consul/consul.key
 fi
+
+# Ensure we don't auto-join anything, so create an empty config
+cat <<EOF > /etc/consul/zzz-join.json
+{}
+EOF
