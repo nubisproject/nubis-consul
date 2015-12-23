@@ -6,6 +6,7 @@ variable "https_cert_arn" {}
 
 variable "aws_access_key" {}
 variable "aws_secret_key" {}
+variable "aws_account_id" {}
 
 variable "key_name" {
   description = "SSH key name in your AWS account for AWS instances."
@@ -101,4 +102,8 @@ variable "private_subnets" {
 variable "allowed_public_cidrs" {
   description = "Comma separated list of CIDRs with public access"
   default = "127.0.0.1/32"
+}
+
+variable "credstash_key" {
+  description = "KMS Key ID used for Credstash (aaaabbbb-cccc-dddd-1111-222233334444)"
 }
