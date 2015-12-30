@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# /usr/local/bin isn't set yet in our PATH
+export PATH=/usr/local/bin:$PATH
+
 USER_DATA=$(curl -fqs http://169.254.169.254/latest/user-data)
 eval "$USER_DATA"
 
@@ -10,6 +13,16 @@ CONSUL_DC="${NUBIS_ENVIRONMENT}-${REGION}-${NUBIS_ACCOUNT}"
 # Setup credstash
 CREDSTASH="/usr/local/bin/credstash --region $REGION"
 CREDSTASH_CONTEXT="environment=$NUBIS_ENVIRONMENT region=$REGION service=$NUBIS_PROJECT"
+
+# If we were not told an explicit cluster size via user-data, find it via our ASG
+if [ ! "$CONSUL_BOOTSTRAP_EXPECT" ]; then
+  MY_INSTANCE_ID=$(curl -s http://169.254.169.254/latest/meta-data/instance-id)
+  ASG_NAME=$(aws autoscaling describe-auto-scaling-instances --region "$REGION" --instance "$MY_INSTANCE_ID" --query 'AutoScalingInstances[0].AutoScalingGroupName' --output text)
+  if [ "$ASG_NAME" ]; then
+    # Figure out what the ASG desired capacity (i.e. cluster size) is set at
+    CONSUL_BOOTSTRAP_EXPECT=$(aws autoscaling describe-auto-scaling-groups --region "$REGION" --auto-scaling-group-name "$ASG_NAME" --query 'AutoScalingGroups[0].DesiredCapacity')
+  fi
+fi
 
 if [ "$CONSUL_BOOTSTRAP_EXPECT" ]; then
 cat <<EOF > /etc/consul/zzz-bootstrap.json
