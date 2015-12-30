@@ -74,6 +74,14 @@ file { '/usr/local/bin/consul-asg-join':
     source => 'puppet:///nubis/files/consul-asg-join',
 }
 
+file { '/usr/local/bin/nubis-secret':
+    ensure => file,
+    owner  => root,
+    group  => root,
+    mode   => '0755',
+    source => 'puppet:///nubis/files/nubis-secret',
+}
+
 cron::job {
   'consul-asg-join':
     minute      => '*/5',
