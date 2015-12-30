@@ -74,3 +74,8 @@ else
   KEY=$($CREDSTASH get "$NUBIS_PROJECT/$NUBIS_ENVIRONMENT/ssl/key" $CREDSTASH_CONTEXT)
   echo "$KEY" > /etc/consul/consul.key
 fi
+
+# Ensure we don't auto-join anything, so create an empty config
+cat <<EOF > /etc/consul/zzz-join.json
+{}
+EOF
