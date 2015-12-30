@@ -24,8 +24,22 @@ done
 
 TARGET=$(aws ec2 describe-instances --region $REGION --instance $OTHER_INSTANCE_ID --query 'Reservations[].Instances[].PrivateDnsName' --output text)
 
-# XXX: Ideally here, we should compare against existing peers and only join new nodes
+# Find the peers Consul already knows about (could peek at /var/lib/consul/raft/peers.json instead)
+KNOWN_PEERS=$(curl -fqs http://localhost:8500/v1/status/peers | jq -r .[] | cut -d: -f1)
 
 for peer in $TARGET; do
-  consul join $peer
+  # AWS gives us hostnames, not IPs
+  PEER_IP=$(dig +short $peer | head -n1)
+
+  KNOWN=0
+  for known in $KNOWN_PEERS; do
+    if [ "$PEER_IP" = "$known" ]; then
+      KNOWN=1
+      break
+    fi
+  done
+
+  if [ "$KNOWN" = "0" ]; then
+    consul join $PEER_IP KNOWN=$KNOWN
+  fi
 done
