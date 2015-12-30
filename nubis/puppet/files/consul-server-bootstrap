@@ -10,10 +10,6 @@ REGION=$(curl -s http://169.254.169.254/latest/dynamic/instance-identity/documen
 
 CONSUL_DC="${NUBIS_ENVIRONMENT}-${REGION}-${NUBIS_ACCOUNT}"
 
-# Setup credstash
-CREDSTASH="/usr/local/bin/credstash --region $REGION"
-CREDSTASH_CONTEXT="environment=$NUBIS_ENVIRONMENT region=$REGION service=$NUBIS_PROJECT"
-
 # If we were not told an explicit cluster size via user-data, find it via our ASG
 if [ ! "$CONSUL_BOOTSTRAP_EXPECT" ]; then
   MY_INSTANCE_ID=$(curl -s http://169.254.169.254/latest/meta-data/instance-id)
@@ -34,8 +30,7 @@ fi
 
 # Grab the master ACL token from credstash (if not in user-data)
 if [ ! "$CONSUL_MASTER_ACL_TOKEN" ]; then
-  # shellcheck disable=SC2086
-  CONSUL_MASTER_ACL_TOKEN=$($CREDSTASH get "$NUBIS_PROJECT/$NUBIS_ENVIRONMENT/master_acl_token" $CREDSTASH_CONTEXT)
+  CONSUL_MASTER_ACL_TOKEN=$(nubis-secret get "$NUBIS_PROJECT/$NUBIS_ENVIRONMENT/master_acl_token")
 fi
 
 if [ "$CONSUL_MASTER_ACL_TOKEN" ]; then
@@ -65,8 +60,7 @@ fi
 if [ "$CONSUL_SECRET" ]; then
   echo "$CONSUL_SECRET" > /etc/consul/consul.secret
 else
-  # shellcheck disable=SC2086
-  SECRET=$($CREDSTASH get "$NUBIS_PROJECT/$NUBIS_ENVIRONMENT/secret" $CREDSTASH_CONTEXT)
+  SECRET=$(nubis-secret get "$NUBIS_PROJECT/$NUBIS_ENVIRONMENT/secret")
   echo "$SECRET" > /etc/consul/consul.secret
 fi
 
@@ -74,8 +68,7 @@ fi
 if [ "$CONSUL_CERT" ]; then
   echo "$CONSUL_CERT" | tr " " "\n" | perl -pe 's/--BEGIN\n/--BEGIN /g' | perl -pe 's/--END\n/--END /g' > /etc/consul/consul.pem
 else
-  # shellcheck disable=SC2086
-  CERT=$($CREDSTASH get "$NUBIS_PROJECT/$NUBIS_ENVIRONMENT/ssl/cert" $CREDSTASH_CONTEXT)
+  CERT=$(nubis-secret get "$NUBIS_PROJECT/$NUBIS_ENVIRONMENT/ssl/cert")
   echo "$CERT" > /etc/consul/consul.pem
 fi
 
@@ -83,8 +76,7 @@ fi
 if [ "$CONSUL_KEY" ]; then
   echo "$CONSUL_KEY" | tr " " "\n" | perl -pe 's/--(BEGIN|END)\n/--$1 /m' | perl -pe 's/ RSA\n/ RSA /g' | perl -pe 's/ PRIVATE\n/ PRIVATE /g' > /etc/consul/consul.key
 else
-  # shellcheck disable=SC2086
-  KEY=$($CREDSTASH get "$NUBIS_PROJECT/$NUBIS_ENVIRONMENT/ssl/key" $CREDSTASH_CONTEXT)
+  KEY=$(nubis-secret get "$NUBIS_PROJECT/$NUBIS_ENVIRONMENT/ssl/key")
   echo "$KEY" > /etc/consul/consul.key
 fi
 
