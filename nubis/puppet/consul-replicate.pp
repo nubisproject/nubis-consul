@@ -1,7 +1,3 @@
-import 'consul.pp'
-import 'consulate.pp'
-import 'datadog.pp'
-
 # XXX: need to move to puppet-consul-replicate proper
 staging::file { 'consul-replicate.tar.gz':
   source => "https://www.github.com/hashicorp/consul-replicate/releases/download/v0.2.0/consul-replicate_0.2.0_linux_amd64.tar.gz"
@@ -15,8 +11,4 @@ file { "/usr/local/bin/consul-replicate":
   owner =>  0,
   group =>  0,
   mode  => '0555',
-}
-
-package { 'awscli':
-  ensure => present,
 }
