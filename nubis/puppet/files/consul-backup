@@ -18,7 +18,8 @@ BACKUP_BUCKET="nubis-${NUBIS_PROJECT}-backup-${NUBIS_ENVIRONMENT}-${REGION}-${NU
 
 # How do we want to represent the backup file
 DATE_STAMP=$(date +\%Y\%m\%d_\%H:\%M:\%S)
-BACKUP_FILE_NAME="consul_backup.${INSTANCE_ID}.${DATE_STAMP}.json"
+DATE_PATH=$(date +\%Y/\%m)
+BACKUP_FILE_NAME="$DATE_PATH/consul_backup.${INSTANCE_ID}.${DATE_STAMP}.json"
 
 # Only 1 member of the cluster needs to run this
 # if you are not the leader then just forget about it
