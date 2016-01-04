@@ -17,12 +17,22 @@ fi
 EXPECTED_MEMBERS=$(aws autoscaling describe-auto-scaling-groups --region "$REGION" --auto-scaling-group-name "$ASG_NAME" --query 'AutoScalingGroups[0].DesiredCapacity')
 
 # Block until we can find all all our peers, on purpose, we can't progress if we are not all here
-while [ "$(echo $OTHER_INSTANCE_IDS | wc -w)" -lt "$EXPECTED_MEMBERS" ]; do
- OTHER_INSTANCE_IDS=$(aws autoscaling describe-auto-scaling-groups --region "$REGION" --auto-scaling-group-name "$ASG_NAME" --query "AutoScalingGroups[0].Instances[].InstanceId" --output text)
+while [ "${#OTHER_INSTANCE_IDS[@]}" -lt "$EXPECTED_MEMBERS" ]; do
+ OTHER_INSTANCE_IDS=($(aws autoscaling describe-auto-scaling-groups --region "$REGION" --auto-scaling-group-name "$ASG_NAME" --query "AutoScalingGroups[0].Instances[].InstanceId" --output text))
  sleep 3
 done
 
-TARGET=$(aws ec2 describe-instances --region "$REGION" --instance $OTHER_INSTANCE_IDS --query 'Reservations[].Instances[].PrivateDnsName' --output text)
+# Look at our ELB for peers too, could be doing a rolling upgrade
+ELB_NAME=$(aws autoscaling describe-auto-scaling-groups --region "$REGION" --auto-scaling-group-name "$ASG_NAME" --query 'AutoScalingGroups[0].LoadBalancerNames[0]' --output text)
+if [ "$ELB_NAME" ]; then
+  ELB_INSTANCES=($(aws elb describe-load-balancers --region "$REGION" --load-balancer-names "$ELB_NAME" --query 'LoadBalancerDescriptions[0].Instances[].InstanceId' --output text))
+  if [ "${#ELB_INSTANCES[@]}" -gt "0" ]; then
+    # Indiscriminately add the instances in the ELB, aws ec2 describe-instances will remove duplicates below
+    OTHER_INSTANCE_IDS=("${ELB_INSTANCES[@]}" "${OTHER_INSTANCE_IDS[@]}")
+  fi
+fi
+
+TARGET=$(aws ec2 describe-instances --region "$REGION" --instance "${OTHER_INSTANCE_IDS[@]}" --query 'Reservations[].Instances[].PrivateIpAddress' --output text)
 
 # Find the peers Consul already knows about (could peek at /var/lib/consul/raft/peers.json instead)
 KNOWN_PEERS=$(curl -fqs http://localhost:8500/v1/status/peers | jq -r .[] | cut -d: -f1)
