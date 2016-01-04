@@ -80,7 +80,5 @@ else
   echo "$KEY" > /etc/consul/consul.key
 fi
 
-# Ensure we don't auto-join anything, so create an empty config
-cat <<EOF > /etc/consul/zzz-join.json
-{}
-EOF
+# Ensure we don't auto-join anything, so create an auto-join skip marker
+touch /etc/consul/zzz-join.skip
