@@ -42,7 +42,7 @@ resource "aws_autoscaling_group" "consul" {
   launch_configuration = "${aws_launch_configuration.consul.name}"
 
   # This resource isn't considered created by TF until we have var.servers in rotation
-  min_elb_capacity = "${var.servers}"
+  wait_for_elb_capacity = "${var.servers}"
   wait_for_capacity_timeout = "15m"
 
   load_balancers = [
