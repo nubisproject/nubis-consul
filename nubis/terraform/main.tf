@@ -137,7 +137,7 @@ resource "aws_elb" "consul" {
     instance_protocol = "http"
     lb_port = 443
     lb_protocol = "https"
-    ssl_certificate_id = "${var.https_cert_arn}"
+    ssl_certificate_id = "${aws_iam_server_certificate.consul_web_ui.arn}"
   }
 
   health_check {
@@ -406,16 +406,16 @@ resource "tls_private_key" "consul_web" {
     algorithm = "RSA"
 }
 
-resource "tls_self_signed_cert" "consul_web" {
+resource "tls_self_signed_cert" "consul_web_public" {
     key_algorithm = "${tls_private_key.consul_web.algorithm}"
     private_key_pem = "${tls_private_key.consul_web.private_key_pem}"
 
-    # Certificate expires after 12 hours.
-    validity_period_hours = 12
+    # Certificate expires after one year
+    validity_period_hours = 8760
 
     # Generate a new certificate if Terraform is run within three
-    # hours of the certificate's expiration time.
-    early_renewal_hours = 3
+    # hours of the certificate's expiration time. ( 7 days )
+    early_renewal_hours = 168
 
     # Reasonable set of uses for a server SSL certificate.
     allowed_uses = [
@@ -430,9 +430,39 @@ resource "tls_self_signed_cert" "consul_web" {
     }
 }
 
+resource "tls_self_signed_cert" "consul_web_ui" {
+    key_algorithm = "${tls_private_key.consul_web.algorithm}"
+    private_key_pem = "${tls_private_key.consul_web.private_key_pem}"
+
+    # Certificate expires after one year
+    validity_period_hours = 8760
+
+    # Generate a new certificate if Terraform is run within three
+    # hours of the certificate's expiration time. ( 7 days )
+    early_renewal_hours = 168
+
+    # Reasonable set of uses for a server SSL certificate.
+    allowed_uses = [
+        "key_encipherment",
+        "digital_signature",
+        "server_auth",
+    ]
+
+    subject {
+        common_name = "ui.${var.project}.${var.environment}.${var.region}.${var.service_name}.${var.domain}"
+        organization = "Nubis Platform"
+    }
+}
+
 resource "aws_iam_server_certificate" "consul_web_public" {
     name = "${var.project}-${var.environment}-${var.region}-consul-web-public"
-    certificate_body = "${tls_self_signed_cert.consul_web.cert_pem}"
+    certificate_body = "${tls_self_signed_cert.consul_web_public.cert_pem}"
+    private_key = "${tls_private_key.consul_web.private_key_pem}"
+}
+
+resource "aws_iam_server_certificate" "consul_web_ui" {
+    name = "${var.project}-${var.environment}-${var.region}-consul-web-ui"
+    certificate_body = "${tls_self_signed_cert.consul_web_ui.cert_pem}"
     private_key = "${tls_private_key.consul_web.private_key_pem}"
 }
 
