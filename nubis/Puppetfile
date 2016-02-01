@@ -5,6 +5,4 @@ forge "https://forgeapi.puppetlabs.com"
 ##########################################################
 
 # modules from the puppet forge
-mod 'KyleAnderson/consul',
-    :git => 'https://github.com/solarkennedy/puppet-consul.git',
-    :ref => 'a84e75c33f71259455375065957ce27098e06d70'
+mod 'KyleAnderson/consul', '1.0.5'

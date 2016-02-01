@@ -32,7 +32,7 @@ EOF
 resource "aws_autoscaling_group" "consul" {
   lifecycle { create_before_destroy = true }
   vpc_zone_identifier = ["${split(",", var.private_subnets)}"]
-  name = "${var.project}-${var.environment}"
+  name = "${var.project}-${var.environment} (LC ${aws_launch_configuration.consul.name})"
   max_size = "${var.servers}"
   min_size = "${var.servers}"
   health_check_grace_period = 10
@@ -40,6 +40,10 @@ resource "aws_autoscaling_group" "consul" {
   desired_capacity = "${var.servers}"
   force_delete = true
   launch_configuration = "${aws_launch_configuration.consul.name}"
+
+  # This resource isn't considered created by TF until we have var.servers in rotation
+  wait_for_elb_capacity = "${var.servers}"
+  wait_for_capacity_timeout = "15m"
 
   load_balancers = [
     "${aws_elb.consul.name}",
@@ -313,6 +317,12 @@ resource "aws_iam_role_policy" "consul" {
         },
         {
             "Action": "ec2:DescribeInstances",
+            "Resource": "*",
+            "Effect": "Allow",
+            "Sid": ""
+        },
+        {
+            "Action": "elasticloadbalancing:DescribeLoadBalancers",
             "Resource": "*",
             "Effect": "Allow",
             "Sid": ""

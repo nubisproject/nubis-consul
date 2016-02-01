@@ -1,5 +1,5 @@
 class { 'consul':
-  version => '0.6.0',
+  version => '0.6.2',
   purge_config_dir => false,
   manage_service => false,
   
@@ -16,13 +16,6 @@ class { 'consul':
           'enable_truncate' => true,
       },
   }
-}->
-file { "/var/lib/consul/ui/static/application.min.js":
-    ensure => present,
-    owner  => root,
-    group  => root,
-    mode   => '0644',
-    source => 'puppet:///nubis/files/application.min.js',
 }
 
 package { 'libwww-perl':
@@ -72,14 +65,6 @@ file { '/usr/local/bin/consul-asg-join':
     group  => root,
     mode   => '0755',
     source => 'puppet:///nubis/files/consul-asg-join',
-}
-
-file { '/usr/local/bin/nubis-secret':
-    ensure => file,
-    owner  => root,
-    group  => root,
-    mode   => '0755',
-    source => 'puppet:///nubis/files/nubis-secret',
 }
 
 cron::job {
