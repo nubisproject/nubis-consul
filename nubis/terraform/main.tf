@@ -383,6 +383,23 @@ resource "aws_iam_role_policy" "credstash" {
       }
     },
     {
+      "Effect": "Allow",
+      "Action": [
+        "kms:GenerateDataKey*",
+        "kms:Encrypt"
+      ],
+      "Resource": [
+        "arn:aws:kms:${var.region}:${var.aws_account_id}:key/${var.credstash_key}"
+      ],
+      "Condition": {
+        "ForAllValues:StringEquals": {
+          "kms:EncryptionContext:environment": "${var.environment}",
+          "kms:EncryptionContext:service": "nubis",
+          "kms:EncryptionContext:region": "${var.region}"
+        }
+      }
+    },
+    {
       "Resource": "arn:aws:dynamodb:${var.region}:${var.aws_account_id}:table/credential-store",
       "Action": [
         "dynamodb:BatchGetItem",
@@ -394,7 +411,36 @@ resource "aws_iam_role_policy" "credstash" {
         "dynamodb:DescribeReservedCapacity",
         "dynamodb:DescribeReservedCapacityOfferings"
       ],
-      "Effect": "Allow"
+      "Effect": "Allow",
+      "Condition": {
+        "ForAllValues:StringLike": {
+          "dynamodb:LeadingKeys": [
+            "${var.project}/${var.environment}/*"
+          ]
+        }
+      }
+    },
+    {
+      "Resource": "arn:aws:dynamodb:${var.region}:${var.aws_account_id}:table/credential-store",
+      "Action": [
+        "dynamodb:BatchGetItem",
+        "dynamodb:DescribeTable",
+        "dynamodb:GetItem",
+        "dynamodb:ListTables",
+        "dynamodb:Query",
+        "dynamodb:Scan",
+        "dynamodb:DescribeReservedCapacity",
+        "dynamodb:DescribeReservedCapacityOfferings",
+        "dynamodb:PutItem"
+      ],
+      "Effect": "Allow",
+      "Condition": {
+        "ForAllValues:StringLike": {
+          "dynamodb:LeadingKeys": [
+            "nubis/${var.environment}/*"
+          ]
+        }
+      }
     }
   ]
 }
