@@ -240,7 +240,6 @@ resource "aws_security_group" "elb-public" {
 
 }
 
-
 resource "aws_route53_record" "ui" {
    zone_id = "${var.zone_id}"
    name = "ui.${var.project}.${var.environment}"
@@ -465,6 +464,27 @@ resource "aws_iam_server_certificate" "consul_web_ui" {
     certificate_body = "${tls_self_signed_cert.consul_web_ui.cert_pem}"
     private_key = "${tls_private_key.consul_web.private_key_pem}"
 }
+
+
+# This null resource is responsible for publishing platform secrets to Credstash
+resource "null_resource" "credstash-public" {
+
+  # Important to list here every variable that affects what needs to be put into credstash
+  triggers {
+    secret = "${var.credstash_key}"
+    cacert = "${tls_self_signed_cert.consul_web_ui.cert_pem}"
+    region = "${var.region}"
+    context = "region=${var.region} environment=${var.environment} service=nubis"
+    credstash = "AWS_ACCESS_KEY_ID=${var.aws_access_key} AWS_SECRET_ACCESS_KEY=${var.aws_secret_key} credstash -r ${var.region} put -k ${var.credstash_key} -a nubis/${var.environment}"
+  }
+
+  # Consul UI SSL Certificate
+  provisioner "local-exec" {
+      command = "${self.triggers.credstash}/ssl/cacert '${tls_self_signed_cert.consul_web_ui.cert_pem}' ${self.triggers.context}"
+  }
+
+}
+
 
 # This null resource is responsible for publishing secrets to Credstash
 resource "null_resource" "credstash" {
