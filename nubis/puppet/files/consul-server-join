@@ -23,3 +23,7 @@ KEY_PREFIX="/environments/$NUBIS_ENVIRONMENT/global/$NUBIS_PROJECT"
 /usr/local/bin/consul-get-or-set "$KEY_PREFIX/key"    "cat /etc/consul/consul.key"
 /usr/local/bin/consul-get-or-set "$KEY_PREFIX/secret" "cat /etc/consul/zzz-tls.json | jq -r .encrypt"
 
+# Run puppet manifests dropped in /etc/consul for post-boostrap configuration (ACLs)
+for PUPPET_FILE in /etc/consul/*pp; do
+  puppet apply $PUPPET_FILE
+done
