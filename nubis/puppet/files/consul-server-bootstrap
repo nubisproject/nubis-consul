@@ -53,6 +53,50 @@ cat <<EOF > /etc/consul/zzz-acl.json
   "acl_down_policy": "$CONSUL_ACL_DOWN_POLICY"
 }
 EOF
+
+# Create the ACLs, and since we are blacklisting for now, we don't need
+# to be very specific, the Platform token gets *.* since we allow by default,
+# and it's the anonymous one that gets denied explicitely. Will need inverting
+
+cat <<EOF > /etc/consul/acl.pp
+consul_acl { "Nubis Platform":
+  ensure => 'present',
+  rules  => {},
+  type   => 'client',
+  acl_api_token => '$CONSUL_MASTER_ACL_TOKEN',
+}
+
+# XXX: Missing support for storage and mysql(bugzilla)
+consul_acl { "Anonymous Token":
+  ensure => 'present',
+  rules  => {
+    "key" => {
+      "_rexec/" => {
+        "policy" => "deny"
+      },
+      "jumphost" => {
+        "policy" => "deny"
+      },
+      "fluent" => {
+        "policy" => "deny"
+      },
+      "proxy" => {
+        "policy" => "deny"
+      }
+    },
+    "service" => {
+      "fluentd" => {
+        "policy" => "read"
+      },
+      "proxy" => {
+        "policy" => "read"
+      }
+    }
+  },
+  type   => 'client',
+  acl_api_token => '$CONSUL_MASTER_ACL_TOKEN',
+}
+EOF
 fi
 
 
