@@ -30,7 +30,7 @@ fi
 
 # Grab the master ACL token from credstash (if not in user-data)
 if [ ! "$CONSUL_MASTER_ACL_TOKEN" ]; then
-  CONSUL_MASTER_ACL_TOKEN=$(nubis-secret get "$NUBIS_PROJECT/$NUBIS_ENVIRONMENT/master_acl_token")
+  CONSUL_MASTER_ACL_TOKEN=$(nubis-secret get master_acl_token)
 fi
 
 if [ "$CONSUL_MASTER_ACL_TOKEN" ]; then
@@ -104,7 +104,7 @@ fi
 if [ "$CONSUL_SECRET" ]; then
   echo "$CONSUL_SECRET" > /etc/consul/consul.secret
 else
-  SECRET=$(nubis-secret get "$NUBIS_PROJECT/$NUBIS_ENVIRONMENT/secret")
+  SECRET=$(nubis-secret get secret)
   echo "$SECRET" > /etc/consul/consul.secret
 fi
 
@@ -112,7 +112,7 @@ fi
 if [ "$CONSUL_CERT" ]; then
   echo "$CONSUL_CERT" | tr " " "\n" | perl -pe 's/--BEGIN\n/--BEGIN /g' | perl -pe 's/--END\n/--END /g' > /etc/consul/consul.pem
 else
-  CERT=$(nubis-secret get "$NUBIS_PROJECT/$NUBIS_ENVIRONMENT/ssl/cert")
+  CERT=$(nubis-secret get ssl/cert)
   echo "$CERT" > /etc/consul/consul.pem
 fi
 
@@ -120,7 +120,7 @@ fi
 if [ "$CONSUL_KEY" ]; then
   echo "$CONSUL_KEY" | tr " " "\n" | perl -pe 's/--(BEGIN|END)\n/--$1 /m' | perl -pe 's/ RSA\n/ RSA /g' | perl -pe 's/ PRIVATE\n/ PRIVATE /g' > /etc/consul/consul.key
 else
-  KEY=$(nubis-secret get "$NUBIS_PROJECT/$NUBIS_ENVIRONMENT/ssl/key")
+  KEY=$(nubis-secret get ssl/key)
   echo "$KEY" > /etc/consul/consul.key
 fi
 
