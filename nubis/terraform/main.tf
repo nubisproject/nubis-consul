@@ -486,11 +486,12 @@ resource "tls_self_signed_cert" "consul_web_ui" {
     # hours of the certificate's expiration time. ( 7 days )
     early_renewal_hours = 168
 
+    is_ca_certificate = true
+
     # Reasonable set of uses for a server SSL certificate.
     allowed_uses = [
         "key_encipherment",
         "digital_signature",
-        "server_auth",
     ]
 
     subject {
