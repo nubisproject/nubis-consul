@@ -1,5 +1,7 @@
 #!/bin/bash
 
+export PATH=/usr/local/bin:$PATH
+
 USER_DATA=$(curl -fqs http://169.254.169.254/latest/user-data)
 eval "$USER_DATA"
 
@@ -43,3 +45,4 @@ if [ "$PLATFORM_ACL" != "" ]; then
       credstash --region "$REGION" put -a "nubis/$NUBIS_ENVIRONMENT/consul/acl_token" "$PLATFORM_ACL" "region=$REGION" "environment=$NUBIS_ENVIRONMENT" "service=nubis"
     fi
 fi
+
