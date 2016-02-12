@@ -1,0 +1,6 @@
+#!/bin/bash
+
+if [ -r /etc/consul/zzz-acl.json ]; then
+  CONSUL_HTTP_TOKEN=$(jq -r '.acl_master_token // "anonymous"'  < /etc/consul/zzz-acl.json)
+  export CONSUL_HTTP_TOKEN
+fi
