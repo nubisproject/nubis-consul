@@ -1,0 +1,16 @@
+#!/bin/bash
+
+# This gets sourced by confd's init script
+
+# First, see if we have a master ACL token config file
+if [ -r /etc/consul/zzz-acl.json ]; then
+  CONSUL_ACL_TOKEN=$(jq -r '.acl_master_token // ""'  < /etc/consul/zzz-acl.json)
+
+  # Should be there, but just in case...
+  if [ "$CONSUL_ACL_TOKEN" != "" ]; then
+    CONSUL_HTTP_TOKEN=$CONSUL_ACL_TOKEN
+
+    # make sure confd gets to see it
+    export CONSUL_HTTP_TOKEN
+  fi
+fi
