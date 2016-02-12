@@ -1,8 +1,10 @@
 class { 'consul':
-  version => '0.6.2',
+  version => '0.6.3',
   purge_config_dir => false,
   manage_service => false,
-  
+  service_enable => false,
+  service_ensure => 'stopped',
+
   config_hash => {
       'data_dir'        => '/var/lib/consul',
       'log_level'       => 'INFO',
