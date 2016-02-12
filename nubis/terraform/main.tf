@@ -476,6 +476,7 @@ resource "tls_self_signed_cert" "consul_web_public" {
 }
 
 resource "tls_self_signed_cert" "consul_web_ui" {
+    lifecycle { create_before_destroy = true }
     key_algorithm = "${tls_private_key.consul_web.algorithm}"
     private_key_pem = "${tls_private_key.consul_web.private_key_pem}"
 
@@ -492,6 +493,7 @@ resource "tls_self_signed_cert" "consul_web_ui" {
     allowed_uses = [
         "key_encipherment",
         "digital_signature",
+        "cert_signing",
     ]
 
     subject {
@@ -504,12 +506,23 @@ resource "aws_iam_server_certificate" "consul_web_public" {
     name = "${var.project}-${var.environment}-${var.region}-consul-web-public"
     certificate_body = "${tls_self_signed_cert.consul_web_public.cert_pem}"
     private_key = "${tls_private_key.consul_web.private_key_pem}"
+
+    # Amazon lies about key creation and availability
+    provisioner "local-exec" {
+      command = "sleep 10"
+    }
 }
 
 resource "aws_iam_server_certificate" "consul_web_ui" {
-    name = "${var.project}-${var.environment}-${var.region}-consul-web-ui"
+    lifecycle { create_before_destroy = true }
+    name = "${var.project}-${var.environment}-${var.region}-consul-web-ui-${tls_self_signed_cert.consul_web_ui.id}"
     certificate_body = "${tls_self_signed_cert.consul_web_ui.cert_pem}"
     private_key = "${tls_private_key.consul_web.private_key_pem}"
+
+    # Amazon lies about key creation and availability
+    provisioner "local-exec" {
+      command = "sleep 10"
+    }
 }
 
 
