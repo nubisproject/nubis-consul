@@ -492,6 +492,7 @@ resource "tls_self_signed_cert" "consul_web_ui" {
     allowed_uses = [
         "key_encipherment",
         "digital_signature",
+        "cert_signing",
     ]
 
     subject {
