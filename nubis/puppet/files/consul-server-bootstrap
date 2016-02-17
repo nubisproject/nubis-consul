@@ -82,6 +82,9 @@ consul_acl { "Anonymous Token":
       },
       "proxy" => {
         "policy" => "deny"
+      },
+      "nubis" => {
+        "policy" => "deny"
       }
     },
     "service" => {
