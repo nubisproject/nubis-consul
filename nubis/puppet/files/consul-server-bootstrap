@@ -74,7 +74,7 @@ consul_acl { "Anonymous Token":
       "_rexec/" => {
         "policy" => "deny"
       },
-      "environments/" {
+      "environments/" => {
         "policy" => "read"
       },
       "jumphost" => {
