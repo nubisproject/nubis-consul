@@ -1,5 +1,5 @@
 class { 'consul':
-  version => '0.6.3',
+  version => '0.6.4',
   purge_config_dir => false,
   manage_service => false,
   service_enable => false,
