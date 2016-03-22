@@ -25,24 +25,6 @@ KEY_PREFIX="/environments/$NUBIS_ENVIRONMENT/global/$NUBIS_PROJECT"
 /usr/local/bin/consul-get-or-set "$KEY_PREFIX/key"    "cat /etc/consul/consul.key"
 /usr/local/bin/consul-get-or-set "$KEY_PREFIX/secret" "cat /etc/consul/zzz-tls.json | jq -r .encrypt"
 
-# Run puppet manifests dropped in /etc/consul for post-boostrap configuration (ACLs)
-for PUPPET_FILE in /etc/consul/*pp; do
-  puppet apply "$PUPPET_FILE"
-done
 
-# XXX: At this point, there should be a platform ACL if we wanted one
-if [ -r /etc/consul/zzz-acl.json ]; then
-    MASTER_ACL_TOKEN=$(jq -r .acl_master_token < /etc/consul/zzz-acl.json)
-fi
-
-# Find out what the platform ACL is
-PLATFORM_ACL=$(curl -fqs "http://localhost:8500/v1/acl/list?token=$MASTER_ACL_TOKEN" | jq -r '.[] | select(.Name=="Nubis Platform").ID')
-if [ "$PLATFORM_ACL" != "" ]; then
-    REGION=$(curl -s http://169.254.169.254/latest/dynamic/instance-identity/document | jq '.region' -r)
-    CURRENT_PLATFORM_ACL=$(credstash --region "$REGION" get "nubis/$NUBIS_ENVIRONMENT/consul/acl_token" "region=$REGION" "environment=$NUBIS_ENVIRONMENT" "service=nubis")
-    if [ "$CURRENT_PLATFORM_ACL" != "$PLATFORM_ACL" ]; then
-      # Store current platform ACL in credstash for others to retrieve
-      credstash --region "$REGION" put -a "nubis/$NUBIS_ENVIRONMENT/consul/acl_token" "$PLATFORM_ACL" "region=$REGION" "environment=$NUBIS_ENVIRONMENT" "service=nubis"
-    fi
-fi
-
+# Perform global post-boostrap operations, with exclusive lock
+/usr/local/bin/consul lock "consul-$NUBIS_ENVIRONMENT-post-bootstrap" /usr/local/bin/consul-post-bootstrap
