@@ -61,6 +61,14 @@ file { '/etc/nubis.d/01-consul-server-join':
     source => 'puppet:///nubis/files/consul-server-join',
 }
 
+file { '/usr/local/bin/consul-post-bootstrap':
+    ensure => file,
+    owner  => root,
+    group  => root,
+    mode   => '0755',
+    source => 'puppet:///nubis/files/consul-post-bootstrap',
+}
+
 file { '/usr/local/bin/consul-asg-join':
     ensure => file,
     owner  => root,
