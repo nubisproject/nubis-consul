@@ -1,98 +1,61 @@
-#ws_launch_configuration Configure the AWS Provider
+# Configure the AWS Provider
 provider "aws" {
-    profile = "${var.aws_profile}"
-    region = "${var.aws_region}"
-}
-
-resource "atlas_artifact" "nubis-consul" {
-  count = "${var.enabled}"
-
-  name = "nubisproject/nubis-consul"
-  type = "amazon.image"
-
-  lifecycle { create_before_destroy = true }
-
-  metadata {
-        project_version = "${var.nubis_version}"
-    }
+    access_key = "${var.aws_access_key}"
+    secret_key = "${var.aws_secret_key}"
+    region = "${var.region}"
 }
 
 resource "aws_launch_configuration" "consul" {
-    count = "${var.enabled * length(split(",", var.environments))}"
-    depends_on = [
-      "null_resource.credstash",
-      "null_resource.credstash-public",
-    ]
-
+    depends_on = [ "null_resource.credstash" ]
     lifecycle { create_before_destroy = true }
-    
-    name_prefix = "${var.project}-${element(split(",",var.environments), count.index)}-${var.aws_region}-"
-
-    # Somewhat nasty, since Atlas doesn't have an elegant way to access the id for a region
-    # the id is "region:ami,region:ami,region:ami"
-    # so we split it all and find the index of the region
-    # add on, and pick that element
-    image_id = "${ element(split(",",replace(atlas_artifact.nubis-consul.id,":",",")) ,1 + index(split(",",replace(atlas_artifact.nubis-consul.id,":",",")), var.aws_region)) }"
-
+    image_id = "${var.ami}"
     instance_type = "t2.nano"
     key_name = "${var.key_name}"
-    iam_instance_profile = "${element(aws_iam_instance_profile.consul.*.name, count.index)}"
+    iam_instance_profile = "${aws_iam_instance_profile.consul.name}"
 
     security_groups = [
-      "${element(aws_security_group.consul.*.id, count.index)}",
-      "${element(split(",",var.internet_access_security_groups), count.index)}",
-      "${element(split(",",var.shared_services_security_groups), count.index)}",
+      "${aws_security_group.consul.id}",
+      "${var.internet_security_group_id}",
+      "${var.shared_services_security_group_id}",
     ]
-
-
 
     user_data = <<EOF
 NUBIS_PROJECT=${var.project}
-NUBIS_ENVIRONMENT=${element(split(",",var.environments), count.index)}
+NUBIS_ENVIRONMENT=${var.environment}
 NUBIS_ACCOUNT=${var.service_name}
 NUBIS_DOMAIN=${var.domain}
 CONSUL_ACL_DEFAULT_POLICY=${var.acl_default_policy}
 CONSUL_ACL_DOWN_POLICY=${var.acl_down_policy}
-NUBIS_BUMP=${md5("${var.datadog_api_key}${element(template_file.mig.*.rendered,count.index)}")}
 EOF
 }
 
 resource "aws_autoscaling_group" "consul" {
-  count = "${var.enabled * length(split(",", var.environments))}"
   lifecycle { create_before_destroy = true }
-  
-  #XXX: Fugly, assumes 3 subnets per environments, bad assumption, but valid ATM
-  vpc_zone_identifier = [
-    "${element(split(",",var.private_subnets), (count.index * 3) + 0 )}",
-    "${element(split(",",var.private_subnets), (count.index * 3) + 1 )}",
-    "${element(split(",",var.private_subnets), (count.index * 3) + 2 )}",
-  ]
-
-  name = "${var.project}-${element(split(",",var.environments), count.index)} (LC ${element(aws_launch_configuration.consul.*.name, count.index)})"
-
+  vpc_zone_identifier = ["${split(",", var.private_subnets)}"]
+  name = "${var.project}-${var.environment} (LC ${aws_launch_configuration.consul.name})"
   max_size = "${var.servers}"
   min_size = "${var.servers}"
   health_check_grace_period = 10
-  health_check_type = "ELB"
+  health_check_type = "EC2"
   desired_capacity = "${var.servers}"
   force_delete = true
-  launch_configuration = "${element(aws_launch_configuration.consul.*.name, count.index)}"
+  launch_configuration = "${aws_launch_configuration.consul.name}"
 
   # This resource isn't considered created by TF until we have var.servers in rotation
-#  wait_for_elb_capacity = "${var.servers - 1}"
   wait_for_elb_capacity = "${var.servers}"
-  wait_for_capacity_timeout = "60m"
+  wait_for_capacity_timeout = "15m"
 
   load_balancers = [
-    "${element(aws_elb.consul.*.name, count.index)}",
-    "${element(aws_elb.consul-public.*.name, count.index)}",
+    "${aws_elb.consul.name}",
+    "${aws_elb.consul-public.name}"
   ]
 
   tag {
     key = "Name"
-    value = "Consul server node (${var.nubis_version}) for ${var.service_name} in ${element(split(",",var.environments), count.index)}"
+    value = "Consul server node (v/${var.release}.${var.build}) for ${var.service_name} in ${var.environment}"
     propagate_at_launch = true
   }
+
   tag {
     key = "ServiceName"
     value = "${var.project}"
@@ -101,38 +64,38 @@ resource "aws_autoscaling_group" "consul" {
 }
 
 resource "aws_security_group" "consul" {
-  count = "${var.enabled * length(split(",", var.environments))}"
-  #XXX
-  lifecycle { create_before_destroy = true }
-
-  name = "${var.project}-${element(split(",",var.environments), count.index)}"
+  name = "${var.project}-${var.environment}"
   description = "Consul internal traffic + maintenance."
- 
-  vpc_id = "${element(split(",",var.vpc_ids), count.index)}"
+  
 
-  # XXX: These are for maintenance
+  vpc_id = "${var.vpc_id}"
+
+  // These are for internal traffic (redundant, ssg does this)
+  ingress {
+    from_port = 8300
+    to_port = 8303
+    protocol = "tcp"
+    security_groups = [
+      "${var.shared_services_security_group_id}",
+    ]
+  }
+
+  // This is for the gossip traffic (redundant, ssg does this)
+  ingress {
+    from_port = 8300
+    to_port = 8303
+    protocol = "udp"
+    security_groups = [
+      "${var.shared_services_security_group_id}",
+    ]
+  }
+
+  // These are for maintenance
   ingress {
     from_port = 22
     to_port = 22
     protocol = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
-  }
-  
-  # XXX: Redundant
-  # Consul TCP
-  ingress {
-    self = true
-    from_port = 8300
-    to_port = 8302
-    protocol = "tcp"
-  }
-
-  # Consul UDP
-  ingress {
-    self = true
-    from_port = 8300
-    to_port = 8302
-    protocol = "udp"
   }
 
   ingress {
@@ -140,8 +103,8 @@ resource "aws_security_group" "consul" {
     to_port = 8500
     protocol = "tcp"
     security_groups = [
-      "${element(aws_security_group.elb.*.id, count.index)}",
-      "${element(aws_security_group.elb-public.*.id, count.index)}"
+      "${aws_security_group.elb.id}",
+      "${aws_security_group.elb-public.id}"
     ]
   }
 
@@ -152,27 +115,12 @@ resource "aws_security_group" "consul" {
       protocol = "-1"
       cidr_blocks = ["0.0.0.0/0"]
   }
-
-  tags = {
-      Name = "${var.project}-${element(split(",",var.environments), count.index)}"
-      Region = "${var.aws_region}"
-      Environment = "${element(split(",",var.environments), count.index)}"
-  }
 }
 
-## Create a new load balancer
+# Create a new load balancer
 resource "aws_elb" "consul" {
-  count = "${var.enabled * length(split(",", var.environments))}"
-  #XXX
-  lifecycle { create_before_destroy = true }
-  name = "elb-${var.project}-${element(split(",",var.environments), count.index)}"
-
-  #XXX: Fugly, assumes 3 subnets per environments, bad assumption, but valid ATM
-  subnets = [
-    "${element(split(",",var.private_subnets), (count.index * 3) + 0 )}",
-    "${element(split(",",var.private_subnets), (count.index * 3) + 1 )}",
-    "${element(split(",",var.private_subnets), (count.index * 3) + 2 )}",
-  ]
+  name = "elb-${var.project}-${var.environment}"
+  subnets = ["${split(",", var.public_subnets)}"]
 
   # This is an internal ELB, only accessible form inside the VPC
   internal = true
@@ -189,7 +137,7 @@ resource "aws_elb" "consul" {
     instance_protocol = "http"
     lb_port = 443
     lb_protocol = "https"
-    ssl_certificate_id = "${element(aws_iam_server_certificate.consul_web_ui.*.arn, count.index)}"
+    ssl_certificate_id = "${aws_iam_server_certificate.consul_web_ui.arn}"
   }
 
   health_check {
@@ -203,31 +151,15 @@ resource "aws_elb" "consul" {
   cross_zone_load_balancing = true
 
   security_groups = [
-    "${element(aws_security_group.elb.*.id, count.index)}"
+    "${aws_security_group.elb.id}"
   ]
-  
-  tags = {
-      Name = "elb-${var.project}-${element(split(",",var.environments), count.index)}"
-      Region = "${var.aws_region}"
-      Environment = "${element(split(",",var.environments), count.index)}"
-  }
 }
 
 # Create the public load-balancer
-#
+
 resource "aws_elb" "consul-public" {
-  count = "${var.enabled * length(split(",", var.environments))}"
-  #XXX
-  lifecycle { create_before_destroy = true }
-
-  name = "elb-${var.project}-${element(split(",",var.environments), count.index)}-public"
-
-  #XXX: Fugly, assumes 3 subnets per environments, bad assumption, but valid ATM
-  subnets = [
-    "${element(split(",",var.public_subnets), (count.index * 3) + 0 )}",
-    "${element(split(",",var.public_subnets), (count.index * 3) + 1 )}",
-    "${element(split(",",var.public_subnets), (count.index * 3) + 2 )}",
-  ]
+  name = "elb-${var.project}-${var.environment}-public"
+  subnets = ["${split(",", var.public_subnets)}"]
 
   # This is an internet facing ELB
   internal = false
@@ -237,7 +169,7 @@ resource "aws_elb" "consul-public" {
     instance_protocol = "http"
     lb_port = 443
     lb_protocol = "https"
-    ssl_certificate_id = "${element(aws_iam_server_certificate.consul_web_public.*.arn, count.index)}"
+    ssl_certificate_id = "${aws_iam_server_certificate.consul_web_public.arn}"
   }
 
   health_check {
@@ -251,25 +183,15 @@ resource "aws_elb" "consul-public" {
   cross_zone_load_balancing = true
 
   security_groups = [
-    "${element(aws_security_group.elb-public.*.id, count.index)}"
+    "${aws_security_group.elb-public.id}"
   ]
-  
-  tags = {
-      Name = "elb-${var.project}-${element(split(",",var.environments), count.index)}-public"
-      Region = "${var.aws_region}"
-      Environment = "${element(split(",",var.environments), count.index)}"
-  }
 }
 
 resource "aws_security_group" "elb" {
-  count = "${var.enabled * length(split(",", var.environments))}"
-  #XXX
-  lifecycle { create_before_destroy = true }
-
-  name = "elb-${var.project}-${element(split(",",var.environments), count.index)}"
+  name = "elb-${var.project}-${var.environment}"
   description = "Allow inbound traffic for consul"
 
-  vpc_id = "${element(split(",",var.vpc_ids), count.index)}"
+  vpc_id = "${var.vpc_id}"
 
   ingress {
       from_port = 80
@@ -293,23 +215,13 @@ resource "aws_security_group" "elb" {
       cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags = {
-      Name = "elb-${var.project}-${element(split(",",var.environments), count.index)}"
-      Region = "${var.aws_region}"
-      Environment = "${element(split(",",var.environments), count.index)}"
-  }
-
 }
 
 resource "aws_security_group" "elb-public" {
-  count = "${var.enabled * length(split(",", var.environments))}"
-  #XXX
-  lifecycle { create_before_destroy = true }
-
-  name = "elb-${var.project}-${element(split(",",var.environments), count.index)}-public"
+  name = "elb-${var.project}-${var.environment}-public"
   description = "Allow inbound traffic for consul"
 
-  vpc_id = "${element(split(",",var.vpc_ids), count.index)}"
+  vpc_id = "${var.vpc_id}"
 
   ingress {
       from_port = 443
@@ -324,69 +236,49 @@ resource "aws_security_group" "elb-public" {
       to_port = 0
       protocol = "-1"
       cidr_blocks = ["0.0.0.0/0"]
- }
+  }
 
-}
-
-resource "aws_route53_zone" "consul" {
-  count = "${var.enabled * length(split(",", var.environments))}"
-  name = "${var.project}.${element(split(",",var.environments), count.index)}.${var.aws_region}.${var.service_name}.${var.domain}"
-  vpc_id = "${element(split(",",var.vpc_ids), count.index)}"
 }
 
 resource "aws_route53_record" "ui" {
-   count = "${var.enabled * length(split(",", var.environments))}"
-   zone_id = "${element(aws_route53_zone.consul.*.zone_id, count.index)}"
-   name = "ui"
+   zone_id = "${var.zone_id}"
+   name = "ui.${var.project}.${var.environment}"
    type = "CNAME"
    ttl = "30"
-   records = ["${element(aws_elb.consul.*.dns_name, count.index)}"]
+   records = ["dualstack.${aws_elb.consul.dns_name}"]
 }
 
 resource "aws_route53_record" "public" {
-   count = "${var.enabled * length(split(",", var.environments))}"
    zone_id = "${var.zone_id}"
-   name = "public.${var.project}.${element(split(",",var.environments), count.index)}"
+   name = "public.${var.project}.${var.environment}"
    type = "CNAME"
    ttl = "30"
-   records = ["dualstack.${element(aws_elb.consul-public.*.dns_name, count.index)}"]
+   records = ["dualstack.${aws_elb.consul-public.dns_name}"]
 }
 
-#XXX: Need UUID bucket
 resource "aws_s3_bucket" "consul_backups" {
-  count = "${var.enabled * length(split(",", var.environments))}"
-  #XXX
-  lifecycle { create_before_destroy = true } 
-
-  bucket = "nubis-${var.project}-backup-${element(split(",",var.environments), count.index)}-${var.aws_region}-${var.service_name}"
+    bucket = "nubis-${var.project}-backup-${var.environment}-${var.region}-${var.service_name}"
     acl = "private"
 
     # Nuke the bucket content on deletion
     force_destroy = true
 
     tags = {
-        Name = "nubis-${var.project}-backup-${element(split(",",var.environments), count.index)}-${var.aws_region}-${var.service_name}"
-        Region = "${var.aws_region}"
-        Environment = "${element(split(",",var.environments), count.index)}"
+        Name = "nubis-${var.project}-backupbucket-${var.environment}-${var.region}"
+        Region = "${var.region}"
+        Environment = "${var.environment}"
     }
 }
 
 resource "aws_iam_instance_profile" "consul" {
-    count = "${var.enabled * length(split(",", var.environments))}"
-    #XXX
-    lifecycle { create_before_destroy = true }
-    name = "${var.project}-${element(split(",",var.environments), count.index)}-${var.aws_region}"
-    roles = ["${element(aws_iam_role.consul.*.name, count.index)}"]
+    name = "${var.project}-${var.environment}-${var.region}"
+    roles = ["${aws_iam_role.consul.name}"]
 }
 
 resource "aws_iam_role" "consul" {
-  count = "${var.enabled * length(split(",", var.environments))}"
-  #XXX
-  lifecycle { create_before_destroy = true }
-  
-  name = "${var.project}-${element(split(",",var.environments), count.index)}-${var.aws_region}"
-  path = "/nubis/consul/"
-    assume_role_policy = <<POLICY
+    name = "${var.project}-${var.environment}-${var.region}"
+    path = "/"
+    assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
   "Statement": [
@@ -400,28 +292,39 @@ resource "aws_iam_role" "consul" {
     }
   ]
 }
-POLICY
+EOF
 }
 
 resource "aws_iam_role_policy" "consul" {
-    count = "${var.enabled * length(split(",", var.environments))}"
-    #XXX
-    lifecycle { create_before_destroy = true }
-    name = "${var.project}-${element(split(",",var.environments), count.index)}-${var.aws_region}"
-    role = "${element(aws_iam_role.consul.*.id, count.index)}"
+    name = "${var.project}-${var.environment}-${var.region}"
+    role = "${aws_iam_role.consul.id}"
     policy = <<EOF
 {
     "Version": "2008-10-17",
     "Statement": [
         {
-            "Action": [
-                "autoscaling:DescribeAutoScalingInstances",
-                "autoscaling:DescribeAutoScalingGroups",
-                "ec2:DescribeInstances",
-                "elasticloadbalancing:DescribeLoadBalancers"
-            ],
+            "Action": "autoscaling:DescribeAutoScalingInstances",
             "Resource": "*",
-            "Effect": "Allow"
+            "Effect": "Allow",
+            "Sid": ""
+        },
+        {
+            "Action": "autoscaling:DescribeAutoScalingGroups",
+            "Resource": "*",
+            "Effect": "Allow",
+            "Sid": ""
+        },
+        {
+            "Action": "ec2:DescribeInstances",
+            "Resource": "*",
+            "Effect": "Allow",
+            "Sid": ""
+        },
+        {
+            "Action": "elasticloadbalancing:DescribeLoadBalancers",
+            "Resource": "*",
+            "Effect": "Allow",
+            "Sid": ""
         }
     ]
 }
@@ -429,11 +332,8 @@ EOF
 }
 
 resource "aws_iam_role_policy" "consul_backups" {
-    count = "${var.enabled * length(split(",", var.environments))}"
-    #XXX
-    lifecycle { create_before_destroy = true }
-    name    = "${var.project}-${element(split(",",var.environments), count.index)}-${var.aws_region}-backups"
-    role    = "${element(aws_iam_role.consul.*.id, count.index)}"
+    name    = "${var.project}-${var.environment}-${var.region}-backups"
+    role    = "${aws_iam_role.consul.id}"
     policy  = <<EOF
 {
     "Version": "2012-10-17",
@@ -443,7 +343,7 @@ resource "aws_iam_role_policy" "consul_backups" {
             "Action": [
                 "s3:ListBucket"
             ],
-            "Resource": [ "${element(aws_s3_bucket.consul_backups.*.arn,count.index)}" ]
+            "Resource": [ "arn:aws:s3:::${aws_s3_bucket.consul_backups.id}" ]
         },
         {
             "Effect": "Allow",
@@ -452,7 +352,7 @@ resource "aws_iam_role_policy" "consul_backups" {
                 "s3:GetObject",
                 "s3:DeleteObject"
             ],
-            "Resource": [ "${element(aws_s3_bucket.consul_backups.*.arn,count.index)}/*" ]
+            "Resource": [ "arn:aws:s3:::${aws_s3_bucket.consul_backups.id}/*" ]
         }
     ]
 }
@@ -460,11 +360,8 @@ EOF
 }
 
 resource "aws_iam_role_policy" "credstash" {
-    count = "${var.enabled * length(split(",", var.environments))}"
-    #XXX
-    lifecycle { create_before_destroy = true }
-    name    = "${var.project}-${element(split(",",var.environments), count.index)}-${var.aws_region}-credstash"
-    role    = "${element(aws_iam_role.consul.*.id, count.index)}"
+    name    = "${var.project}-${var.environment}-${var.region}-credstash"
+    role    = "${aws_iam_role.consul.id}"
     policy  = <<EOF
 {
   "Version": "2012-10-17",
@@ -472,30 +369,75 @@ resource "aws_iam_role_policy" "credstash" {
     {
       "Effect": "Allow",
       "Action": [
-        "kms:GenerateDataKey*",
-        "kms:Encrypt"
+        "kms:Decrypt"
       ],
       "Resource": [
-        "${var.credstash_key}"
+        "arn:aws:kms:${var.region}:${var.aws_account_id}:key/${var.credstash_key}"
       ],
       "Condition": {
-        "ForAllValues:StringEquals": {
-          "kms:EncryptionContext:environment": "${element(split(",",var.environments), count.index)}",
-          "kms:EncryptionContext:service": "nubis",
-          "kms:EncryptionContext:region": "${var.aws_region}"
+        "StringEquals": {
+          "kms:EncryptionContext:environment": "${var.environment}",
+          "kms:EncryptionContext:service": "${var.project}",
+          "kms:EncryptionContext:region": "${var.region}"
         }
       }
     },
     {
-      "Resource": "arn:aws:dynamodb:${var.aws_region}:${var.aws_account_id}:table/credential-store",
+      "Effect": "Allow",
       "Action": [
+        "kms:GenerateDataKey*",
+        "kms:Encrypt"
+      ],
+      "Resource": [
+        "arn:aws:kms:${var.region}:${var.aws_account_id}:key/${var.credstash_key}"
+      ],
+      "Condition": {
+        "ForAllValues:StringEquals": {
+          "kms:EncryptionContext:environment": "${var.environment}",
+          "kms:EncryptionContext:service": "nubis",
+          "kms:EncryptionContext:region": "${var.region}"
+        }
+      }
+    },
+    {
+      "Resource": "arn:aws:dynamodb:${var.region}:${var.aws_account_id}:table/credential-store",
+      "Action": [
+        "dynamodb:BatchGetItem",
+        "dynamodb:DescribeTable",
+        "dynamodb:GetItem",
+        "dynamodb:ListTables",
+        "dynamodb:Query",
+        "dynamodb:Scan",
+        "dynamodb:DescribeReservedCapacity",
+        "dynamodb:DescribeReservedCapacityOfferings"
+      ],
+      "Effect": "Allow",
+      "Condition": {
+        "ForAllValues:StringLike": {
+          "dynamodb:LeadingKeys": [
+            "${var.project}/${var.environment}/*"
+          ]
+        }
+      }
+    },
+    {
+      "Resource": "arn:aws:dynamodb:${var.region}:${var.aws_account_id}:table/credential-store",
+      "Action": [
+        "dynamodb:BatchGetItem",
+        "dynamodb:DescribeTable",
+        "dynamodb:GetItem",
+        "dynamodb:ListTables",
+        "dynamodb:Query",
+        "dynamodb:Scan",
+        "dynamodb:DescribeReservedCapacity",
+        "dynamodb:DescribeReservedCapacityOfferings",
         "dynamodb:PutItem"
       ],
       "Effect": "Allow",
       "Condition": {
         "ForAllValues:StringLike": {
           "dynamodb:LeadingKeys": [
-            "nubis/${element(split(",",var.environments), count.index)}/*"
+            "nubis/${var.environment}/*"
           ]
         }
       }
@@ -506,14 +448,10 @@ EOF
 }
 
 resource "tls_private_key" "consul_web" {
-    count = "${var.enabled}"
-    lifecycle { create_before_destroy = true }
     algorithm = "RSA"
 }
 
 resource "tls_self_signed_cert" "consul_web_public" {
-    count = "${var.enabled * length(split(",", var.environments))}"
-    lifecycle { create_before_destroy = true }
     key_algorithm = "${tls_private_key.consul_web.algorithm}"
     private_key_pem = "${tls_private_key.consul_web.private_key_pem}"
 
@@ -532,13 +470,12 @@ resource "tls_self_signed_cert" "consul_web_public" {
     ]
 
     subject {
-        common_name = "public.${var.project}.${element(split(",",var.environments), count.index)}.${var.aws_region}.${var.service_name}.${var.domain}"
+        common_name = "public.${var.project}.${var.environment}.${var.region}.${var.service_name}.${var.domain}"
         organization = "Nubis Platform"
     }
 }
 
 resource "tls_self_signed_cert" "consul_web_ui" {
-    count = "${var.enabled * length(split(",", var.environments))}"
     lifecycle { create_before_destroy = true }
     key_algorithm = "${tls_private_key.consul_web.algorithm}"
     private_key_pem = "${tls_private_key.consul_web.private_key_pem}"
@@ -560,17 +497,14 @@ resource "tls_self_signed_cert" "consul_web_ui" {
     ]
 
     subject {
-        common_name = "ui.${var.project}.${element(split(",",var.environments), count.index)}.${var.aws_region}.${var.service_name}.${var.domain}"
+        common_name = "ui.${var.project}.${var.environment}.${var.region}.${var.service_name}.${var.domain}"
         organization = "Nubis Platform"
     }
 }
 
 resource "aws_iam_server_certificate" "consul_web_public" {
-    count = "${var.enabled * length(split(",", var.environments))}"
-    lifecycle { create_before_destroy = true }
-
-    name_prefix = "${var.project}-${element(split(",",var.environments), count.index)}-${var.aws_region}-public-"
-    certificate_body = "${element(tls_self_signed_cert.consul_web_public.*.cert_pem, count.index)}"
+    name = "${var.project}-${var.environment}-${var.region}-consul-web-public"
+    certificate_body = "${tls_self_signed_cert.consul_web_public.cert_pem}"
     private_key = "${tls_private_key.consul_web.private_key_pem}"
 
     # Amazon lies about key creation and availability
@@ -580,93 +514,50 @@ resource "aws_iam_server_certificate" "consul_web_public" {
 }
 
 resource "aws_iam_server_certificate" "consul_web_ui" {
-    count = "${var.enabled * length(split(",", var.environments))}"
     lifecycle { create_before_destroy = true }
-
-    name_prefix = "${var.project}-${element(split(",",var.environments), count.index)}-${var.aws_region}-ui-"
-    certificate_body = "${element(tls_self_signed_cert.consul_web_ui.*.cert_pem, count.index)}"
+    name = "${var.project}-${var.environment}-${var.region}-consul-web-ui-${tls_self_signed_cert.consul_web_ui.id}"
+    certificate_body = "${tls_self_signed_cert.consul_web_ui.cert_pem}"
     private_key = "${tls_private_key.consul_web.private_key_pem}"
 
     # Amazon lies about key creation and availability
-    #provisioner "local-exec" {
-    #  command = "sleep 10"
-    #}
-}
-
-resource "tls_private_key" "gossip" {
-    count = "${var.enabled}"
-    lifecycle { create_before_destroy = true }
-    algorithm = "RSA"
-}
-
-resource "tls_self_signed_cert" "gossip" {
-    count = "${var.enabled * length(split(",", var.environments))}"
-    lifecycle { create_before_destroy = true }
-    key_algorithm = "${tls_private_key.gossip.algorithm}"
-    private_key_pem = "${tls_private_key.gossip.private_key_pem}"
-
-    # Certificate expires after one year
-    validity_period_hours = 8760
-
-    # Generate a new certificate if Terraform is run within three
-    # hours of the certificate's expiration time. ( 7 days )
-    early_renewal_hours = 168
-
-    is_ca_certificate = true
-
-    # Reasonable set of uses for a server SSL certificate.
-    allowed_uses = [
-        "key_encipherment",
-        "digital_signature",
-        "cert_signing",
-        "server_auth",
-        "client_auth",
-
-    ]
-
-    subject {
-        common_name = "gossip.${var.project}.${element(split(",",var.environments), count.index)}.${var.aws_region}.${var.service_name}.${var.domain}"
-        organization = "Nubis Platform"
+    provisioner "local-exec" {
+      command = "sleep 10"
     }
 }
 
 
 # This null resource is responsible for publishing platform secrets to Credstash
 resource "null_resource" "credstash-public" {
-  count = "${var.enabled * length(split(",", var.environments))}"
-  lifecycle { create_before_destroy = true }
 
   # Important to list here every variable that affects what needs to be put into credstash
   triggers {
     secret = "${var.credstash_key}"
-    cacert = "${element(tls_self_signed_cert.consul_web_ui.*.cert_pem, count.index)}"
-    region = "${var.aws_region}"
-    context = "region=${var.aws_region} environment=${element(split(",",var.environments), count.index)} service=nubis"
-    credstash = "AWS_DEFAULT_PROFILE=${var.aws_profile} credstash -r ${var.aws_region} put -k ${var.credstash_key} -a nubis/${element(split(",",var.environments), count.index)}"
+    cacert = "${tls_self_signed_cert.consul_web_ui.cert_pem}"
+    region = "${var.region}"
+    context = "region=${var.region} environment=${var.environment} service=nubis"
+    credstash = "AWS_ACCESS_KEY_ID=${var.aws_access_key} AWS_SECRET_ACCESS_KEY=${var.aws_secret_key} credstash -r ${var.region} put -k ${var.credstash_key} -a nubis/${var.environment}"
   }
 
   # Consul UI SSL Certificate
   provisioner "local-exec" {
-      command = "${self.triggers.credstash}/ssl/cacert '${element(tls_self_signed_cert.consul_web_ui.*.cert_pem, count.index)}' ${self.triggers.context}"
+      command = "${self.triggers.credstash}/ssl/cacert '${tls_self_signed_cert.consul_web_ui.cert_pem}' ${self.triggers.context}"
   }
+
 }
+
 
 # This null resource is responsible for publishing secrets to Credstash
 resource "null_resource" "credstash" {
-  count = "${var.enabled * length(split(",", var.environments))}"
-  lifecycle { create_before_destroy = true }
 
   # Important to list here every variable that affects what needs to be put into credstash
   triggers {
     secret = "${var.credstash_key}"
     master_acl_token = "${var.master_acl_token}"
-    datadog_api_key = "${var.datadog_api_key}"
-    mig = "${md5(element(template_file.mig.*.rendered,count.index))}"
-    ssl_key = "${element(tls_private_key.gossip.*.private_key_pem, count.index)}"
-    ssl_cert = "${element(tls_self_signed_cert.gossip.*.cert_pem, count.index)}"
-    region = "${var.aws_region}"
-    context = "region=${var.aws_region} environment=${element(split(",",var.environments), count.index)} service=${var.project}"
-    credstash = "AWS_DEFAULT_PROFILE=${var.aws_profile} credstash -r ${var.aws_region} put -k ${var.credstash_key} -a ${var.project}/${element(split(",",var.environments), count.index)}"
+    ssl_key = "${file("${var.ssl_key}")}"
+    ssl_cert = "${file("${var.ssl_cert}")}"
+    region = "${var.region}"
+    context = "region=${var.region} environment=${var.environment} service=${var.project}"
+    credstash = "AWS_ACCESS_KEY_ID=${var.aws_access_key} AWS_SECRET_ACCESS_KEY=${var.aws_secret_key} credstash -r ${var.region} put -k ${var.credstash_key} -a ${var.project}/${var.environment}"
   }
 
   # Consul gossip secret
@@ -681,31 +572,11 @@ resource "null_resource" "credstash" {
 
   # Consul SSL key
   provisioner "local-exec" {
-      command = "${self.triggers.credstash}/ssl/key '${element(tls_private_key.gossip.*.private_key_pem, count.index)}' ${self.triggers.context}"
+      command = "${self.triggers.credstash}/ssl/key @${var.ssl_key} ${self.triggers.context}"
   }
 
   # Consul SSL Certificate
   provisioner "local-exec" {
-      command = "${self.triggers.credstash}/ssl/cert '${element(tls_self_signed_cert.gossip.*.cert_pem, count.index)}' ${self.triggers.context}"
-  }
-
-  # Datadog
-  provisioner "local-exec" {
-      command = "${self.triggers.credstash}/datadog/api_key '${var.datadog_api_key}' ${self.triggers.context}"
-  }
-}
-
-resource "template_file" "mig" {
-  count = "${var.enabled * length(split(",", var.environments))}"
-  lifecycle { create_before_destroy = true }
-
-  template = <<TEMPLATE
-MIG_AGENT_CRT=""
-MIG_AGENT_KEY=""
-MIG_CA_CRT=""
-MIG_RELAY_PASSWORD=""
-MIG_RELAY_USER="agent-it-nubis"
-TEMPLATE
-  vars = {
+      command = "${self.triggers.credstash}/ssl/cert @${var.ssl_cert} ${self.triggers.context}"
   }
 }

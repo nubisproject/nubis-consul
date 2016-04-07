@@ -1,15 +1,16 @@
 # nubis-consul release 10
 
-variable "aws_profile" {}
-variable "aws_account_id" {}
+variable "ami" { }
 
-variable "nubis_version" {}
+variable "aws_access_key" {}
+variable "aws_secret_key" {}
+variable "aws_account_id" {}
 
 variable "key_name" {
   description = "SSH key name in your AWS account for AWS instances."
 }
 
-variable "aws_region" {
+variable "region" {
   default = "us-east-1"
   description = "The region of AWS, for AMI lookups."
 }
@@ -37,7 +38,7 @@ variable "project" {
   default = "consul"
 }
 
-variable "environments" {
+variable "environment" {
   default = "sandbox"
 }
 
@@ -54,21 +55,28 @@ variable "service_name" {
   description = "Service this is deployed for (i.e. dpaste)"
 }
 
-variable "vpc_ids" {
-  description = "IDs of the VPC to launch into"
+variable "vpc_id" {
+  description = "ID of the VPC to launch into"
 }
 
-variable "internet_access_security_groups" {
+variable "ssl_cert" {
+  description = "SSL Certificate file"
+}
+
+variable "ssl_key" {
+  description = "SSL Key file"
+}
+
+variable "internet_security_group_id" {
   description = "ID of that SG"
 }
 
-variable "shared_services_security_groups" {
+variable "shared_services_security_group_id" {
   description = "ID of that SG"
 }
 
 variable "master_acl_token" {
   description = "Master ACL Token (use uuidgen)"
-  default = "00000000-0000-0000-0000-000000000000"
 }
 
 variable "acl_down_policy" {
@@ -97,13 +105,3 @@ variable "allowed_public_cidrs" {
 variable "credstash_key" {
   description = "KMS Key ID used for Credstash (aaaabbbb-cccc-dddd-1111-222233334444)"
 }
-
-variable "credstash_dynamodb_table" {
-
-}
-
-variable "enabled" {
-  default = "1"
-}
-
-variable "datadog_api_key" {}
