@@ -1,6 +1,6 @@
-#output "consul_endpoints" {
-#  value = "${module.consul-admin.elb-address},${module.consul-prod.elb-address},${module.consul-stage.elb-address}"
-#}
-output "iam_roles" {
-  value = "${module.consul.iam_roles}"
+output "internal-address" {
+  value = "http://${aws_route53_record.ui.fqdn}/"
+}
+output "public-address" {
+  value = "https://${aws_route53_record.public.fqdn}/"
 }
