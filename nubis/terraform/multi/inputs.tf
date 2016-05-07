@@ -1,16 +1,20 @@
 # nubis-consul release 10
 
-variable "aws_profile" {}
-variable "aws_account_id" {}
+variable "aws_profile" {
+}
 
-variable "nubis_version" {}
+variable "aws_account_id" {
+}
+
+variable "nubis_version" {
+}
 
 variable "key_name" {
   description = "SSH key name in your AWS account for AWS instances."
 }
 
 variable "aws_region" {
-  default = "us-east-1"
+  default     = "us-east-1"
   description = "The region of AWS, for AMI lookups."
 }
 
@@ -19,17 +23,17 @@ variable "consul_secret" {
 }
 
 variable "servers" {
-  default = "3"
+  default     = "3"
   description = "The number of Consul servers to launch"
 }
 
 variable "release" {
-  default = "0"
+  default     = "0"
   description = "Release number of this architecture"
 }
 
 variable "build" {
-  default = "35"
+  default     = "35"
   description = "Build number of this architecture"
 }
 
@@ -47,7 +51,7 @@ variable "zone_id" {
 
 variable "domain" {
   description = "Top-level nubis domain for this environment"
-  default = "nubis.allizom.org"
+  default     = "nubis.allizom.org"
 }
 
 variable "service_name" {
@@ -68,17 +72,17 @@ variable "shared_services_security_groups" {
 
 variable "master_acl_token" {
   description = "Master ACL Token (use uuidgen)"
-  default = "00000000-0000-0000-0000-000000000000"
+  default     = "00000000-0000-0000-0000-000000000000"
 }
 
 variable "acl_down_policy" {
   description = "Policy for when ACL master is down"
-  default = "extend-cache"
+  default     = "extend-cache"
 }
 
 variable "acl_default_policy" {
   description = "Default ACL action for anonymous users"
-  default = "allow"
+  default     = "allow"
 }
 
 variable "public_subnets" {
@@ -91,7 +95,7 @@ variable "private_subnets" {
 
 variable "allowed_public_cidrs" {
   description = "Comma separated list of CIDRs with public access"
-  default = "127.0.0.1/32"
+  default     = "127.0.0.1/32"
 }
 
 variable "credstash_key" {
@@ -99,11 +103,11 @@ variable "credstash_key" {
 }
 
 variable "credstash_dynamodb_table" {
-
 }
 
 variable "enabled" {
   default = "1"
 }
 
-variable "datadog_api_key" {}
+variable "datadog_api_key" {
+}
