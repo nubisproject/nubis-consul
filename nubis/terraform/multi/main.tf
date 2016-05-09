@@ -390,6 +390,10 @@ resource "aws_s3_bucket" "consul_backups" {
   # Nuke the bucket content on deletion
   force_destroy = true
 
+  versioning {
+    enabled = true
+  }
+
   tags = {
     Name        = "nubis-${var.project}-backup-${element(split(",",var.environments), count.index)}-${var.aws_region}-${var.service_name}"
     Region      = "${var.aws_region}"
