@@ -106,6 +106,12 @@ resource "aws_autoscaling_group" "consul" {
     value               = "${var.project}"
     propagate_at_launch = true
   }
+
+  tag {
+    key                 = "Environment"
+    value               = "${element(split(",",var.environments), count.index)}"
+    propagate_at_launch = true
+  }
 }
 
 resource "aws_security_group" "consul" {
