@@ -92,7 +92,7 @@ package { 'boto3':
   ensure => '1.3.1',
 }
 package { 'botocore':
-  ensure => '1.4.34',
+  ensure => '1.4.35',
 }
 package { 'bsdmainutils':
   ensure => '9.0.5ubuntu1',
@@ -176,7 +176,7 @@ package { 'dash':
   ensure => '0.5.7-4ubuntu1',
 }
 package { 'datadog-agent':
-  ensure => '1:5.8.0-1',
+  ensure => '1:5.8.3-1',
 }
 package { 'dbus':
   ensure => '1.6.18-0ubuntu4.3',
@@ -824,7 +824,7 @@ package { 'liblcms2-2':
   ensure => '2.5-0ubuntu4.1',
 }
 package { 'libldap-2.4-2':
-  ensure => '2.4.31-1+nmu2ubuntu8.2',
+  ensure => '2.4.31-1+nmu2ubuntu8.3',
 }
 package { 'liblocale-gettext-perl':
   ensure => '1.05-7build3',
@@ -1763,7 +1763,7 @@ package { 'tmux':
   ensure => '1.8-5',
 }
 package { 'tzdata':
-  ensure => '2016d-0ubuntu0.14.04',
+  ensure => '2016f-0ubuntu0.14.04',
 }
 package { 'ubuntu-keyring':
   ensure => '2012.05.19',
