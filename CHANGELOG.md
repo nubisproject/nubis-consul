@@ -1,5 +1,23 @@
 # Change Log
 
+## [v1.2.0](https://github.com/nubisproject/nubis-consul/tree/v1.2.0) (2016-07-07)
+[Full Changelog](https://github.com/nubisproject/nubis-consul/compare/v1.1.0...v1.2.0)
+
+**Closed issues:**
+
+- Missing Environment tags for instances [\#186](https://github.com/nubisproject/nubis-consul/issues/186)
+- Terraform format [\#184](https://github.com/nubisproject/nubis-consul/issues/184)
+- Enable versionning for our S3 buckets [\#182](https://github.com/nubisproject/nubis-consul/issues/182)
+- Tag v1.1.0 release [\#47](https://github.com/nubisproject/nubis-consul/issues/47)
+
+**Merged pull requests:**
+
+- Update builder artifacts for v1.2.0 release [\#189](https://github.com/nubisproject/nubis-consul/pull/189) ([tinnightcap](https://github.com/tinnightcap))
+- Update builder artifacts for v1.2.0 release [\#188](https://github.com/nubisproject/nubis-consul/pull/188) ([tinnightcap](https://github.com/tinnightcap))
+- Add missing Environment tag [\#187](https://github.com/nubisproject/nubis-consul/pull/187) ([gozer](https://github.com/gozer))
+- terraform fmt [\#185](https://github.com/nubisproject/nubis-consul/pull/185) ([gozer](https://github.com/gozer))
+- Enable versionning for our S3 buckets [\#183](https://github.com/nubisproject/nubis-consul/pull/183) ([gozer](https://github.com/gozer))
+
 ## [v1.1.0](https://github.com/nubisproject/nubis-consul/tree/v1.1.0) (2016-04-18)
 [Full Changelog](https://github.com/nubisproject/nubis-consul/compare/v1.0.1...v1.1.0)
 
@@ -15,6 +33,7 @@
 **Closed issues:**
 
 - Create a multi-environment TF module [\#176](https://github.com/nubisproject/nubis-consul/issues/176)
+- Ensure cron jobs that need the proxies get them. [\#174](https://github.com/nubisproject/nubis-consul/issues/174)
 - Inject DataDog info if known [\#172](https://github.com/nubisproject/nubis-consul/issues/172)
 - Notify that a Consul cluster has finished starting up in a client visible way [\#169](https://github.com/nubisproject/nubis-consul/issues/169)
 - Race-condition in post-bootstrap actions [\#167](https://github.com/nubisproject/nubis-consul/issues/167)
@@ -47,13 +66,16 @@
 - Use credstash to bootstrap secrets [\#103](https://github.com/nubisproject/nubis-consul/issues/103)
 - Upgrade to Consul v0.6.0 [\#99](https://github.com/nubisproject/nubis-consul/issues/99)
 - ASG-join cronjob should intelligently join missing nodes instead of blindly joining [\#95](https://github.com/nubisproject/nubis-consul/issues/95)
+- \[Datadog\] Enable Consul service checks [\#88](https://github.com/nubisproject/nubis-consul/issues/88)
 - consul secret should be read from a file, to be consistent with the x509 inputs [\#80](https://github.com/nubisproject/nubis-consul/issues/80)
 - Use ASG discovery to set bootstrap expect, possibly. [\#72](https://github.com/nubisproject/nubis-consul/issues/72)
 - Consider using our ASG discovery to forcibly reap nodes that are not in the ASG anymore [\#69](https://github.com/nubisproject/nubis-consul/issues/69)
 - Consider base64 encoding the SSL certs/keys before shoving them in Consul [\#53](https://github.com/nubisproject/nubis-consul/issues/53)
+- Tag v1.0.2 release [\#98](https://github.com/nubisproject/nubis-consul/issues/98)
 
 **Merged pull requests:**
 
+- Update CHANGELOG for v1.1.0 release [\#181](https://github.com/nubisproject/nubis-consul/pull/181) ([tinnightcap](https://github.com/tinnightcap))
 - Update builder artifacts for v1.1.0 release [\#180](https://github.com/nubisproject/nubis-consul/pull/180) ([tinnightcap](https://github.com/tinnightcap))
 - Update versions for  release [\#179](https://github.com/nubisproject/nubis-consul/pull/179) ([tinnightcap](https://github.com/tinnightcap))
 - Add multi-environment Consul TF module Take 2 [\#178](https://github.com/nubisproject/nubis-consul/pull/178) ([gozer](https://github.com/gozer))
@@ -179,6 +201,7 @@
 
 **Merged pull requests:**
 
+- Updating changelog for v0.9.0 release [\#34](https://github.com/nubisproject/nubis-consul/pull/34) ([gozer](https://github.com/gozer))
 - Upgrades [\#25](https://github.com/nubisproject/nubis-consul/pull/25) ([gozer](https://github.com/gozer))
 - Convert to new-new-new VPC design with security group sauce. [\#23](https://github.com/nubisproject/nubis-consul/pull/23) ([gozer](https://github.com/gozer))
 - include ASG nodes in the UI load-balancer [\#20](https://github.com/nubisproject/nubis-consul/pull/20) ([gozer](https://github.com/gozer))
