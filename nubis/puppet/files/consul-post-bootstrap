@@ -1,5 +1,7 @@
 #!/bin/bash
 
+### WE ARE INVOKED WITH AN EXCLUSIVE LOCK ###
+
 export PATH=/usr/local/bin:$PATH
 
 USER_DATA=$(curl -fqs http://169.254.169.254/latest/user-data)
@@ -27,13 +29,17 @@ if [ "$PLATFORM_ACL" != "" ]; then
 fi
 
 # XXX: Need an agnostic way to do this
+
 # Datadog
+
+DATADOG_API_KEY_PATH="environments/$NUBIS_ENVIRONMENT/global/datadog/config/api_key"
 DATADOG_API_KEY=$(nubis-secret get datadog/api_key)
-if [ "$DATADOG_API_KEY" != "" ]; then
+CONSUL_DATADOG_API_KEY=$(consulate kv get "$DATADOG_API_KEY_PATH")
+
+if [ "$DATADOG_API_KEY" != "$CONSUL_DATADOG_API_KEY" ]; then
   echo "Injecting Datadog API key"
-  curl -fqs -X PUT -d "$NOW" "http://localhost:8500/v1/kv/environments/$NUBIS_ENVIRONMENT/global/datadog/config/api_key?token=$MASTER_ACL_TOKEN"
+  consulate --token="$MASTER_ACL_TOKEN" kv set "$DATADOG_API_KEY_PATH" "$DATADOG_API_KEY"
 fi
 
 # Finalize by creating a well-known KV
-NOW=$(date '+%s')
-curl -fqs -X PUT -d "$NOW" "http://localhost:8500/v1/kv/consul-ready?token=$MASTER_ACL_TOKEN"
+consulate --token="$MASTER_ACL_TOKEN" kv set consul-ready "$(date '+%s')"
