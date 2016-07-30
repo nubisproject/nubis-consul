@@ -1,17 +1,32 @@
 # Change Log
 
+## [v1.2.1](https://github.com/nubisproject/nubis-consul/tree/v1.2.1) (2016-07-30)
+[Full Changelog](https://github.com/nubisproject/nubis-consul/compare/v1.2.0...v1.2.1)
+
+**Closed issues:**
+
+- Update DataDog API key only if it changes [\#194](https://github.com/nubisproject/nubis-consul/issues/194)
+
+**Merged pull requests:**
+
+- Update builder artifacts for v1.2.1 release [\#197](https://github.com/nubisproject/nubis-consul/pull/197) ([tinnightcap](https://github.com/tinnightcap))
+- Update DataDog API key only if it changed [\#195](https://github.com/nubisproject/nubis-consul/pull/195) ([gozer](https://github.com/gozer))
+- Update builder artifacts for v1.3.0-dev release [\#192](https://github.com/nubisproject/nubis-consul/pull/192) ([tinnightcap](https://github.com/tinnightcap))
+
 ## [v1.2.0](https://github.com/nubisproject/nubis-consul/tree/v1.2.0) (2016-07-07)
 [Full Changelog](https://github.com/nubisproject/nubis-consul/compare/v1.1.0...v1.2.0)
 
 **Closed issues:**
 
+- Tag v1.1.0 release [\#47](https://github.com/nubisproject/nubis-consul/issues/47)
+- Tag v1.2.0 release [\#190](https://github.com/nubisproject/nubis-consul/issues/190)
 - Missing Environment tags for instances [\#186](https://github.com/nubisproject/nubis-consul/issues/186)
 - Terraform format [\#184](https://github.com/nubisproject/nubis-consul/issues/184)
 - Enable versionning for our S3 buckets [\#182](https://github.com/nubisproject/nubis-consul/issues/182)
-- Tag v1.1.0 release [\#47](https://github.com/nubisproject/nubis-consul/issues/47)
 
 **Merged pull requests:**
 
+- Update CHANGELOG for v1.2.0 release [\#191](https://github.com/nubisproject/nubis-consul/pull/191) ([tinnightcap](https://github.com/tinnightcap))
 - Update builder artifacts for v1.2.0 release [\#189](https://github.com/nubisproject/nubis-consul/pull/189) ([tinnightcap](https://github.com/tinnightcap))
 - Update builder artifacts for v1.2.0 release [\#188](https://github.com/nubisproject/nubis-consul/pull/188) ([tinnightcap](https://github.com/tinnightcap))
 - Add missing Environment tag [\#187](https://github.com/nubisproject/nubis-consul/pull/187) ([gozer](https://github.com/gozer))
