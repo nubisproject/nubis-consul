@@ -1,14 +1,23 @@
 # Change Log
 
+## [v1.2.2](https://github.com/nubisproject/nubis-consul/tree/v1.2.2) (2016-08-02)
+[Full Changelog](https://github.com/nubisproject/nubis-consul/compare/v1.2.1...v1.2.2)
+
+**Merged pull requests:**
+
+- Update builder artifacts for v1.2.2 release [\#200](https://github.com/nubisproject/nubis-consul/pull/200) ([tinnightcap](https://github.com/tinnightcap))
+
 ## [v1.2.1](https://github.com/nubisproject/nubis-consul/tree/v1.2.1) (2016-07-30)
 [Full Changelog](https://github.com/nubisproject/nubis-consul/compare/v1.2.0...v1.2.1)
 
 **Closed issues:**
 
 - Update DataDog API key only if it changes [\#194](https://github.com/nubisproject/nubis-consul/issues/194)
+- Tag v1.2.1 release [\#196](https://github.com/nubisproject/nubis-consul/issues/196)
 
 **Merged pull requests:**
 
+- Update CHANGELOG for v1.2.1 release [\#198](https://github.com/nubisproject/nubis-consul/pull/198) ([tinnightcap](https://github.com/tinnightcap))
 - Update builder artifacts for v1.2.1 release [\#197](https://github.com/nubisproject/nubis-consul/pull/197) ([tinnightcap](https://github.com/tinnightcap))
 - Update DataDog API key only if it changed [\#195](https://github.com/nubisproject/nubis-consul/pull/195) ([gozer](https://github.com/gozer))
 - Update builder artifacts for v1.3.0-dev release [\#192](https://github.com/nubisproject/nubis-consul/pull/192) ([tinnightcap](https://github.com/tinnightcap))
