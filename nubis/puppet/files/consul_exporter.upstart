@@ -1,4 +1,4 @@
-description "Node Exporter"
+description "Consul Exporter"
 start on (local-filesystems and net-device-up IFACE!=lo)
 stop on runlevel [016]
 
