@@ -1,0 +1,9 @@
+#!/bin/bash
+
+ENABLED={{ if exists "/config/enabled" }}{{ getv "/config/enabled" }}{{ else }}0{{ end }}
+
+if [ "$ENABLED" == "1" ]; then
+  service consul_exporter start
+else
+  service consul_exporter stop
+fi
