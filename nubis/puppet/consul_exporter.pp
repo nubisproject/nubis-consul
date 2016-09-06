@@ -7,7 +7,6 @@ staging::file { "consul_exporter.${consul_exporter_version}.tar.gz":
 }->
 staging::extract { "consul_exporter.${consul_exporter_version}.tar.gz":
   target  => "/usr/local/bin",
-  strip   => 1,
   creates => "/usr/local/bin/consul_exporter",
 }
 
