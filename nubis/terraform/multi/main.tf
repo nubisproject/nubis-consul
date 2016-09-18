@@ -730,6 +730,7 @@ resource "null_resource" "credstash-public" {
     secret    = "${var.credstash_key}"
     cacert    = "${element(tls_self_signed_cert.consul_web_ui.*.cert_pem, count.index)}"
     region    = "${var.aws_region}"
+    version   = "${var.nubis_version}"
     context   = "region=${var.aws_region} environment=${element(split(",",var.environments), count.index)} service=nubis"
     credstash = "AWS_DEFAULT_PROFILE=${var.aws_profile} credstash -r ${var.aws_region} put -k ${var.credstash_key} -a nubis/${element(split(",",var.environments), count.index)}"
   }
@@ -753,6 +754,7 @@ resource "null_resource" "credstash" {
     secret           = "${var.credstash_key}"
     master_acl_token = "${var.master_acl_token}"
     datadog_api_key  = "${var.datadog_api_key}"
+    version          = "${var.nubis_version}"
     mig              = "${md5(element(template_file.mig.*.rendered,count.index))}"
     ssl_key          = "${element(tls_private_key.gossip.*.private_key_pem, count.index)}"
     ssl_cert         = "${element(tls_self_signed_cert.gossip.*.cert_pem, count.index)}"
