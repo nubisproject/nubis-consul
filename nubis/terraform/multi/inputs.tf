@@ -1,6 +1,7 @@
 # nubis-consul release 10
 
 variable "aws_profile" {
+  default = ""
 }
 
 variable "aws_account_id" {

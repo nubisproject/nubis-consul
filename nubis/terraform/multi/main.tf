@@ -1,6 +1,5 @@
 #ws_launch_configuration Configure the AWS Provider
 provider "aws" {
-  profile = "${var.aws_profile}"
   region  = "${var.aws_region}"
 }
 
@@ -732,7 +731,7 @@ resource "null_resource" "credstash-public" {
     region    = "${var.aws_region}"
     version   = "${var.nubis_version}"
     context   = "region=${var.aws_region} environment=${element(split(",",var.environments), count.index)} service=nubis"
-    credstash = "AWS_DEFAULT_PROFILE=${var.aws_profile} credstash -r ${var.aws_region} put -k ${var.credstash_key} -a nubis/${element(split(",",var.environments), count.index)}"
+    credstash = "credstash -r ${var.aws_region} put -k ${var.credstash_key} -a nubis/${element(split(",",var.environments), count.index)}"
   }
 
   # Consul UI SSL Certificate
@@ -760,7 +759,7 @@ resource "null_resource" "credstash" {
     ssl_cert         = "${element(tls_self_signed_cert.gossip.*.cert_pem, count.index)}"
     region           = "${var.aws_region}"
     context          = "region=${var.aws_region} environment=${element(split(",",var.environments), count.index)} service=${var.project}"
-    credstash        = "AWS_DEFAULT_PROFILE=${var.aws_profile} credstash -r ${var.aws_region} put -k ${var.credstash_key} -a ${var.project}/${element(split(",",var.environments), count.index)}"
+    credstash        = "credstash -r ${var.aws_region} put -k ${var.credstash_key} -a ${var.project}/${element(split(",",var.environments), count.index)}"
   }
 
   # Consul gossip secret
