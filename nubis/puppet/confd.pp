@@ -4,10 +4,10 @@
 
 case $::osfamily {
   default: {
-    $confd_defaults = "/etc/sysconfig/confd"
+    $confd_defaults = '/etc/sysconfig/confd'
   }
   'Debian': {
-    $confd_defaults = "/etc/default/confd"
+    $confd_defaults = '/etc/default/confd'
   }
 }
 

@@ -1,20 +1,20 @@
 class { 'consul':
-  version => '0.7.0',
+  version          => '0.7.0',
   purge_config_dir => false,
-  manage_service => false,
-  service_enable => false,
-  service_ensure => 'stopped',
+  manage_service   => false,
+  service_enable   => false,
+  service_ensure   => 'stopped',
 
-  config_hash => {
-      'data_dir'        => '/var/lib/consul',
-      'log_level'       => 'INFO',
-      'ui_dir'          => '/var/lib/consul/ui',
-      'client_addr'     => '0.0.0.0',
+  config_hash      => {
+      'data_dir'           => '/var/lib/consul',
+      'log_level'          => 'INFO',
+      'ui_dir'             => '/var/lib/consul/ui',
+      'client_addr'        => '0.0.0.0',
       'leave_on_terminate' => true,
-      'server'          => true,
-      'enable_syslog'   => true,
-      'dogstatsd_addr'  => '127.0.0.1:8125',
-      'dns_config'      => {
+      'server'             => true,
+      'enable_syslog'      => true,
+      'dogstatsd_addr'     => '127.0.0.1:8125',
+      'dns_config'         => {
           'enable_truncate' => true,
       },
   }
@@ -33,11 +33,11 @@ package { 'liblwp-useragent-determined-perl':
 }
 
 file { '/usr/local/bin/consul-get-or-set':
-    ensure => file,
-    owner  => root,
-    group  => root,
-    mode   => '0755',
-    source => 'puppet:///nubis/files/consul-get-or-set',
+    ensure  => file,
+    owner   => root,
+    group   => root,
+    mode    => '0755',
+    source  => 'puppet:///nubis/files/consul-get-or-set',
     require => [
       Package['libwww-perl'],
       Package['libjson-perl'],
