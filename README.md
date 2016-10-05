@@ -1,5 +1,9 @@
 # nubis-consul
 
+[![Version](https://img.shields.io/github/release/nubisproject/nubis-consul.svg?maxAge=2592000)](https://github.com/nubisproject/nubis-consul/releases)
+[![Build Status](https://img.shields.io/travis/nubisproject/nubis-consul/master.svg?maxAge=2592000)](https://travis-ci.org/nubisproject/nubis-consul)
+[![Issues](https://img.shields.io/github/issues/nubisproject/nubis-consul.svg?maxAge=2592000)](https://github.com/nubisproject/nubis-consul/issues)
+
 ### Dependencies
 
 You need [credstash](https://github.com/fugue/credstash) locally installed (in your PATH) to be able to deploy Consul
