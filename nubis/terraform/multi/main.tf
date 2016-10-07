@@ -55,6 +55,7 @@ NUBIS_ACCOUNT=${var.service_name}
 NUBIS_DOMAIN=${var.domain}
 CONSUL_ACL_DEFAULT_POLICY=${var.acl_default_policy}
 CONSUL_ACL_DOWN_POLICY=${var.acl_down_policy}
+CONSUL_BOOTSTRAP_EXPECT=${var.servers}
 NUBIS_BUMP=${md5("${var.datadog_api_key}${element(template_file.mig.*.rendered,count.index)}")}
 EOF
 }
