@@ -4,6 +4,8 @@ ENABLED={{ if exists "/config/enabled" }}{{ getv "/config/enabled" }}{{ else }}0
 
 if [ "$ENABLED" == "1" ]; then
   service consul_exporter start
+  service statsd_exporter start
 else
   service consul_exporter stop
+  service statsd_exporter stop
 fi
