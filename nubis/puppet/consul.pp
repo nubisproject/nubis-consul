@@ -14,9 +14,9 @@ class { 'consul':
       'server'             => true,
       'enable_syslog'      => true,
       'telemetry'          => {
-        'dogstatsd_addr'     => '127.0.0.1:8125',
-        'statsd_address'     => '127.0.0.1:9125',
-        'disable_hostname'   => true,
+        'dogstatsd_addr'   => '127.0.0.1:8125',
+        'statsd_address'   => '127.0.0.1:9125',
+        'disable_hostname' => true,
        },
       'dns_config'         => {
           'enable_truncate' => true,
