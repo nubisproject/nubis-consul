@@ -17,7 +17,7 @@ class { 'consul':
         'dogstatsd_addr'   => '127.0.0.1:8125',
         'statsd_address'   => '127.0.0.1:9125',
         'disable_hostname' => true,
-       },
+      },
       'dns_config'         => {
           'enable_truncate' => true,
       },
