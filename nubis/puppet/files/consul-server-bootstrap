@@ -86,6 +86,9 @@ consul_acl { "Anonymous Token":
       "proxy" => {
         "policy" => "deny"
       },
+      "prometheus" => {
+        "policy" => "deny"
+      },
       "nubis" => {
         "policy" => "deny"
       },
@@ -98,6 +101,15 @@ consul_acl { "Anonymous Token":
         "policy" => "read"
       },
       "proxy" => {
+        "policy" => "read"
+      },
+      "prometheus" => {
+        "policy" => "read"
+      },
+      "alertmanager" => {
+        "policy" => "read"
+      },
+      "grafana" => {
         "policy" => "read"
       }
     }
