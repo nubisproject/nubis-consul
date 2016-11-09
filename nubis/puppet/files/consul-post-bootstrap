@@ -21,10 +21,10 @@ fi
 PLATFORM_ACL=$(curl -fqs "http://localhost:8500/v1/acl/list?token=$MASTER_ACL_TOKEN" | jq -r '.[] | select(.Name=="Nubis Platform").ID')
 if [ "$PLATFORM_ACL" != "" ]; then
     REGION=$(curl -s http://169.254.169.254/latest/dynamic/instance-identity/document | jq '.region' -r)
-    CURRENT_PLATFORM_ACL=$(credstash --region "$REGION" get "nubis/$NUBIS_ENVIRONMENT/consul/acl_token" "region=$REGION" "environment=$NUBIS_ENVIRONMENT" "service=nubis")
+    CURRENT_PLATFORM_ACL=$(unicreds --region "$REGION" get "nubis/$NUBIS_ENVIRONMENT/consul/acl_token" -E "region:$REGION" -E "environment:$NUBIS_ENVIRONMENT" -E "service:nubis")
     if [ "$CURRENT_PLATFORM_ACL" != "$PLATFORM_ACL" ]; then
       # Store current platform ACL in credstash for others to retrieve
-      credstash --region "$REGION" put -a "nubis/$NUBIS_ENVIRONMENT/consul/acl_token" "$PLATFORM_ACL" "region=$REGION" "environment=$NUBIS_ENVIRONMENT" "service=nubis"
+      unicreds --region "$REGION" put "nubis/$NUBIS_ENVIRONMENT/consul/acl_token" "$PLATFORM_ACL" -E "region:$REGION" -E "environment:$NUBIS_ENVIRONMENT" -E "service:nubis"
     fi
 fi
 

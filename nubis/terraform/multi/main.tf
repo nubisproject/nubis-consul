@@ -731,8 +731,8 @@ resource "null_resource" "credstash-public" {
     cacert    = "${element(tls_self_signed_cert.consul_web_ui.*.cert_pem, count.index)}"
     region    = "${var.aws_region}"
     version   = "${var.nubis_version}"
-    context   = "region=${var.aws_region} environment=${element(split(",",var.environments), count.index)} service=nubis"
-    credstash = "credstash -r ${var.aws_region} put -k ${var.credstash_key} -a nubis/${element(split(",",var.environments), count.index)}"
+    context   = "-E region:${var.aws_region} -E environment:${element(split(",",var.environments), count.index)} -E service:nubis"
+    credstash = "unicreds -r ${var.aws_region} put -k ${var.credstash_key} nubis/${element(split(",",var.environments), count.index)}"
   }
 
   # Consul UI SSL Certificate
@@ -759,8 +759,8 @@ resource "null_resource" "credstash" {
     ssl_key          = "${element(tls_private_key.gossip.*.private_key_pem, count.index)}"
     ssl_cert         = "${element(tls_self_signed_cert.gossip.*.cert_pem, count.index)}"
     region           = "${var.aws_region}"
-    context          = "region=${var.aws_region} environment=${element(split(",",var.environments), count.index)} service=${var.project}"
-    credstash        = "credstash -r ${var.aws_region} put -k ${var.credstash_key} -a ${var.project}/${element(split(",",var.environments), count.index)}"
+    context          = "-E region:${var.aws_region} -E nvironment:${element(split(",",var.environments), count.index)} -E service:${var.project}"
+    credstash        = "unicreds -r ${var.aws_region} put -k ${var.credstash_key} ${var.project}/${element(split(",",var.environments), count.index)}"
   }
 
   # Consul gossip secret
