@@ -759,7 +759,7 @@ resource "null_resource" "secrets" {
     ssl_key          = "${element(tls_private_key.gossip.*.private_key_pem, count.index)}"
     ssl_cert         = "${element(tls_self_signed_cert.gossip.*.cert_pem, count.index)}"
     region           = "${var.aws_region}"
-    context          = "-E region:${var.aws_region} -E nvironment:${element(split(",",var.environments), count.index)} -E service:${var.project}"
+    context          = "-E region:${var.aws_region} -E environment:${element(split(",",var.environments), count.index)} -E service:${var.project}"
     unicreds         = "unicreds -r ${var.aws_region} put -k ${var.credstash_key} ${var.project}/${element(split(",",var.environments), count.index)}"
     unicreds_file    = "unicreds -r ${var.aws_region} put-file -k ${var.credstash_key} ${var.project}/${element(split(",",var.environments), count.index)}"
   }
