@@ -22,8 +22,8 @@ resource "aws_launch_configuration" "consul" {
   count = "${var.enabled * length(split(",", var.environments))}"
 
   depends_on = [
-    "null_resource.credstash",
-    "null_resource.credstash-public",
+    "null_resource.secrets",
+    "null_resource.secrets-public",
   ]
 
   lifecycle {
@@ -717,39 +717,39 @@ resource "tls_self_signed_cert" "gossip" {
   }
 }
 
-# This null resource is responsible for publishing platform secrets to Credstash
-resource "null_resource" "credstash-public" {
+# This null resource is responsible for publishing platform secrets to KMS
+resource "null_resource" "secrets-public" {
   count = "${var.enabled * length(split(",", var.environments))}"
 
   lifecycle {
     create_before_destroy = true
   }
 
-  # Important to list here every variable that affects what needs to be put into credstash
+  # Important to list here every variable that affects what needs to be put into KMS
   triggers {
     secret    = "${var.credstash_key}"
     cacert    = "${element(tls_self_signed_cert.consul_web_ui.*.cert_pem, count.index)}"
     region    = "${var.aws_region}"
     version   = "${var.nubis_version}"
     context   = "-E region:${var.aws_region} -E environment:${element(split(",",var.environments), count.index)} -E service:nubis"
-    credstash = "unicreds -r ${var.aws_region} put -k ${var.credstash_key} nubis/${element(split(",",var.environments), count.index)}"
+    unicreds_file = "unicreds -r ${var.aws_region} put-file -k ${var.credstash_key} nubis/${element(split(",",var.environments), count.index)}"
   }
 
   # Consul UI SSL Certificate
   provisioner "local-exec" {
-    command = "${self.triggers.credstash}/ssl/cacert '${element(tls_self_signed_cert.consul_web_ui.*.cert_pem, count.index)}' ${self.triggers.context}"
+    command = "echo -n '${element(tls_self_signed_cert.consul_web_ui.*.cert_pem, count.index)}' | ${self.triggers.unicreds_file}/ssl/cacert /dev/stdin ${self.triggers.context}"
   }
 }
 
-# This null resource is responsible for publishing secrets to Credstash
-resource "null_resource" "credstash" {
+# This null resource is responsible for publishing secrets to KMS
+resource "null_resource" "secrets" {
   count = "${var.enabled * length(split(",", var.environments))}"
 
   lifecycle {
     create_before_destroy = true
   }
 
-  # Important to list here every variable that affects what needs to be put into credstash
+  # Important to list here every variable that affects what needs to be put into KMS
   triggers {
     secret           = "${var.credstash_key}"
     master_acl_token = "${var.master_acl_token}"
@@ -760,32 +760,33 @@ resource "null_resource" "credstash" {
     ssl_cert         = "${element(tls_self_signed_cert.gossip.*.cert_pem, count.index)}"
     region           = "${var.aws_region}"
     context          = "-E region:${var.aws_region} -E nvironment:${element(split(",",var.environments), count.index)} -E service:${var.project}"
-    credstash        = "unicreds -r ${var.aws_region} put -k ${var.credstash_key} ${var.project}/${element(split(",",var.environments), count.index)}"
+    unicreds         = "unicreds -r ${var.aws_region} put -k ${var.credstash_key} ${var.project}/${element(split(",",var.environments), count.index)}"
+    unicreds_file    = "unicreds -r ${var.aws_region} put-file -k ${var.credstash_key} ${var.project}/${element(split(",",var.environments), count.index)}"
   }
 
   # Consul gossip secret
   provisioner "local-exec" {
-    command = "${self.triggers.credstash}/secret ${var.consul_secret} ${self.triggers.context}"
+    command = "${self.triggers.unicreds}/secret ${var.consul_secret} ${self.triggers.context}"
   }
 
   # Consul Master ACL Token
   provisioner "local-exec" {
-    command = "${self.triggers.credstash}/master_acl_token ${var.master_acl_token} ${self.triggers.context}"
+    command = "${self.triggers.unicreds}/master_acl_token ${var.master_acl_token} ${self.triggers.context}"
   }
 
   # Consul SSL key
   provisioner "local-exec" {
-    command = "${self.triggers.credstash}/ssl/key '${element(tls_private_key.gossip.*.private_key_pem, count.index)}' ${self.triggers.context}"
+    command = "echo -n '${element(tls_private_key.gossip.*.private_key_pem, count.index)}' | ${self.triggers.unicreds_file}/ssl/key /dev/stdin ${self.triggers.context}"
   }
 
   # Consul SSL Certificate
   provisioner "local-exec" {
-    command = "${self.triggers.credstash}/ssl/cert '${element(tls_self_signed_cert.gossip.*.cert_pem, count.index)}' ${self.triggers.context}"
+    command = "echo -n '${element(tls_self_signed_cert.gossip.*.cert_pem, count.index)}' | ${self.triggers.unicreds_file}/ssl/cert /dev/stdin ${self.triggers.context}"
   }
 
   # Datadog
   provisioner "local-exec" {
-    command = "${self.triggers.credstash}/datadog/api_key '${var.datadog_api_key}' ${self.triggers.context}"
+    command = "${self.triggers.unicreds}/datadog/api_key '${var.datadog_api_key}' ${self.triggers.context}"
   }
 }
 
