@@ -22,8 +22,8 @@ resource "aws_launch_configuration" "consul" {
   count = "${var.enabled * length(split(",", var.environments))}"
 
   depends_on = [
-    "null_resource.credstash",
-    "null_resource.credstash-public",
+    "null_resource.secrets",
+    "null_resource.secrets-public",
   ]
 
   lifecycle {
@@ -717,15 +717,15 @@ resource "tls_self_signed_cert" "gossip" {
   }
 }
 
-# This null resource is responsible for publishing platform secrets to Credstash
-resource "null_resource" "credstash-public" {
+# This null resource is responsible for publishing platform secrets to KMS
+resource "null_resource" "secrets-public" {
   count = "${var.enabled * length(split(",", var.environments))}"
 
   lifecycle {
     create_before_destroy = true
   }
 
-  # Important to list here every variable that affects what needs to be put into credstash
+  # Important to list here every variable that affects what needs to be put into KMS
   triggers {
     secret    = "${var.credstash_key}"
     cacert    = "${element(tls_self_signed_cert.consul_web_ui.*.cert_pem, count.index)}"
@@ -741,15 +741,15 @@ resource "null_resource" "credstash-public" {
   }
 }
 
-# This null resource is responsible for publishing secrets to Credstash
-resource "null_resource" "credstash" {
+# This null resource is responsible for publishing secrets to KMS
+resource "null_resource" "secrets" {
   count = "${var.enabled * length(split(",", var.environments))}"
 
   lifecycle {
     create_before_destroy = true
   }
 
-  # Important to list here every variable that affects what needs to be put into credstash
+  # Important to list here every variable that affects what needs to be put into KMS
   triggers {
     secret           = "${var.credstash_key}"
     master_acl_token = "${var.master_acl_token}"
@@ -786,7 +786,7 @@ resource "null_resource" "credstash" {
 
   # Datadog
   provisioner "local-exec" {
-    command = "${self.triggers.credstash}/datadog/api_key '${var.datadog_api_key}' ${self.triggers.context}"
+    command = "${self.triggers.unicreds}/datadog/api_key '${var.datadog_api_key}' ${self.triggers.context}"
   }
 }
 
