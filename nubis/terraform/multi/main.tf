@@ -737,7 +737,7 @@ resource "null_resource" "secrets-public" {
 
   # Consul UI SSL Certificate
   provisioner "local-exec" {
-    command = "echo -n '${element(tls_self_signed_cert.consul_web_ui.*.cert_pem, count.index)}' | ${self.triggers.unicreds_file}/ssl/cacert /dev/stdin ${self.triggers.context}"
+    command = "echo '${element(tls_self_signed_cert.consul_web_ui.*.cert_pem, count.index)}' | ${self.triggers.unicreds_file}/ssl/cacert /dev/stdin ${self.triggers.context}"
   }
 }
 
@@ -776,12 +776,12 @@ resource "null_resource" "secrets" {
 
   # Consul SSL key
   provisioner "local-exec" {
-    command = "echo -n '${element(tls_private_key.gossip.*.private_key_pem, count.index)}' | ${self.triggers.unicreds_file}/ssl/key /dev/stdin ${self.triggers.context}"
+    command = "echo '${element(tls_private_key.gossip.*.private_key_pem, count.index)}' | ${self.triggers.unicreds_file}/ssl/key /dev/stdin ${self.triggers.context}"
   }
 
   # Consul SSL Certificate
   provisioner "local-exec" {
-    command = "echo -n '${element(tls_self_signed_cert.gossip.*.cert_pem, count.index)}' | ${self.triggers.unicreds_file}/ssl/cert /dev/stdin ${self.triggers.context}"
+    command = "echo '${element(tls_self_signed_cert.gossip.*.cert_pem, count.index)}' | ${self.triggers.unicreds_file}/ssl/cert /dev/stdin ${self.triggers.context}"
   }
 
   # Datadog
