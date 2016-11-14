@@ -9,3 +9,4 @@ nubis/librarian-puppet
 nubis/Puppetfile.lock
 nubis/.tmp
 nubis/.librarian
+.~lock.*
