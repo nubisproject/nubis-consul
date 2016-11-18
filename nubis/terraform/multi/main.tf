@@ -593,11 +593,13 @@ resource "tls_self_signed_cert" "consul_web_public" {
   # hours of the certificate's expiration time. ( 7 days )
   early_renewal_hours = 168
 
+  is_ca_certificate = true
+
   # Reasonable set of uses for a server SSL certificate.
   allowed_uses = [
     "key_encipherment",
     "digital_signature",
-    "server_auth",
+    "cert_signing",
   ]
 
   subject {
@@ -731,15 +733,21 @@ resource "null_resource" "secrets-public" {
   triggers {
     secret    = "${var.credstash_key}"
     cacert    = "${element(tls_self_signed_cert.consul_web_ui.*.cert_pem, count.index)}"
+    public_cacert = "${element(tls_self_signed_cert.consul_web_public.*.cert_pem, count.index)}"
     region    = "${var.aws_region}"
     version   = "${var.nubis_version}"
     context   = "-E region:${var.aws_region} -E environment:${element(split(",",var.environments), count.index)} -E service:nubis"
     unicreds_file = "unicreds -r ${var.aws_region} put-file -k ${var.credstash_key} nubis/${element(split(",",var.environments), count.index)}"
   }
 
-  # Consul UI SSL Certificate
+  # Consul Internal UI SSL Certificate
   provisioner "local-exec" {
     command = "echo '${element(tls_self_signed_cert.consul_web_ui.*.cert_pem, count.index)}' | ${self.triggers.unicreds_file}/ssl/cacert /dev/stdin ${self.triggers.context}"
+  }
+
+    # Consul External UI SSL Certificate
+  provisioner "local-exec" {
+    command = "echo '${element(tls_self_signed_cert.consul_web_public.*.cert_pem, count.index)}' | ${self.triggers.unicreds_file}/ssl/public-cacert /dev/stdin ${self.triggers.context}"
   }
 }
 
