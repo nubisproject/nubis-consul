@@ -109,6 +109,15 @@ consul_acl { "Anonymous Token":
       "alertmanager" => {
         "policy" => "read"
       },
+      "traefik" => {
+        "policy" => "read"
+      },
+      "es" => {
+        "policy" => "read"
+      },
+      "kv" => {
+        "policy" => "read"
+      },
       "grafana" => {
         "policy" => "read"
       }
