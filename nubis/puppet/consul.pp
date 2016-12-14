@@ -89,7 +89,7 @@ cron::job {
     month       => '*',
     weekday     => '*',
     user        => 'root',
-    command     => '/usr/local/bin/consul-asg-join >/dev/null',
+    command     => 'nubis-cron consul-asg-join "/usr/local/bin/consul-asg-join >/dev/null"',
     environment => [ 'PATH="/usr/local/bin:/usr/bin:/bin"', 'SHELL=/bin/bash' ],
 }
 
@@ -105,7 +105,7 @@ file { '/usr/local/sbin/consul-backup':
 cron::hourly { 'consul_backup':
     minute      => '0',
     user        => 'root',
-    command     => '/usr/local/sbin/consul-backup',
+    command     => 'nubis-cron consul_backup /usr/local/sbin/consul-backup',
     environment => [ 'PATH="/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin"', 'SHELL=/bin/bash' ],
     require     => File['/usr/local/sbin/consul-backup']
 }
