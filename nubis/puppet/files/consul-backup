@@ -15,11 +15,12 @@ eval "$(curl -s -fq http://169.254.169.254/latest/user-data)"
 INSTANCE_ID=$(curl -s -fq http://169.254.169.254/latest/meta-data/instance-id)
 REGION=$(curl -s http://169.254.169.254/latest/dynamic/instance-identity/document | jq '.region' -r)
 BACKUP_BUCKET="nubis-${NUBIS_PROJECT}-backup-${NUBIS_ENVIRONMENT}-${REGION}-${NUBIS_ACCOUNT}"
+CONSUL_ACL_TOKEN=$(jq -r .acl_master_token < /etc/consul/zzz-acl.json)
 
 # How do we want to represent the backup file
 DATE_STAMP=$(date +%Y%m%d_%H:%M:%S)
 DATE_PATH=$(date +%Y/%m)
-BACKUP_FILE_NAME="$DATE_PATH/consul_backup.${INSTANCE_ID}.${DATE_STAMP}.json"
+BACKUP_FILE_NAME="$DATE_PATH/consul_backup.${INSTANCE_ID}.${DATE_STAMP}.dump"
 
 # Only 1 member of the cluster needs to run this
 # if you are not the leader then just forget about it
@@ -31,11 +32,11 @@ trap 'rm -f "$BACKUP_FILE"' EXIT
 
 # We probably can do a little better here to check if the backup actually worked
 $LOGGER "Backing up KV store to $BACKUP_FILE"
-consulate kv backup -f "$BACKUP_FILE"
+consul snapshot save -token="$CONSUL_ACL_TOKEN" "$BACKUP_FILE"
 
 # Copy to s3
 if [[ -s $BACKUP_FILE ]]; then
-    for DEST in ${BACKUP_FILE_NAME} latest.json; do
+    for DEST in ${BACKUP_FILE_NAME} latest.dump; do
         $LOGGER "Copying ${DEST} to s3 (BucketName: ${BACKUP_BUCKET})"
         aws s3 cp "$BACKUP_FILE" "s3://${BACKUP_BUCKET}/${DEST}" --region "${REGION}" --quiet
         RV=$?
