@@ -25,28 +25,29 @@ Details for the deployment including; naming conventions, relationships, permiss
 
 |Resource Type|Resource Title|Code Location|
 |-------------|--------------|-------------|
-|aws_launch_configuration|consul|[nubis/terraform/main.tf#8](nubis/terraform/main.tf#8)|
-|aws_autoscaling_group|consul|[nubis/terraform/main.tf#36](nubis/terraform/main.tf#36)|
-|aws_security_group|consul|[nubis/terraform/main.tf#73](nubis/terraform/main.tf#73)|
-|aws_elb|consul|[nubis/terraform/main.tf#130](nubis/terraform/main.tf#130)|
-|aws_elb|consul-public|[nubis/terraform/main.tf#169](nubis/terraform/main.tf#169)|
-|aws_security_group|elb|[nubis/terraform/main.tf#199](nubis/terraform/main.tf#199)|
-|aws_security_group|elb-public|[nubis/terraform/main.tf#228](nubis/terraform/main.tf#228)|
-|aws_route53_record|ui|[nubis/terraform/main.tf#250](nubis/terraform/main.tf#250)|
-|aws_route53_record|public|[nubis/terraform/main.tf#258](nubis/terraform/main.tf#258)|
-|aws_s3_bucket|consul_backups|[nubis/terraform/main.tf#266](nubis/terraform/main.tf#266)|
-|aws_iam_instance_profile|consul|[nubis/terraform/main.tf#280](nubis/terraform/main.tf#280)|
-|aws_iam_role|consul|[nubis/terraform/main.tf#285](nubis/terraform/main.tf#285)|
-|aws_iam_role_policy|consul|[nubis/terraform/main.tf#306](nubis/terraform/main.tf#306)|
-|aws_iam_role_policy|consul_backups|[nubis/terraform/main.tf#343](nubis/terraform/main.tf#343)|
-|aws_iam_role_policy|credstash|[nubis/terraform/main.tf#372](nubis/terraform/main.tf#372)|
-|tls_private_key|consul_web|[nubis/terraform/main.tf#461](nubis/terraform/main.tf#461)|
-|tls_self_signed_cert|consul_web_public|[nubis/terraform/main.tf#465](nubis/terraform/main.tf#465)|
-|tls_self_signed_cert|consul_web_ui|[nubis/terraform/main.tf#489](nubis/terraform/main.tf#489)|
-|aws_iam_server_certificate|consul_web_public|[nubis/terraform/main.tf#519](nubis/terraform/main.tf#519)|
-|aws_iam_server_certificate|consul_web_ui|[nubis/terraform/main.tf#530](nubis/terraform/main.tf#530)|
-|null_resource|credstash-public|[nubis/terraform/main.tf#546](nubis/terraform/main.tf#546)|
-|null_resource|credstash|[nubis/terraform/main.tf#563](nubis/terraform/main.tf#563)|
+|aws_launch_configuration|consul|[nubis/terraform/main.tf#L8](nubis/terraform/main.tf#L8)|
+|aws_autoscaling_group|consul|[nubis/terraform/main.tf#L36](nubis/terraform/main.tf#L36)|
+|aws_security_group|consul|[nubis/terraform/main.tf#L73](nubis/terraform/main.tf#L73)|
+|aws_elb|consul|[nubis/terraform/main.tf#L130](nubis/terraform/main.tf#L130)|
+|aws_elb|consul-public|[nubis/terraform/main.tf#L169](nubis/terraform/main.tf#L169)|
+|aws_security_group|elb|[nubis/terraform/main.tf#L199](nubis/terraform/main.tf#L199)|
+|aws_security_group|elb-public|[nubis/terraform/main.tf#L228](nubis/terraform/main.tf#L228)|
+|aws_route53_record|ui|[nubis/terraform/main.tf#L250](nubis/terraform/main.tf#L250)|
+|aws_route53_record|public|[nubis/terraform/main.tf#L258](nubis/terraform/main.tf#L258)|
+|aws_s3_bucket|consul_backups|[nubis/terraform/main.tf#L266](nubis/terraform/main.tf#L266)|
+|aws_iam_instance_profile|consul|[nubis/terraform/main.tf#L280](nubis/terraform/main.tf#L280)|
+|aws_iam_role|consul|[nubis/terraform/main.tf#L285](nubis/terraform/main.tf#L285)|
+|aws_iam_role_policy|consul|[nubis/terraform/main.tf#L306](nubis/terraform/main.tf#L306)|
+|aws_iam_role_policy|consul_backups|[nubis/terraform/main.tf#L343](nubis/terraform/main.tf#L343)|
+|aws_iam_role_policy|credstash|[nubis/terraform/main.tf#L372](nubis/terraform/main.tf#L372)|
+|tls_private_key|consul_web|[nubis/terraform/main.tf#L461](nubis/terraform/main.tf#L461)|
+|tls_self_signed_cert|consul_web_public|[nubis/terraform/main.tf#L465](nubis/terraform/main.tf#L465)|
+|tls_self_signed_cert|consul_web_ui|[nubis/terraform/main.tf#L489](nubis/terraform/main.tf#L489)|
+|aws_iam_server_certificate|consul_web_public|[nubis/terraform/main.tf#L519](nubis/terraform/main.tf#L519)|
+|aws_iam_server_certificate|consul_web_ui|[nubis/terraform/main.tf#L530](nubis/terraform/main.tf#L530)|
+|null_resource|credstash-public|[nubis/terraform/main.tf#L546](nubis/terraform/main.tf#L546)|
+|null_resource|credstash|[nubis/terraform/main.tf#L563](nubis/terraform/main.tf#L563)|
+
 
 ### Dependencies
 
