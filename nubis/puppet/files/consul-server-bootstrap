@@ -86,6 +86,9 @@ consul_acl { "Anonymous Token":
       "proxy" => {
         "policy" => "deny"
       },
+      "nat" => {
+        "policy" => "deny"
+      },
       "prometheus" => {
         "policy" => "deny"
       },
