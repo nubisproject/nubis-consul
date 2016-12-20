@@ -1,0 +1,10 @@
+amazon-ebs-ubuntu:
+ap-northeast-1: ami-97d2baf0
+ap-southeast-1: ami-17de7074
+ap-southeast-2: ami-bfcaf1dc
+eu-central-1: ami-7106c61e
+eu-west-1: ami-9b0929e8
+sa-east-1: ami-6a43db06
+us-east-1: ami-a8d1c4bf
+us-west-1: ami-b93263d9
+us-west-2: ami-aa3387ca
