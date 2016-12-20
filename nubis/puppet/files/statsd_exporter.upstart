@@ -1,0 +1,14 @@
+description "Prometheus Statsd Exporter"
+start on (local-filesystems and net-device-up IFACE!=lo)
+stop on runlevel [016]
+
+respawn
+env GOMAXPROCS=2
+setuid root
+setgid root
+
+script
+  exec >> /var/log/statsd_exporter.log
+  exec 2>&1
+  exec /usr/local/bin/statsd_exporter -statsd.listen-address="127.0.0.1:9125" -web.listen-address=":9102" -log.level info -log.format 'logger:syslog?appname=statsd_exporter&local=7'
+end script
