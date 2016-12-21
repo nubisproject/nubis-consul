@@ -1,10 +1,64 @@
 # Change Log
 
-## [v1.2.2](https://github.com/nubisproject/nubis-consul/tree/v1.2.2) (2016-08-02)
-[Full Changelog](https://github.com/nubisproject/nubis-consul/compare/v1.2.1...v1.2.2)
+## [v1.3.0](https://github.com/nubisproject/nubis-consul/tree/v1.3.0) (2016-12-20)
+[Full Changelog](https://github.com/nubisproject/nubis-consul/compare/v1.2.2...v1.3.0)
+
+**Closed issues:**
+
+- Use new consul snapshot command for backups [\#233](https://github.com/nubisproject/nubis-consul/issues/233)
+- Upgrade to Consul 0.7.1 [\#232](https://github.com/nubisproject/nubis-consul/issues/232)
+- \[ssl\] Public SSL cert should be verifiable and isn't [\#230](https://github.com/nubisproject/nubis-consul/issues/230)
+- Inject userdata for user management [\#227](https://github.com/nubisproject/nubis-consul/issues/227)
+- \[backup\] Store backups in S3 with a data-based prefix [\#226](https://github.com/nubisproject/nubis-consul/issues/226)
+- Convert to unicreds from credstash [\#218](https://github.com/nubisproject/nubis-consul/issues/218)
+- \[telemetry\] Use statsd\_exporter to bubble up more telemetry data [\#214](https://github.com/nubisproject/nubis-consul/issues/214)
+- Upgrade to Consul 0.7.0 [\#210](https://github.com/nubisproject/nubis-consul/issues/210)
+- Install consul\_exporter [\#208](https://github.com/nubisproject/nubis-consul/issues/208)
+- Tag v1.2.3 release [\#204](https://github.com/nubisproject/nubis-consul/issues/204)
+- \[cleanup\] Remove usage of AWS\_DEFAULT\_PROFILE [\#202](https://github.com/nubisproject/nubis-consul/issues/202)
+- Split DNS entries publishing in 2 distinct zones, one for discovery, the other one for public access [\#162](https://github.com/nubisproject/nubis-consul/issues/162)
+- Convert to using TLS provider for generating our Consul X509 Cert [\#133](https://github.com/nubisproject/nubis-consul/issues/133)
+- Convert to CloudFormation [\#22](https://github.com/nubisproject/nubis-consul/issues/22)
 
 **Merged pull requests:**
 
+- Update builder artifacts for v1.3.0 release [\#242](https://github.com/nubisproject/nubis-consul/pull/242) ([tinnightcap](https://github.com/tinnightcap))
+- Add missing file [\#241](https://github.com/nubisproject/nubis-consul/pull/241) ([gozer](https://github.com/gozer))
+- add nat/ as protected area of our Consul platform keyspace [\#239](https://github.com/nubisproject/nubis-consul/pull/239) ([gozer](https://github.com/gozer))
+- Use consul snapshot \(new in 0.7\) to drive our backups [\#238](https://github.com/nubisproject/nubis-consul/pull/238) ([gozer](https://github.com/gozer))
+- Fix Links [\#237](https://github.com/nubisproject/nubis-consul/pull/237) ([tinnightcap](https://github.com/tinnightcap))
+- Update Documentation [\#236](https://github.com/nubisproject/nubis-consul/pull/236) ([tinnightcap](https://github.com/tinnightcap))
+- use nubis-cron [\#235](https://github.com/nubisproject/nubis-consul/pull/235) ([gozer](https://github.com/gozer))
+- Upgrade to Consul 0.7.1 [\#234](https://github.com/nubisproject/nubis-consul/pull/234) ([gozer](https://github.com/gozer))
+- Make sure the public SSL cert is verifiyable [\#231](https://github.com/nubisproject/nubis-consul/pull/231) ([gozer](https://github.com/gozer))
+- merge [\#229](https://github.com/nubisproject/nubis-consul/pull/229) ([gozer](https://github.com/gozer))
+- Inject userdata into consul [\#228](https://github.com/nubisproject/nubis-consul/pull/228) ([limed](https://github.com/limed))
+- Update background for redability [\#225](https://github.com/nubisproject/nubis-consul/pull/225) ([tinnightcap](https://github.com/tinnightcap))
+- Change echo -n to just echo [\#224](https://github.com/nubisproject/nubis-consul/pull/224) ([gozer](https://github.com/gozer))
+- Add deployment media and documentation [\#223](https://github.com/nubisproject/nubis-consul/pull/223) ([tinnightcap](https://github.com/tinnightcap))
+- fix tyop [\#222](https://github.com/nubisproject/nubis-consul/pull/222) ([gozer](https://github.com/gozer))
+- Fix issue with unicreds choking on key values starting with -- [\#221](https://github.com/nubisproject/nubis-consul/pull/221) ([gozer](https://github.com/gozer))
+- Convert to unicreds for secret managment [\#219](https://github.com/nubisproject/nubis-consul/pull/219) ([gozer](https://github.com/gozer))
+- Lock down KV space for prometheus as well as services:  - prometheus  - alertmanager  - grafana [\#217](https://github.com/nubisproject/nubis-consul/pull/217) ([gozer](https://github.com/gozer))
+- Install and run statsd\_exporter and publish Consul metrics to it [\#215](https://github.com/nubisproject/nubis-consul/pull/215) ([gozer](https://github.com/gozer))
+- Set the expected number of Consul servers in user-data [\#213](https://github.com/nubisproject/nubis-consul/pull/213) ([gozer](https://github.com/gozer))
+- Enable nubis-travis v0.1.0 [\#212](https://github.com/nubisproject/nubis-consul/pull/212) ([gozer](https://github.com/gozer))
+- Upgrade to Consul 0.7.0 [\#211](https://github.com/nubisproject/nubis-consul/pull/211) ([gozer](https://github.com/gozer))
+- Install and enable consul\_exporter, when node\_exporter is enabled [\#209](https://github.com/nubisproject/nubis-consul/pull/209) ([gozer](https://github.com/gozer))
+- Update builder artifacts for v1.3.0-dev release [\#206](https://github.com/nubisproject/nubis-consul/pull/206) ([gozer](https://github.com/gozer))
+- Update builder artifacts for v1.2.3 release [\#205](https://github.com/nubisproject/nubis-consul/pull/205) ([gozer](https://github.com/gozer))
+- Remove aws\_profile, we don't need it and don't use it anymore [\#203](https://github.com/nubisproject/nubis-consul/pull/203) ([gozer](https://github.com/gozer))
+
+## [v1.2.2](https://github.com/nubisproject/nubis-consul/tree/v1.2.2) (2016-08-02)
+[Full Changelog](https://github.com/nubisproject/nubis-consul/compare/v1.2.1...v1.2.2)
+
+**Closed issues:**
+
+- Tag v1.2.2 release [\#199](https://github.com/nubisproject/nubis-consul/issues/199)
+
+**Merged pull requests:**
+
+- Update CHANGELOG for v1.2.2 release [\#201](https://github.com/nubisproject/nubis-consul/pull/201) ([tinnightcap](https://github.com/tinnightcap))
 - Update builder artifacts for v1.2.2 release [\#200](https://github.com/nubisproject/nubis-consul/pull/200) ([tinnightcap](https://github.com/tinnightcap))
 
 ## [v1.2.1](https://github.com/nubisproject/nubis-consul/tree/v1.2.1) (2016-07-30)
