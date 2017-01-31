@@ -469,6 +469,7 @@ resource "aws_iam_role_policy" "consul" {
                 "autoscaling:DescribeAutoScalingInstances",
                 "autoscaling:DescribeAutoScalingGroups",
                 "ec2:DescribeInstances",
+                "ec2:DescribeTags",
                 "elasticloadbalancing:DescribeLoadBalancers"
             ],
             "Resource": "*",
