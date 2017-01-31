@@ -92,6 +92,13 @@ resource "aws_autoscaling_group" "consul" {
 
   wait_for_capacity_timeout = "60m"
 
+  enabled_metrics = [
+    "GroupMinSize",
+    "GroupMaxSize",
+    "GroupDesiredCapacity",
+    "GroupInServiceInstances",
+  ]
+
   load_balancers = [
     "${element(aws_elb.consul.*.name, count.index)}",
     "${element(aws_elb.consul-public.*.name, count.index)}",
