@@ -3,15 +3,11 @@ provider "aws" {
   region  = "${var.aws_region}"
 }
 
-resource "atlas_artifact" "nubis-consul" {
+data "atlas_artifact" "nubis-consul" {
   count = "${var.enabled}"
 
   name = "nubisproject/nubis-consul"
   type = "amazon.image"
-
-  lifecycle {
-    create_before_destroy = true
-  }
 
   metadata {
     project_version = "${var.nubis_version}"
@@ -31,12 +27,7 @@ resource "aws_launch_configuration" "consul" {
   }
 
   name_prefix = "${var.project}-${element(split(",",var.environments), count.index)}-${var.aws_region}-"
-
-  # Somewhat nasty, since Atlas doesn't have an elegant way to access the id for a region
-  # the id is "region:ami,region:ami,region:ami"
-  # so we split it all and find the index of the region
-  # add on, and pick that element
-  image_id = "${ element(split(",",replace(atlas_artifact.nubis-consul.id,":",",")) ,1 + index(split(",",replace(atlas_artifact.nubis-consul.id,":",",")), var.aws_region)) }"
+  image_id = "${data.atlas_artifact.nubis-consul.metadata_full["region-${var.aws_region}"]}"
 
   instance_type        = "t2.nano"
   key_name             = "${var.key_name}"
@@ -56,7 +47,7 @@ NUBIS_DOMAIN=${var.domain}
 CONSUL_ACL_DEFAULT_POLICY=${var.acl_default_policy}
 CONSUL_ACL_DOWN_POLICY=${var.acl_down_policy}
 CONSUL_BOOTSTRAP_EXPECT=${var.servers}
-NUBIS_BUMP=${md5("${var.datadog_api_key}${element(template_file.mig.*.rendered,count.index)}")}
+NUBIS_BUMP=${md5("${var.datadog_api_key}${element(data.template_file.mig.*.rendered,count.index)}")}
 NUBIS_SUDO_GROUPS="${var.nubis_sudo_groups}"
 NUBIS_USER_GROUPS="${var.nubis_user_groups}"
 EOF
@@ -773,7 +764,7 @@ resource "null_resource" "secrets" {
     master_acl_token = "${var.master_acl_token}"
     datadog_api_key  = "${var.datadog_api_key}"
     version          = "${var.nubis_version}"
-    mig              = "${md5(element(template_file.mig.*.rendered,count.index))}"
+    mig              = "${md5(element(data.template_file.mig.*.rendered,count.index))}"
     ssl_key          = "${element(tls_private_key.gossip.*.private_key_pem, count.index)}"
     ssl_cert         = "${element(tls_self_signed_cert.gossip.*.cert_pem, count.index)}"
     region           = "${var.aws_region}"
@@ -808,12 +799,8 @@ resource "null_resource" "secrets" {
   }
 }
 
-resource "template_file" "mig" {
+data "template_file" "mig" {
   count = "${var.enabled * length(split(",", var.environments))}"
-
-  lifecycle {
-    create_before_destroy = true
-  }
 
   template = <<TEMPLATE
 MIG_AGENT_CRT=""
