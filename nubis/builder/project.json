@@ -5,6 +5,6 @@
     ],
     "project_description": "Consul",
     "project_name": "nubis-consul",
-    "project_version": "v1.4.0-dev"
+    "project_version": "v1.4.0"
   }
 }
