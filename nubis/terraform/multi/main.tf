@@ -32,6 +32,7 @@ resource "aws_launch_configuration" "consul" {
   instance_type        = "t2.nano"
   key_name             = "${var.key_name}"
   iam_instance_profile = "${element(aws_iam_instance_profile.consul.*.name, count.index)}"
+  enable_monitoring    = false
 
   security_groups = [
     "${element(aws_security_group.consul.*.id, count.index)}",
