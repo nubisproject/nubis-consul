@@ -1,6 +1,31 @@
 # Change Log
 
-## [v1.3.0](https://github.com/nubisproject/nubis-consul/tree/v1.3.0) (2016-12-20)
+## [v1.4.0](https://github.com/nubisproject/nubis-consul/tree/v1.4.0) (2017-03-23)
+[Full Changelog](https://github.com/nubisproject/nubis-consul/compare/v1.3.0...v1.4.0)
+
+**Closed issues:**
+
+- Disable detailled monitoring [\#259](https://github.com/nubisproject/nubis-consul/issues/259)
+- Upgrade to Consul 0.7.5 [\#257](https://github.com/nubisproject/nubis-consul/issues/257)
+- Add ec2:DescribeTags permission for EC2 peer discovery [\#251](https://github.com/nubisproject/nubis-consul/issues/251)
+- Enable ASG metrics [\#249](https://github.com/nubisproject/nubis-consul/issues/249)
+- Upgrade Consul to v0.7.3 [\#248](https://github.com/nubisproject/nubis-consul/issues/248)
+- Upgrade to Consul 0.7.2 [\#244](https://github.com/nubisproject/nubis-consul/issues/244)
+- Upgrade to Consul 0.7 [\#207](https://github.com/nubisproject/nubis-consul/issues/207)
+
+**Merged pull requests:**
+
+- Disable EC2 detailled monitoring [\#260](https://github.com/nubisproject/nubis-consul/pull/260) ([gozer](https://github.com/gozer))
+- Upgrade to Consul v0.7.5 [\#258](https://github.com/nubisproject/nubis-consul/pull/258) ([gozer](https://github.com/gozer))
+- Update builder artifacts for v1.4.0 release \[skip ci\] [\#256](https://github.com/nubisproject/nubis-consul/pull/256) ([tinnightcap](https://github.com/tinnightcap))
+- Terraform 0.8 Upgrade [\#254](https://github.com/nubisproject/nubis-consul/pull/254) ([gozer](https://github.com/gozer))
+- Add some ASG metrics for monitoring [\#253](https://github.com/nubisproject/nubis-consul/pull/253) ([gozer](https://github.com/gozer))
+- Add ec2:DescribeTags permission [\#252](https://github.com/nubisproject/nubis-consul/pull/252) ([gozer](https://github.com/gozer))
+- Upgrade to Consul 0.7.3 [\#250](https://github.com/nubisproject/nubis-consul/pull/250) ([gozer](https://github.com/gozer))
+- Update builder artifacts for v1.4.0-dev release [\#246](https://github.com/nubisproject/nubis-consul/pull/246) ([tinnightcap](https://github.com/tinnightcap))
+- Upgrade to Consul 0.7.2 [\#245](https://github.com/nubisproject/nubis-consul/pull/245) ([gozer](https://github.com/gozer))
+
+## [v1.3.0](https://github.com/nubisproject/nubis-consul/tree/v1.3.0) (2016-12-21)
 [Full Changelog](https://github.com/nubisproject/nubis-consul/compare/v1.2.2...v1.3.0)
 
 **Closed issues:**
@@ -19,9 +44,12 @@
 - Split DNS entries publishing in 2 distinct zones, one for discovery, the other one for public access [\#162](https://github.com/nubisproject/nubis-consul/issues/162)
 - Convert to using TLS provider for generating our Consul X509 Cert [\#133](https://github.com/nubisproject/nubis-consul/issues/133)
 - Convert to CloudFormation [\#22](https://github.com/nubisproject/nubis-consul/issues/22)
+- Tag v1.3.0 release [\#240](https://github.com/nubisproject/nubis-consul/issues/240)
+- Update DataDog API key only if it changes [\#194](https://github.com/nubisproject/nubis-consul/issues/194)
 
 **Merged pull requests:**
 
+- Update CHANGELOG for v1.3.0 release [\#243](https://github.com/nubisproject/nubis-consul/pull/243) ([tinnightcap](https://github.com/tinnightcap))
 - Update builder artifacts for v1.3.0 release [\#242](https://github.com/nubisproject/nubis-consul/pull/242) ([tinnightcap](https://github.com/tinnightcap))
 - Add missing file [\#241](https://github.com/nubisproject/nubis-consul/pull/241) ([gozer](https://github.com/gozer))
 - add nat/ as protected area of our Consul platform keyspace [\#239](https://github.com/nubisproject/nubis-consul/pull/239) ([gozer](https://github.com/gozer))
@@ -48,6 +76,7 @@
 - Update builder artifacts for v1.3.0-dev release [\#206](https://github.com/nubisproject/nubis-consul/pull/206) ([gozer](https://github.com/gozer))
 - Update builder artifacts for v1.2.3 release [\#205](https://github.com/nubisproject/nubis-consul/pull/205) ([gozer](https://github.com/gozer))
 - Remove aws\_profile, we don't need it and don't use it anymore [\#203](https://github.com/nubisproject/nubis-consul/pull/203) ([gozer](https://github.com/gozer))
+- Update DataDog API key only if it changed [\#195](https://github.com/nubisproject/nubis-consul/pull/195) ([gozer](https://github.com/gozer))
 
 ## [v1.2.2](https://github.com/nubisproject/nubis-consul/tree/v1.2.2) (2016-08-02)
 [Full Changelog](https://github.com/nubisproject/nubis-consul/compare/v1.2.1...v1.2.2)
@@ -66,14 +95,12 @@
 
 **Closed issues:**
 
-- Update DataDog API key only if it changes [\#194](https://github.com/nubisproject/nubis-consul/issues/194)
 - Tag v1.2.1 release [\#196](https://github.com/nubisproject/nubis-consul/issues/196)
 
 **Merged pull requests:**
 
 - Update CHANGELOG for v1.2.1 release [\#198](https://github.com/nubisproject/nubis-consul/pull/198) ([tinnightcap](https://github.com/tinnightcap))
 - Update builder artifacts for v1.2.1 release [\#197](https://github.com/nubisproject/nubis-consul/pull/197) ([tinnightcap](https://github.com/tinnightcap))
-- Update DataDog API key only if it changed [\#195](https://github.com/nubisproject/nubis-consul/pull/195) ([gozer](https://github.com/gozer))
 - Update builder artifacts for v1.3.0-dev release [\#192](https://github.com/nubisproject/nubis-consul/pull/192) ([tinnightcap](https://github.com/tinnightcap))
 
 ## [v1.2.0](https://github.com/nubisproject/nubis-consul/tree/v1.2.0) (2016-07-07)
