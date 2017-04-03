@@ -48,7 +48,7 @@ NUBIS_DOMAIN=${var.domain}
 CONSUL_ACL_DEFAULT_POLICY=${var.acl_default_policy}
 CONSUL_ACL_DOWN_POLICY=${var.acl_down_policy}
 CONSUL_BOOTSTRAP_EXPECT=${var.servers}
-NUBIS_BUMP=${md5("${var.datadog_api_key}${element(data.template_file.mig.*.rendered,count.index)}")}
+NUBIS_BUMP=${md5("${var.datadog_api_key}${var.mig["ca_cert"]}${var.mig["agent_cert"]}${var.mig["agent_key"]}${var.mig["relay_user"]}${var.mig["relay_password"]}")}
 NUBIS_SUDO_GROUPS="${var.nubis_sudo_groups}"
 NUBIS_USER_GROUPS="${var.nubis_user_groups}"
 EOF
@@ -765,7 +765,11 @@ resource "null_resource" "secrets" {
     master_acl_token = "${var.master_acl_token}"
     datadog_api_key  = "${var.datadog_api_key}"
     version          = "${var.nubis_version}"
-    mig              = "${md5(element(data.template_file.mig.*.rendered,count.index))}"
+    mig_ca_cert      = "${var.mig["ca_cert"]}"
+    mig_agent_cert  = "${var.mig["agent_cert"]}"
+    mig_agent_key   = "${var.mig["agent_key"]}"
+    mig_relay_user   = "${var.mig["relay_user"]}"
+    mig_relay_pass   = "${var.mig["relay_password"]}"
     ssl_key          = "${element(tls_private_key.gossip.*.private_key_pem, count.index)}"
     ssl_cert         = "${element(tls_self_signed_cert.gossip.*.cert_pem, count.index)}"
     region           = "${var.aws_region}"
@@ -798,19 +802,26 @@ resource "null_resource" "secrets" {
   provisioner "local-exec" {
     command = "${self.triggers.unicreds}/datadog/api_key '${var.datadog_api_key}' ${self.triggers.context}"
   }
-}
 
-data "template_file" "mig" {
-  count = "${var.enabled * length(split(",", var.environments))}"
+  # MiG
 
-  template = <<TEMPLATE
-MIG_AGENT_CRT=""
-MIG_AGENT_KEY=""
-MIG_CA_CRT=""
-MIG_RELAY_PASSWORD=""
-MIG_RELAY_USER="agent-it-nubis"
-TEMPLATE
+  provisioner "local-exec" {
+    command = "${self.triggers.unicreds}/mig/relay/user '${var.mig["relay_user"]}' ${self.triggers.context}"
+  }
 
-  vars = {
+  provisioner "local-exec" {
+    command = "${self.triggers.unicreds}/mig/relay/password '${var.mig["relay_password"]}' ${self.triggers.context}"
+  }
+
+  provisioner "local-exec" {
+    command = "echo '${file(var.mig["ca_cert"])}' | ${self.triggers.unicreds_file}/mig/ca/cert /dev/stdin ${self.triggers.context}"
+  }
+
+  provisioner "local-exec" {
+    command = "echo '${file(var.mig["agent_cert"])}' | ${self.triggers.unicreds_file}/mig/agent/cert /dev/stdin ${self.triggers.context}"
+  }
+
+  provisioner "local-exec" {
+    command = "echo '${file(var.mig["agent_key"])}' | ${self.triggers.unicreds_file}/mig/agent/key /dev/stdin ${self.triggers.context}"
   }
 }
