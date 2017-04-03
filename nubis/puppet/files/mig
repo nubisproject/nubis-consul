@@ -1,0 +1,44 @@
+#!/bin/bash
+
+export PATH=/usr/local/bin:$PATH
+
+eval "$(nubis-metadata)"
+KV_PREFIX="environments/$NUBIS_ENVIRONMENT/global/mig/config"
+
+# We need the Consul ACL token
+CONSUL_ACL_TOKEN=$(jq -r .acl_master_token < /etc/consul/zzz-acl.json)
+
+MIG_RELAY_PASSWORD=$(nubis-secret get mig/relay/password)
+if [ "$MIG_RELAY_PASSWORD" != "" ]; then
+  consulate --token "$CONSUL_ACL_TOKEN" kv set "$KV_PREFIX/relay_password" "$MIG_RELAY_PASSWORD"
+else
+  consulate --token "$CONSUL_ACL_TOKEN" kv rm "$KV_PREFIX/relay_password"
+fi
+
+MIG_RELAY_USER=$(nubis-secret get mig/relay/user)
+if [ "$MIG_RELAY_USER" != "" ]; then
+  consulate --token "$CONSUL_ACL_TOKEN" kv set "$KV_PREFIX/relay_user" "$MIG_RELAY_USER"
+else
+  consulate --token "$CONSUL_ACL_TOKEN" kv rm "$KV_PREFIX/relay_user"
+fi
+
+MIG_CA_CERT=$(nubis-secret get mig/ca/cert)
+if [ "$MIG_CA_CERT" != "" ]; then
+  consulate --token "$CONSUL_ACL_TOKEN" kv set "$KV_PREFIX/ca.crt" "$MIG_CA_CERT"
+else
+  consulate --token "$CONSUL_ACL_TOKEN" kv rm "$KV_PREFIX/ca.crt"
+fi
+
+MIG_AGENT_CERT=$(nubis-secret get mig/agent/cert)
+if [ "$MIG_AGENT_CERT" != "" ]; then
+  consulate --token "$CONSUL_ACL_TOKEN" kv set "$KV_PREFIX/agent.crt" "$MIG_AGENT_CERT"
+else
+  consulate --token "$CONSUL_ACL_TOKEN" kv rm "$KV_PREFIX/agent.crt"
+fi
+
+MIG_AGENT_KEY=$(nubis-secret get mig/agent/key)
+if [ "$MIG_AGENT_KEY" != "" ]; then
+  consulate --token "$CONSUL_ACL_TOKEN" kv set "$KV_PREFIX/agent.key" "$MIG_AGENT_KEY"
+else
+  consulate --token "$CONSUL_ACL_TOKEN" kv rm "$KV_PREFIX/agent.key"
+fi
