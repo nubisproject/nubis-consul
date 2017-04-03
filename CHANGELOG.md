@@ -1,5 +1,12 @@
 # Change Log
 
+## [v1.4.0](https://github.com/nubisproject/nubis-consul/tree/v1.4.0) (2017-04-03)
+[Full Changelog](https://github.com/nubisproject/nubis-consul/compare/v1.4.0...v1.4.0)
+
+**Merged pull requests:**
+
+- fix MiG bootstrap [\#263](https://github.com/nubisproject/nubis-consul/pull/263) ([gozer](https://github.com/gozer))
+
 ## [v1.4.0](https://github.com/nubisproject/nubis-consul/tree/v1.4.0) (2017-03-23)
 [Full Changelog](https://github.com/nubisproject/nubis-consul/compare/v1.3.0...v1.4.0)
 
@@ -12,9 +19,12 @@
 - Upgrade Consul to v0.7.3 [\#248](https://github.com/nubisproject/nubis-consul/issues/248)
 - Upgrade to Consul 0.7.2 [\#244](https://github.com/nubisproject/nubis-consul/issues/244)
 - Upgrade to Consul 0.7 [\#207](https://github.com/nubisproject/nubis-consul/issues/207)
+- Tag v1.4.0 release [\#247](https://github.com/nubisproject/nubis-consul/issues/247)
 
 **Merged pull requests:**
 
+- Merge v1.4.0 release into develop. \[skip ci\] [\#262](https://github.com/nubisproject/nubis-consul/pull/262) ([tinnightcap](https://github.com/tinnightcap))
+- Update CHANGELOG for v1.4.0 release \[skip ci\] [\#261](https://github.com/nubisproject/nubis-consul/pull/261) ([tinnightcap](https://github.com/tinnightcap))
 - Disable EC2 detailled monitoring [\#260](https://github.com/nubisproject/nubis-consul/pull/260) ([gozer](https://github.com/gozer))
 - Upgrade to Consul v0.7.5 [\#258](https://github.com/nubisproject/nubis-consul/pull/258) ([gozer](https://github.com/gozer))
 - Update builder artifacts for v1.4.0 release \[skip ci\] [\#256](https://github.com/nubisproject/nubis-consul/pull/256) ([tinnightcap](https://github.com/tinnightcap))
