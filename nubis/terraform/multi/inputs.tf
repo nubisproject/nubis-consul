@@ -120,3 +120,13 @@ variable nubis_sudo_groups {
 variable nubis_user_groups {
   default = ""
 }
+
+variable mig {
+  default = {
+    agent_cert     = "mig/agent.crt"
+    agent_key      = "mig/agent.key"
+    ca             = "mig/ca.crt"
+    relay_password = "<unset>"
+    relay_user     = "agent-it-nubis"
+  }
+}
