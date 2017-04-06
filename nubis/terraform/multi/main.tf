@@ -54,6 +54,12 @@ NUBIS_USER_GROUPS="${var.nubis_user_groups}"
 EOF
 }
 
+resource "random_id" "cluster_id" {
+  count = "${var.enabled * length(split(",", var.environments))}"
+  prefix = "consul-"
+  byte_length = 24
+}
+
 resource "aws_autoscaling_group" "consul" {
   count = "${var.enabled * length(split(",", var.environments))}"
 
@@ -111,6 +117,12 @@ resource "aws_autoscaling_group" "consul" {
   tag {
     key                 = "Environment"
     value               = "${element(split(",",var.environments), count.index)}"
+    propagate_at_launch = true
+  }
+
+  tag {
+    key                 = "ConsulClusterName"
+    value               = "consul-server-${element(split(",",var.environments), count.index)}"
     propagate_at_launch = true
   }
 }

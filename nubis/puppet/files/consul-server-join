@@ -6,7 +6,7 @@ USER_DATA=$(curl -fqs http://169.254.169.254/latest/user-data)
 eval "$USER_DATA"
 
 echo "Attempting to find initial peers"
-/usr/local/bin/consul-asg-join
+/usr/local/bin/consul-aws-join
 
 echo "Waiting for a Consul leader, possibly forever"
 
