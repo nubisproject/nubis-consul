@@ -54,12 +54,6 @@ NUBIS_USER_GROUPS="${var.nubis_user_groups}"
 EOF
 }
 
-resource "random_id" "cluster_id" {
-  count = "${var.enabled * length(split(",", var.environments))}"
-  prefix = "consul-"
-  byte_length = 24
-}
-
 resource "aws_autoscaling_group" "consul" {
   count = "${var.enabled * length(split(",", var.environments))}"
 
