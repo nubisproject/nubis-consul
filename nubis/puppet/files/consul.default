@@ -1,0 +1,17 @@
+#!/bin/bash
+
+if [ -r /etc/profile.d/proxy.sh ]; then
+  echo "Loading Proxy Settings"
+  # remember shell options state
+  set_state=$(set +o)
+  
+  # disable noerr (set by upstart)
+  set +e
+  
+  # Load our proxy settings
+  # shellcheck disable=SC1091
+  . /etc/profile.d/proxy.sh
+  
+  # restore shell options state
+  eval "$set_state"
+fi

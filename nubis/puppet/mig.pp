@@ -1,4 +1,4 @@
-file { "/etc/nubis.d/mig":
+file { '/etc/nubis.d/mig':
     ensure => file,
     owner  => root,
     group  => root,
