@@ -28,6 +28,15 @@ cat <<EOF > /etc/consul/zzz-bootstrap.json
 EOF
 fi
 
+cat <<EOF > /etc/consul/ec2_join.json
+{
+  "retry_join_ec2": {
+    "tag_key": "ConsulClusterName",
+    "tag_value": "consul-server-${NUBIS_ENVIRONMENT}"
+  }
+}
+EOF
+
 # Grab the master ACL token from credstash (if not in user-data)
 if [ ! "$CONSUL_MASTER_ACL_TOKEN" ]; then
   CONSUL_MASTER_ACL_TOKEN=$(nubis-secret get master_acl_token)

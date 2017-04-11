@@ -1,0 +1,110 @@
+#!/bin/bash -l
+
+# /usr/local/bin isn't set yet in our PATH
+export PATH=/usr/local/bin:$PATH
+
+REGION=$(nubis-region)
+
+MY_INSTANCE_ID=$(curl -s http://169.254.169.254/latest/meta-data/instance-id)
+ASG_NAME=$(aws autoscaling describe-auto-scaling-instances --region "$REGION" --instance "$MY_INSTANCE_ID" --query 'AutoScalingInstances[0].AutoScalingGroupName' --output text)
+
+if [ -z "$ASG_NAME" ]; then
+  echo "We are not part of an Auto Scaling Group"
+  exit 1
+fi
+
+ELB_NAME=$(aws autoscaling describe-auto-scaling-groups --region "$REGION" --auto-scaling-group-name "$ASG_NAME" --query 'AutoScalingGroups[0].LoadBalancerNames[0]' --output text)
+
+if [ -z "$ELB_NAME" ] ; then
+  echo "We are not part of an Elastic Load Balancer"
+  exit 1
+fi
+
+contains() {
+    local haystack="${1}[@]"
+    local needle=${2}
+    for i in ${!haystack}; do
+        if [[ "${i}" == "${needle}" ]]; then
+            return 0
+        fi
+    done
+    return 1
+}
+
+consul_join () {
+  local peer=$1
+  local known_peers
+
+  # shellcheck disable=SC2034
+  known_peers=($(curl -fqs http://localhost:8500/v1/status/peers | jq -r .[] | cut -d: -f1))
+
+  if [[ $peer =~ ^i-[0-9a-f]+ ]]; then
+    peer_ip=$(aws ec2 describe-instances --region "$REGION" --instance "$peer" --query 'Reservations[].Instances[].PrivateIpAddress' --output text)
+  else
+    peer_ip=$peer
+  fi
+
+  if ! contains known_peers "$peer_ip"; then
+    echo "Attempting to join with $peer($peer_ip)"
+    consul join "$peer_ip"
+  fi
+}
+
+consul_peers_enough () {
+  local peer_count
+  local peer_wanted
+
+  peer_count=$(curl -fqs http://localhost:8500/v1/status/peers | jq '. | length')
+  peer_wanted=$(jq -r .bootstrap_expect /etc/consul/zzz-bootstrap.json)
+
+  if [ "$peer_count" -ge "$peer_wanted" ]; then
+    return 0
+  else
+    return 1
+  fi
+}
+
+consul_asg_peers () {
+  local asg_name=$1
+  local asg_peers
+
+  asg_peers=$(aws autoscaling describe-auto-scaling-groups --region "$REGION" --auto-scaling-group-name "$asg_name" --query "AutoScalingGroups[0].Instances[].InstanceId" --output text)
+
+  echo "$asg_peers"
+}
+
+consul_elb_peers () {
+  local elb_name=$1
+  local elb_peers
+
+  elb_peers=$(aws elb describe-load-balancers --region "$REGION" --load-balancer-names "$elb_name" --query 'LoadBalancerDescriptions[0].Instances[].InstanceId' --output text)
+
+  echo "$elb_peers"
+}
+
+consul_peers () {
+  local asg_name=$1
+  local elb_name=$2
+
+  local asg_peers
+  local elb_peers
+
+  elb_peers=$(consul_elb_peers "$elb_name")
+  asg_peers=$(consul_asg_peers "$asg_name")
+
+  # Be predictable and remove duplicates
+  echo "$elb_peers $asg_peers" | sort | uniq
+}
+
+# Join up with all ELB peers first, in case we are doing a rolling upgrade
+for p in $(consul_elb_peers "$ELB_NAME"); do
+   consul_join "$p"
+done
+
+# Wait until we have enough peers before proceeding
+while ! consul_peers_enough; do
+ for p in $(consul_peers "$ASG_NAME" "$ELB_NAME"); do
+   consul_join "$p"
+ done
+ sleep 3
+done

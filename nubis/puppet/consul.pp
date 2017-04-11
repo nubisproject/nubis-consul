@@ -73,24 +73,20 @@ file { '/usr/local/bin/consul-post-bootstrap':
     source => 'puppet:///nubis/files/consul-post-bootstrap',
 }
 
-file { '/usr/local/bin/consul-asg-join':
+file { '/etc/default/consul':
+    ensure => file,
+    owner  => root,
+    group  => root,
+    mode   => '0644',
+    source => 'puppet:///nubis/files/consul.default',
+}
+
+file { '/usr/local/bin/consul-aws-join':
     ensure => file,
     owner  => root,
     group  => root,
     mode   => '0755',
-    source => 'puppet:///nubis/files/consul-asg-join',
-}
-
-cron::job {
-  'consul-asg-join':
-    minute      => '*/5',
-    hour        => '*',
-    date        => '*',
-    month       => '*',
-    weekday     => '*',
-    user        => 'root',
-    command     => 'nubis-cron consul-asg-join "/usr/local/bin/consul-asg-join >/dev/null"',
-    environment => [ 'PATH="/usr/local/bin:/usr/bin:/bin"', 'SHELL=/bin/bash' ],
+    source => 'puppet:///nubis/files/consul-aws-join',
 }
 
 # Install consul backup script and create cron for it
