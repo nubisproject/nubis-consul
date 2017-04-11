@@ -1,13 +1,24 @@
 # Change Log
 
-## [v1.4.0](https://github.com/nubisproject/nubis-consul/tree/v1.4.0) (2017-04-03)
-[Full Changelog](https://github.com/nubisproject/nubis-consul/compare/v1.4.0...v1.4.0)
+## [v1.4.1](https://github.com/nubisproject/nubis-consul/tree/v1.4.1) (2017-04-11)
+[Full Changelog](https://github.com/nubisproject/nubis-consul/compare/v1.4.0...v1.4.1)
+
+**Closed issues:**
+
+- Use Consul's new ec2\_join to discover peers [\#268](https://github.com/nubisproject/nubis-consul/issues/268)
+- Upgrade Consul to 0.7.5 [\#255](https://github.com/nubisproject/nubis-consul/issues/255)
+- \[acl\] Lock down Prometheus KV/Services [\#216](https://github.com/nubisproject/nubis-consul/issues/216)
+- Keep the list of servers up-to-date in the consul.\<env\>.\<region\>.\<account\>.nubis.allizom.org zone [\#164](https://github.com/nubisproject/nubis-consul/issues/164)
+- Look into the possiblilty of keeping a DNS record with multiple A records that's [\#68](https://github.com/nubisproject/nubis-consul/issues/68)
+- Tag v1.4.1 release [\#270](https://github.com/nubisproject/nubis-consul/issues/270)
 
 **Merged pull requests:**
 
-- fix MiG bootstrap [\#263](https://github.com/nubisproject/nubis-consul/pull/263) ([gozer](https://github.com/gozer))
+- Update CHANGELOG for v1.4.1 release \[skip ci\] [\#271](https://github.com/nubisproject/nubis-consul/pull/271) ([tinnightcap](https://github.com/tinnightcap))
+- Use Consul ec2\_join to try and find our peers [\#269](https://github.com/nubisproject/nubis-consul/pull/269) ([gozer](https://github.com/gozer))
+- v1.4.0 fixups [\#267](https://github.com/nubisproject/nubis-consul/pull/267) ([gozer](https://github.com/gozer))
 
-## [v1.4.0](https://github.com/nubisproject/nubis-consul/tree/v1.4.0) (2017-03-23)
+## [v1.4.0](https://github.com/nubisproject/nubis-consul/tree/v1.4.0) (2017-04-04)
 [Full Changelog](https://github.com/nubisproject/nubis-consul/compare/v1.3.0...v1.4.0)
 
 **Closed issues:**
@@ -19,10 +30,14 @@
 - Upgrade Consul to v0.7.3 [\#248](https://github.com/nubisproject/nubis-consul/issues/248)
 - Upgrade to Consul 0.7.2 [\#244](https://github.com/nubisproject/nubis-consul/issues/244)
 - Upgrade to Consul 0.7 [\#207](https://github.com/nubisproject/nubis-consul/issues/207)
+- Tag v1.4.0 release [\#264](https://github.com/nubisproject/nubis-consul/issues/264)
 - Tag v1.4.0 release [\#247](https://github.com/nubisproject/nubis-consul/issues/247)
 
 **Merged pull requests:**
 
+- Merge v1.4.0 release into develop. \[skip ci\] [\#266](https://github.com/nubisproject/nubis-consul/pull/266) ([tinnightcap](https://github.com/tinnightcap))
+- Update CHANGELOG for v1.4.0 release \[skip ci\] [\#265](https://github.com/nubisproject/nubis-consul/pull/265) ([tinnightcap](https://github.com/tinnightcap))
+- fix MiG bootstrap [\#263](https://github.com/nubisproject/nubis-consul/pull/263) ([gozer](https://github.com/gozer))
 - Merge v1.4.0 release into develop. \[skip ci\] [\#262](https://github.com/nubisproject/nubis-consul/pull/262) ([tinnightcap](https://github.com/tinnightcap))
 - Update CHANGELOG for v1.4.0 release \[skip ci\] [\#261](https://github.com/nubisproject/nubis-consul/pull/261) ([tinnightcap](https://github.com/tinnightcap))
 - Disable EC2 detailled monitoring [\#260](https://github.com/nubisproject/nubis-consul/pull/260) ([gozer](https://github.com/gozer))
