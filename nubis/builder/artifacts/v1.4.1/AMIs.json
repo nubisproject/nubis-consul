@@ -7,7 +7,15 @@
       "files": null,
       "artifact_id": "ap-northeast-1:ami-ae7557c9,ap-northeast-2:ami-21c0124f,ap-southeast-1:ami-ff4df39c,ap-southeast-2:ami-43808e20,eu-central-1:ami-4d885a22,eu-west-1:ami-16360c70,sa-east-1:ami-7a412316,us-east-1:ami-a1860eb7,us-west-1:ami-bd2702dd,us-west-2:ami-19019179",
       "packer_run_uuid": "e2250d4f-fdb3-c60c-a2cc-9c9012f47c5c"
+    },
+    {
+      "name": "amazon-ebs-ubuntu",
+      "builder_type": "amazon-ebs",
+      "build_time": 1491919535,
+      "files": null,
+      "artifact_id": "ap-northeast-1:ami-d47456b3,ap-northeast-2:ami-c1c614af,ap-southeast-1:ami-5b4bf538,ap-southeast-2:ami-85818fe6,eu-central-1:ami-5d8e5c32,eu-west-1:ami-71350f17,sa-east-1:ami-05402269,us-east-1:ami-9a9b138c,us-west-1:ami-78240118,us-west-2:ami-cf0090af",
+      "packer_run_uuid": "5663ca76-2439-3f5c-6fda-cf43c222cdc8"
     }
   ],
-  "last_run_uuid": "e2250d4f-fdb3-c60c-a2cc-9c9012f47c5c"
+  "last_run_uuid": "5663ca76-2439-3f5c-6fda-cf43c222cdc8"
 }
