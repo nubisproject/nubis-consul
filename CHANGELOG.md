@@ -1,13 +1,22 @@
 # Change Log
 
-## [v1.4.0](https://github.com/nubisproject/nubis-consul/tree/v1.4.0) (2017-04-03)
-[Full Changelog](https://github.com/nubisproject/nubis-consul/compare/v1.4.0...v1.4.0)
+## [v1.4.1](https://github.com/nubisproject/nubis-consul/tree/v1.4.1) (2017-04-11)
+[Full Changelog](https://github.com/nubisproject/nubis-consul/compare/v1.4.0...v1.4.1)
+
+**Closed issues:**
+
+- Use Consul's new ec2\_join to discover peers [\#268](https://github.com/nubisproject/nubis-consul/issues/268)
+- Upgrade Consul to 0.7.5 [\#255](https://github.com/nubisproject/nubis-consul/issues/255)
+- \[acl\] Lock down Prometheus KV/Services [\#216](https://github.com/nubisproject/nubis-consul/issues/216)
+- Keep the list of servers up-to-date in the consul.\<env\>.\<region\>.\<account\>.nubis.allizom.org zone [\#164](https://github.com/nubisproject/nubis-consul/issues/164)
+- Look into the possiblilty of keeping a DNS record with multiple A records that's [\#68](https://github.com/nubisproject/nubis-consul/issues/68)
 
 **Merged pull requests:**
 
-- fix MiG bootstrap [\#263](https://github.com/nubisproject/nubis-consul/pull/263) ([gozer](https://github.com/gozer))
+- Use Consul ec2\_join to try and find our peers [\#269](https://github.com/nubisproject/nubis-consul/pull/269) ([gozer](https://github.com/gozer))
+- v1.4.0 fixups [\#267](https://github.com/nubisproject/nubis-consul/pull/267) ([gozer](https://github.com/gozer))
 
-## [v1.4.0](https://github.com/nubisproject/nubis-consul/tree/v1.4.0) (2017-03-23)
+## [v1.4.0](https://github.com/nubisproject/nubis-consul/tree/v1.4.0) (2017-04-04)
 [Full Changelog](https://github.com/nubisproject/nubis-consul/compare/v1.3.0...v1.4.0)
 
 **Closed issues:**
@@ -19,14 +28,17 @@
 - Upgrade Consul to v0.7.3 [\#248](https://github.com/nubisproject/nubis-consul/issues/248)
 - Upgrade to Consul 0.7.2 [\#244](https://github.com/nubisproject/nubis-consul/issues/244)
 - Upgrade to Consul 0.7 [\#207](https://github.com/nubisproject/nubis-consul/issues/207)
+- Tag v1.4.0 release [\#264](https://github.com/nubisproject/nubis-consul/issues/264)
 - Tag v1.4.0 release [\#247](https://github.com/nubisproject/nubis-consul/issues/247)
 
 **Merged pull requests:**
 
+- Merge v1.4.0 release into develop. \[skip ci\] [\#266](https://github.com/nubisproject/nubis-consul/pull/266) ([tinnightcap](https://github.com/tinnightcap))
+- Update CHANGELOG for v1.4.0 release \[skip ci\] [\#265](https://github.com/nubisproject/nubis-consul/pull/265) ([tinnightcap](https://github.com/tinnightcap))
+- fix MiG bootstrap [\#263](https://github.com/nubisproject/nubis-consul/pull/263) ([gozer](https://github.com/gozer))
 - Merge v1.4.0 release into develop. \[skip ci\] [\#262](https://github.com/nubisproject/nubis-consul/pull/262) ([tinnightcap](https://github.com/tinnightcap))
 - Update CHANGELOG for v1.4.0 release \[skip ci\] [\#261](https://github.com/nubisproject/nubis-consul/pull/261) ([tinnightcap](https://github.com/tinnightcap))
 - Disable EC2 detailled monitoring [\#260](https://github.com/nubisproject/nubis-consul/pull/260) ([gozer](https://github.com/gozer))
-- Upgrade to Consul v0.7.5 [\#258](https://github.com/nubisproject/nubis-consul/pull/258) ([gozer](https://github.com/gozer))
 - Update builder artifacts for v1.4.0 release \[skip ci\] [\#256](https://github.com/nubisproject/nubis-consul/pull/256) ([tinnightcap](https://github.com/tinnightcap))
 - Terraform 0.8 Upgrade [\#254](https://github.com/nubisproject/nubis-consul/pull/254) ([gozer](https://github.com/gozer))
 - Add some ASG metrics for monitoring [\#253](https://github.com/nubisproject/nubis-consul/pull/253) ([gozer](https://github.com/gozer))
@@ -206,11 +218,9 @@
 - Add confd defaults to set CONSUL\_HTTP\_TOKEN in confd's environment, if we know of one [\#154](https://github.com/nubisproject/nubis-consul/pull/154) ([gozer](https://github.com/gozer))
 - Upgrade to consul 0.6.3 [\#153](https://github.com/nubisproject/nubis-consul/pull/153) ([gozer](https://github.com/gozer))
 - Turns out that we just needed to add the cert\_signing usage to the cert to make OpenSSL happy [\#150](https://github.com/nubisproject/nubis-consul/pull/150) ([gozer](https://github.com/gozer))
-- Add the CA flag and disable the troublesome extension to our internal self-signed cert, so curl can happilly verify it. [\#148](https://github.com/nubisproject/nubis-consul/pull/148) ([gozer](https://github.com/gozer))
 - Fix for new default nubis-secret prefix handling [\#146](https://github.com/nubisproject/nubis-consul/pull/146) ([gozer](https://github.com/gozer))
 - /usr/local/bin PATH fixup [\#144](https://github.com/nubisproject/nubis-consul/pull/144) ([gozer](https://github.com/gozer))
 - Publish the platform ACL into credstash at nubis/$ENV/consul/acl\_token [\#143](https://github.com/nubisproject/nubis-consul/pull/143) ([gozer](https://github.com/gozer))
-- Automated Platform ACL creation [\#142](https://github.com/nubisproject/nubis-consul/pull/142) ([gozer](https://github.com/gozer))
 - IAM Policy work to enable Consul servers to write to credstash, albeit in a limited way. [\#137](https://github.com/nubisproject/nubis-consul/pull/137) ([gozer](https://github.com/gozer))
 - Place our UI SSL Cert \(self-signed\) to credstash [\#135](https://github.com/nubisproject/nubis-consul/pull/135) ([gozer](https://github.com/gozer))
 - nubis-consul puppet module 1.0.5 has been released. [\#132](https://github.com/nubisproject/nubis-consul/pull/132) ([gozer](https://github.com/gozer))
@@ -220,7 +230,6 @@
 - Remove nubis-secret, it's in base now [\#126](https://github.com/nubisproject/nubis-consul/pull/126) ([gozer](https://github.com/gozer))
 - Switch over to /etc/consul/zzz-join.skip [\#124](https://github.com/nubisproject/nubis-consul/pull/124) ([gozer](https://github.com/gozer))
 - Adopt Hashicorp's recommended way to perform rolling upgrades with Terraform [\#123](https://github.com/nubisproject/nubis-consul/pull/123) ([gozer](https://github.com/gozer))
-- Prefix Consul backups with YYYY/MM/ prefix so they list nicer in the S3 bucket [\#120](https://github.com/nubisproject/nubis-consul/pull/120) ([gozer](https://github.com/gozer))
 - Move puppet logic out of the deprecated init.pp [\#119](https://github.com/nubisproject/nubis-consul/pull/119) ([gozer](https://github.com/gozer))
 - Hide the credstash handling to its own wrapper to hide it away [\#118](https://github.com/nubisproject/nubis-consul/pull/118) ([gozer](https://github.com/gozer))
 - Determine our bootstrap quorum treshold from the size of our ASG [\#116](https://github.com/nubisproject/nubis-consul/pull/116) ([gozer](https://github.com/gozer))
@@ -324,7 +333,6 @@
 - Convert to using VPCs [\#18](https://github.com/nubisproject/nubis-consul/pull/18) ([gozer](https://github.com/gozer))
 - bump [\#16](https://github.com/nubisproject/nubis-consul/pull/16) ([gozer](https://github.com/gozer))
 - Conversion to Consul 0.5.0 and with SSL/TLS support [\#15](https://github.com/nubisproject/nubis-consul/pull/15) ([gozer](https://github.com/gozer))
-- Cleanups [\#14](https://github.com/nubisproject/nubis-consul/pull/14) ([gozer](https://github.com/gozer))
 - Convert to nubis-builder [\#13](https://github.com/nubisproject/nubis-consul/pull/13) ([gozer](https://github.com/gozer))
 - set node name to instance id, fixes issue \#9 [\#10](https://github.com/nubisproject/nubis-consul/pull/10) ([gozer](https://github.com/gozer))
 - Rebuild AMIs at release 10 [\#8](https://github.com/nubisproject/nubis-consul/pull/8) ([gozer](https://github.com/gozer))
