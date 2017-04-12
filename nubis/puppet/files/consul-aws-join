@@ -34,9 +34,15 @@ contains() {
 consul_join () {
   local peer=$1
   local known_peers
+  local consul_peers
+
+  consul_peers=$(curl -fqs http://localhost:8500/v1/status/peers)
+  if [ "$consul_peers" == "null" ] || [ "$consul_peers" == "" ]; then
+    consul_peers='[]'
+  fi
 
   # shellcheck disable=SC2034
-  known_peers=($(curl -fqs http://localhost:8500/v1/status/peers | jq -r .[] | cut -d: -f1))
+  known_peers=($(echo "$consul_peers" | jq -r .[] | cut -d: -f1))
 
   if [[ $peer =~ ^i-[0-9a-f]+ ]]; then
     peer_ip=$(aws ec2 describe-instances --region "$REGION" --instance "$peer" --query 'Reservations[].Instances[].PrivateIpAddress' --output text)
