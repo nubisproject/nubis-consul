@@ -10,3 +10,4 @@ nubis/Puppetfile.lock
 nubis/.tmp
 nubis/.librarian
 nubis/builder/artifacts/*-dev/
+nubis/builder/artifacts/AMIs.json
