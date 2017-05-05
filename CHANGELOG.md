@@ -1,5 +1,20 @@
 # Change Log
 
+## [v1.4.2](https://github.com/nubisproject/nubis-consul/tree/v1.4.2) (2017-05-03)
+[Full Changelog](https://github.com/nubisproject/nubis-consul/compare/v1.4.1...v1.4.2)
+
+**Closed issues:**
+
+- Add nubis/builder/artifacts/AMIs.json to .gitignore [\#278](https://github.com/nubisproject/nubis-consul/issues/278)
+- \[consul-aws-join\] Handle more gracefully the case where no peers are known [\#276](https://github.com/nubisproject/nubis-consul/issues/276)
+- Tag v1.4.2 release [\#280](https://github.com/nubisproject/nubis-consul/issues/280)
+
+**Merged pull requests:**
+
+- Update CHANGELOG for v1.4.2 release \[skip ci\] [\#281](https://github.com/nubisproject/nubis-consul/pull/281) ([tinnightcap](https://github.com/tinnightcap))
+- Add nubis/builder/artifacts/AMIs.json to .gitignore [\#279](https://github.com/nubisproject/nubis-consul/pull/279) ([gozer](https://github.com/gozer))
+- When consul has no peers, handle the 'null ' case as no peers too [\#277](https://github.com/nubisproject/nubis-consul/pull/277) ([gozer](https://github.com/gozer))
+
 ## [v1.4.1](https://github.com/nubisproject/nubis-consul/tree/v1.4.1) (2017-04-11)
 [Full Changelog](https://github.com/nubisproject/nubis-consul/compare/v1.4.0...v1.4.1)
 
@@ -10,10 +25,13 @@
 - \[acl\] Lock down Prometheus KV/Services [\#216](https://github.com/nubisproject/nubis-consul/issues/216)
 - Keep the list of servers up-to-date in the consul.\<env\>.\<region\>.\<account\>.nubis.allizom.org zone [\#164](https://github.com/nubisproject/nubis-consul/issues/164)
 - Look into the possiblilty of keeping a DNS record with multiple A records that's [\#68](https://github.com/nubisproject/nubis-consul/issues/68)
+- Tag v1.4.1 release [\#272](https://github.com/nubisproject/nubis-consul/issues/272)
 - Tag v1.4.1 release [\#270](https://github.com/nubisproject/nubis-consul/issues/270)
 
 **Merged pull requests:**
 
+- Merge v1.4.1 release into develop. \[skip ci\] [\#274](https://github.com/nubisproject/nubis-consul/pull/274) ([tinnightcap](https://github.com/tinnightcap))
+- Update CHANGELOG for v1.4.1 release \[skip ci\] [\#273](https://github.com/nubisproject/nubis-consul/pull/273) ([tinnightcap](https://github.com/tinnightcap))
 - Update CHANGELOG for v1.4.1 release \[skip ci\] [\#271](https://github.com/nubisproject/nubis-consul/pull/271) ([tinnightcap](https://github.com/tinnightcap))
 - Use Consul ec2\_join to try and find our peers [\#269](https://github.com/nubisproject/nubis-consul/pull/269) ([gozer](https://github.com/gozer))
 - v1.4.0 fixups [\#267](https://github.com/nubisproject/nubis-consul/pull/267) ([gozer](https://github.com/gozer))
