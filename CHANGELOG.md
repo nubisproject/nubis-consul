@@ -7,9 +7,11 @@
 
 - Add nubis/builder/artifacts/AMIs.json to .gitignore [\#278](https://github.com/nubisproject/nubis-consul/issues/278)
 - \[consul-aws-join\] Handle more gracefully the case where no peers are known [\#276](https://github.com/nubisproject/nubis-consul/issues/276)
+- Tag v1.4.2 release [\#280](https://github.com/nubisproject/nubis-consul/issues/280)
 
 **Merged pull requests:**
 
+- Update CHANGELOG for v1.4.2 release \[skip ci\] [\#281](https://github.com/nubisproject/nubis-consul/pull/281) ([tinnightcap](https://github.com/tinnightcap))
 - Add nubis/builder/artifacts/AMIs.json to .gitignore [\#279](https://github.com/nubisproject/nubis-consul/pull/279) ([gozer](https://github.com/gozer))
 - When consul has no peers, handle the 'null ' case as no peers too [\#277](https://github.com/nubisproject/nubis-consul/pull/277) ([gozer](https://github.com/gozer))
 
