@@ -14,6 +14,8 @@ class { 'consul':
       'server'                => true,
       'enable_syslog'         => true,
       'acl_enforce_version_8' => false,
+      'disable_host_node_id'  => true,
+      'disable_update_check'  => true,
       'telemetry'             => {
         'dogstatsd_addr'   => '127.0.0.1:8125',
         'statsd_address'   => '127.0.0.1:9125',
