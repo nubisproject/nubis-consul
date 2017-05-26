@@ -71,6 +71,10 @@ variable "shared_services_security_groups" {
   description = "ID of that SG"
 }
 
+variable "sso_security_groups" {
+  default = ""
+}
+
 variable "master_acl_token" {
   description = "Master ACL Token (use uuidgen)"
   default     = "00000000-0000-0000-0000-000000000000"

@@ -167,6 +167,7 @@ resource "aws_security_group" "consul" {
     security_groups = [
       "${element(aws_security_group.elb.*.id, count.index)}",
       "${element(aws_security_group.elb-public.*.id, count.index)}",
+      "${element(split(",",var.sso_security_groups), count.index)}",
     ]
   }
 
