@@ -48,7 +48,7 @@ NUBIS_DOMAIN=${var.domain}
 CONSUL_ACL_DEFAULT_POLICY=${var.acl_default_policy}
 CONSUL_ACL_DOWN_POLICY=${var.acl_down_policy}
 CONSUL_BOOTSTRAP_EXPECT=${var.servers}
-NUBIS_BUMP=${md5("${var.datadog_api_key}${var.mig["ca_cert"]}${var.mig["agent_cert"]}${var.mig["agent_key"]}${var.mig["relay_user"]}${var.mig["relay_password"]}")}
+NUBIS_BUMP=${md5("${var.mig["ca_cert"]}${var.mig["agent_cert"]}${var.mig["agent_key"]}${var.mig["relay_user"]}${var.mig["relay_password"]}")}
 NUBIS_SUDO_GROUPS="${var.nubis_sudo_groups}"
 NUBIS_USER_GROUPS="${var.nubis_user_groups}"
 EOF
@@ -770,7 +770,6 @@ resource "null_resource" "secrets" {
   triggers {
     secret           = "${var.credstash_key}"
     master_acl_token = "${var.master_acl_token}"
-    datadog_api_key  = "${var.datadog_api_key}"
     version          = "${var.nubis_version}"
     mig_ca_cert      = "${var.mig["ca_cert"]}"
     mig_agent_cert  = "${var.mig["agent_cert"]}"
@@ -781,6 +780,7 @@ resource "null_resource" "secrets" {
     ssl_cert         = "${element(tls_self_signed_cert.gossip.*.cert_pem, count.index)}"
     region           = "${var.aws_region}"
     context          = "-E region:${var.aws_region} -E environment:${element(split(",",var.environments), count.index)} -E service:${var.project}"
+    unicreds_rm      = "unicreds -r ${var.aws_region} delete -k ${var.credstash_key} ${var.project}/${element(split(",",var.environments), count.index)}"
     unicreds         = "unicreds -r ${var.aws_region} put -k ${var.credstash_key} ${var.project}/${element(split(",",var.environments), count.index)}"
     unicreds_file    = "unicreds -r ${var.aws_region} put-file -k ${var.credstash_key} ${var.project}/${element(split(",",var.environments), count.index)}"
   }
@@ -805,9 +805,9 @@ resource "null_resource" "secrets" {
     command = "echo '${element(tls_self_signed_cert.gossip.*.cert_pem, count.index)}' | ${self.triggers.unicreds_file}/ssl/cert /dev/stdin ${self.triggers.context}"
   }
 
-  # Datadog
+  # XXX: Datadog Cleanup
   provisioner "local-exec" {
-    command = "${self.triggers.unicreds}/datadog/api_key '${var.datadog_api_key}' ${self.triggers.context}"
+    command = "${self.triggers.unicreds_rm}/datadog/api_key"
   }
 
   # MiG

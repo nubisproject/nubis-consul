@@ -114,7 +114,9 @@ variable "enabled" {
   default = "1"
 }
 
+#XXX: DataDog cleanup
 variable "datadog_api_key" {
+  default = "***DISABLED***"
 }
 
 variable nubis_sudo_groups {
