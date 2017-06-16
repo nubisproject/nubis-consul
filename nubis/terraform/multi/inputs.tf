@@ -136,3 +136,12 @@ variable mig {
     relay_user     = "agent-it-nubis"
   }
 }
+
+variable instance_mfa {
+  default = {
+    ikey     = ""
+    skey     = ""
+    host     = ""
+    failmode = "secure"
+  }
+}
