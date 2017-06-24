@@ -1,24 +1,27 @@
 class { 'consul':
-  version          => '0.7.5',
+  version          => '0.8.3',
   purge_config_dir => false,
   manage_service   => false,
   service_enable   => false,
   service_ensure   => 'stopped',
 
   config_hash      => {
-      'data_dir'           => '/var/lib/consul',
-      'log_level'          => 'INFO',
-      'ui_dir'             => '/var/lib/consul/ui',
-      'client_addr'        => '0.0.0.0',
-      'leave_on_terminate' => true,
-      'server'             => true,
-      'enable_syslog'      => true,
-      'telemetry'          => {
+      'data_dir'              => '/var/lib/consul',
+      'log_level'             => 'INFO',
+      'ui_dir'                => '/var/lib/consul/ui',
+      'client_addr'           => '0.0.0.0',
+      'leave_on_terminate'    => true,
+      'server'                => true,
+      'enable_syslog'         => true,
+      'acl_enforce_version_8' => false,
+      'disable_host_node_id'  => true,
+      'disable_update_check'  => true,
+      'telemetry'             => {
         'dogstatsd_addr'   => '127.0.0.1:8125',
         'statsd_address'   => '127.0.0.1:9125',
         'disable_hostname' => true,
       },
-      'dns_config'         => {
+      'dns_config'            => {
           'enable_truncate' => true,
       },
   }

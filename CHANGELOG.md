@@ -1,16 +1,35 @@
 # Change Log
 
-## [v1.4.2](https://github.com/nubisproject/nubis-consul/tree/v1.4.2) (2017-05-03)
+## [v1.5.0](https://github.com/nubisproject/nubis-consul/tree/v1.5.0) (2017-06-24)
+[Full Changelog](https://github.com/nubisproject/nubis-consul/compare/v1.4.2...v1.5.0)
+
+**Closed issues:**
+
+- Get rid of DataDog [\#291](https://github.com/nubisproject/nubis-consul/issues/291)
+- Upgrade to Consul 0.8.3 [\#275](https://github.com/nubisproject/nubis-consul/issues/275)
+
+**Merged pull requests:**
+
+- Add instance mfa \(DUO\) variables to consul [\#294](https://github.com/nubisproject/nubis-consul/pull/294) ([tinnightcap](https://github.com/tinnightcap))
+- Get rid of DataDog [\#293](https://github.com/nubisproject/nubis-consul/pull/293) ([gozer](https://github.com/gozer))
+- Add support for SSO security group [\#290](https://github.com/nubisproject/nubis-consul/pull/290) ([gozer](https://github.com/gozer))
+- Use random node IDs [\#289](https://github.com/nubisproject/nubis-consul/pull/289) ([gozer](https://github.com/gozer))
+- Upgrade to Consul v0.8.3, with the new ACLs disabled [\#288](https://github.com/nubisproject/nubis-consul/pull/288) ([gozer](https://github.com/gozer))
+
+## [v1.4.2](https://github.com/nubisproject/nubis-consul/tree/v1.4.2) (2017-05-05)
 [Full Changelog](https://github.com/nubisproject/nubis-consul/compare/v1.4.1...v1.4.2)
 
 **Closed issues:**
 
 - Add nubis/builder/artifacts/AMIs.json to .gitignore [\#278](https://github.com/nubisproject/nubis-consul/issues/278)
 - \[consul-aws-join\] Handle more gracefully the case where no peers are known [\#276](https://github.com/nubisproject/nubis-consul/issues/276)
+- Tag v1.4.2 release [\#283](https://github.com/nubisproject/nubis-consul/issues/283)
 - Tag v1.4.2 release [\#280](https://github.com/nubisproject/nubis-consul/issues/280)
 
 **Merged pull requests:**
 
+- Merge v1.4.2 release into develop. \[skip ci\] [\#285](https://github.com/nubisproject/nubis-consul/pull/285) ([tinnightcap](https://github.com/tinnightcap))
+- Update CHANGELOG for v1.4.2 release \[skip ci\] [\#284](https://github.com/nubisproject/nubis-consul/pull/284) ([tinnightcap](https://github.com/tinnightcap))
 - Update CHANGELOG for v1.4.2 release \[skip ci\] [\#281](https://github.com/nubisproject/nubis-consul/pull/281) ([tinnightcap](https://github.com/tinnightcap))
 - Add nubis/builder/artifacts/AMIs.json to .gitignore [\#279](https://github.com/nubisproject/nubis-consul/pull/279) ([gozer](https://github.com/gozer))
 - When consul has no peers, handle the 'null ' case as no peers too [\#277](https://github.com/nubisproject/nubis-consul/pull/277) ([gozer](https://github.com/gozer))

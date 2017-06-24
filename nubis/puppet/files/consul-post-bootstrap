@@ -28,18 +28,9 @@ if [ "$PLATFORM_ACL" != "" ]; then
     fi
 fi
 
-# XXX: Need an agnostic way to do this
-
-# Datadog
-
+#XXX: Kept here to ensure we cleanup the KV store of DataDog things
 DATADOG_API_KEY_PATH="environments/$NUBIS_ENVIRONMENT/global/datadog/config/api_key"
-DATADOG_API_KEY=$(nubis-secret get datadog/api_key)
-CONSUL_DATADOG_API_KEY=$(consulate kv get "$DATADOG_API_KEY_PATH")
-
-if [ "$DATADOG_API_KEY" != "$CONSUL_DATADOG_API_KEY" ]; then
-  echo "Injecting Datadog API key"
-  consulate --token="$MASTER_ACL_TOKEN" kv set "$DATADOG_API_KEY_PATH" "$DATADOG_API_KEY"
-fi
+consulate --token="$MASTER_ACL_TOKEN" kv rm "$DATADOG_API_KEY_PATH"
 
 # Finalize by creating a well-known KV
 consulate --token="$MASTER_ACL_TOKEN" kv set consul-ready "$(date '+%s')"

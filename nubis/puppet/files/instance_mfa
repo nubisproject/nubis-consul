@@ -1,0 +1,37 @@
+#!/bin/bash
+
+export PATH=/usr/local/bin:$PATH
+
+eval "$(nubis-metadata)"
+KV_PREFIX="environments/$NUBIS_ENVIRONMENT/global/instance_mfa/config"
+
+# We need the Consul ACL token
+CONSUL_ACL_TOKEN=$(jq -r .acl_master_token < /etc/consul/zzz-acl.json)
+
+INSTANCE_MFA_IKEY=$(nubis-secret get instance_mfa/ikey)
+if [ "$INSTANCE_MFA_IKEY" != "" ]; then
+  consulate --token "$CONSUL_ACL_TOKEN" kv set "$KV_PREFIX/ikey" "$INSTANCE_MFA_IKEY"
+else
+  consulate --token "$CONSUL_ACL_TOKEN" kv rm "$KV_PREFIX/ikey"
+fi
+
+INSTANCE_MFA_SKEY=$(nubis-secret get instance_mfa/skey)
+if [ "$INSTANCE_MFA_SKEY" != "" ]; then
+  consulate --token "$CONSUL_ACL_TOKEN" kv set "$KV_PREFIX/skey" "$INSTANCE_MFA_SKEY"
+else
+  consulate --token "$CONSUL_ACL_TOKEN" kv rm "$KV_PREFIX/skey"
+fi
+
+INSTANCE_MFA_HOST=$(nubis-secret get instance_mfa/host)
+if [ "$INSTANCE_MFA_HOST" != "" ]; then
+  consulate --token "$CONSUL_ACL_TOKEN" kv set "$KV_PREFIX/host" "$INSTANCE_MFA_HOST"
+else
+  consulate --token "$CONSUL_ACL_TOKEN" kv rm "$KV_PREFIX/host"
+fi
+
+INSTANCE_MFA_FAILMODE=$(nubis-secret get instance_mfa/failmode)
+if [ "$INSTANCE_MFA_FAILMODE" != "" ]; then
+  consulate --token "$CONSUL_ACL_TOKEN" kv set "$KV_PREFIX/failmode" "$INSTANCE_MFA_FAILMODE"
+else
+  consulate --token "$CONSUL_ACL_TOKEN" kv rm "$KV_PREFIX/failmode"
+fi

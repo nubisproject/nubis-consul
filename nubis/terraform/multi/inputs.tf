@@ -71,6 +71,10 @@ variable "shared_services_security_groups" {
   description = "ID of that SG"
 }
 
+variable "sso_security_groups" {
+  default = ""
+}
+
 variable "master_acl_token" {
   description = "Master ACL Token (use uuidgen)"
   default     = "00000000-0000-0000-0000-000000000000"
@@ -110,7 +114,9 @@ variable "enabled" {
   default = "1"
 }
 
+#XXX: DataDog cleanup
 variable "datadog_api_key" {
+  default = "***DISABLED***"
 }
 
 variable nubis_sudo_groups {
@@ -128,5 +134,14 @@ variable mig {
     ca             = "mig/ca.crt"
     relay_password = "<unset>"
     relay_user     = "agent-it-nubis"
+  }
+}
+
+variable instance_mfa {
+  default = {
+    ikey     = ""
+    skey     = ""
+    host     = ""
+    failmode = "secure"
   }
 }
