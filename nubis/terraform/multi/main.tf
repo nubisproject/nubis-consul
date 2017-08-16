@@ -422,7 +422,7 @@ resource "aws_iam_instance_profile" "consul" {
   }
 
   name  = "${var.project}-${element(split(",",var.environments), count.index)}-${var.aws_region}"
-  roles = ["${element(aws_iam_role.consul.*.name, count.index)}"]
+  role = "${element(aws_iam_role.consul.*.name, count.index)}"
 }
 
 resource "aws_iam_role" "consul" {
