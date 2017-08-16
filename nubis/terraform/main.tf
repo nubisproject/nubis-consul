@@ -279,7 +279,7 @@ resource "aws_s3_bucket" "consul_backups" {
 
 resource "aws_iam_instance_profile" "consul" {
   name  = "${var.project}-${var.environment}-${var.region}"
-  roles = ["${aws_iam_role.consul.name}"]
+  role = "${aws_iam_role.consul.name}"
 }
 
 resource "aws_iam_role" "consul" {
