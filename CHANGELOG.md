@@ -7,9 +7,12 @@
 
 - Get rid of DataDog [\#291](https://github.com/nubisproject/nubis-consul/issues/291)
 - Upgrade to Consul 0.8.3 [\#275](https://github.com/nubisproject/nubis-consul/issues/275)
+- Tag v1.5.0 release [\#295](https://github.com/nubisproject/nubis-consul/issues/295)
 
 **Merged pull requests:**
 
+- Merge v1.5.0 release into develop. \[skip ci\] [\#297](https://github.com/nubisproject/nubis-consul/pull/297) ([tinnightcap](https://github.com/tinnightcap))
+- Update CHANGELOG for v1.5.0 release \[skip ci\] [\#296](https://github.com/nubisproject/nubis-consul/pull/296) ([tinnightcap](https://github.com/tinnightcap))
 - Add instance mfa \(DUO\) variables to consul [\#294](https://github.com/nubisproject/nubis-consul/pull/294) ([tinnightcap](https://github.com/tinnightcap))
 - Get rid of DataDog [\#293](https://github.com/nubisproject/nubis-consul/pull/293) ([gozer](https://github.com/gozer))
 - Add support for SSO security group [\#290](https://github.com/nubisproject/nubis-consul/pull/290) ([gozer](https://github.com/gozer))
