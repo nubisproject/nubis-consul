@@ -12,6 +12,55 @@ module "consul-image" {
 
 }
 
+resource "aws_sqs_queue" "graceful_termination_queue" {
+  count = "${var.enabled * length(split(",", var.environments))}"
+  name_prefix = "${var.project}-${element(split(",",var.environments), count.index)}-${var.aws_region}-termination-queue"
+}
+
+resource "aws_iam_role" "autoscaling_role" {
+  count = "${var.enabled * length(split(",", var.environments))}"
+  name = "${var.project}-termination-${element(split(",",var.environments), count.index)}-${var.aws_region}"
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "",
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "autoscaling.amazonaws.com"
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy" "lifecycle_hook_autoscaling_policy" {
+  count = "${var.enabled * length(split(",", var.environments))}"
+  name = "${var.project}-termination-${element(split(",",var.environments), count.index)}-${var.aws_region}"
+  role = "${element(aws_iam_role.autoscaling_role.*.id, count.index)}"
+  policy = <<POLICY
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "",
+            "Effect": "Allow",
+            "Action": [
+                "sqs:GetQueueUrl",
+                "sqs:SendMessage"
+            ],
+            "Resource": [
+                "${element(aws_sqs_queue.graceful_termination_queue.*.arn, count.index)}"
+            ]
+        }
+    ]
+}
+POLICY
+}
+
 resource "aws_launch_configuration" "consul" {
   count = "${var.enabled * length(split(",", var.environments))}"
 
@@ -47,6 +96,7 @@ NUBIS_DOMAIN=${var.domain}
 CONSUL_ACL_DEFAULT_POLICY=${var.acl_default_policy}
 CONSUL_ACL_DOWN_POLICY=${var.acl_down_policy}
 CONSUL_BOOTSTRAP_EXPECT=${var.servers}
+CONSUL_TERMINATION_QUEUE=${element(aws_sqs_queue.graceful_termination_queue.*.id, count.index)}
 NUBIS_BUMP=${md5("${var.mig["ca_cert"]}${var.mig["agent_cert"]}${var.mig["agent_key"]}${var.mig["relay_user"]}${var.mig["relay_password"]}${var.instance_mfa["ikey"]}${var.instance_mfa["skey"]}${var.instance_mfa["host"]}${var.instance_mfa["failmode"]}")}
 NUBIS_SUDO_GROUPS="${var.nubis_sudo_groups}"
 NUBIS_USER_GROUPS="${var.nubis_user_groups}"
@@ -479,7 +529,15 @@ resource "aws_iam_role_policy" "consul" {
             ],
             "Resource": "*",
             "Effect": "Allow"
-        }
+        },
+        {
+            "Action": [
+                "sqs:ReceiveMessage",
+                "sqs:DeleteMessage"
+            ],
+            "Resource": "${element(aws_sqs_queue.graceful_termination_queue.*.arn, count.index)}",
+            "Effect": "Allow"
+        },
     ]
 }
 EOF
