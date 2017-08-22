@@ -26,6 +26,7 @@ resource "aws_launch_configuration" "consul" {
   user_data = <<EOF
 NUBIS_PROJECT=${var.project}
 NUBIS_ENVIRONMENT=${var.environment}
+NUBIS_ARENA=${var.environment}
 NUBIS_ACCOUNT=${var.service_name}
 NUBIS_DOMAIN=${var.domain}
 CONSUL_ACL_DEFAULT_POLICY=${var.acl_default_policy}
