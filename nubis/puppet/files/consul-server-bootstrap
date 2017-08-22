@@ -86,6 +86,9 @@ consul_acl { "Anonymous Token":
       "environments/" => {
         "policy" => "read"
       },
+      "arenas/" => {
+        "policy" => "read"
+      },
       "jumphost" => {
         "policy" => "deny"
       },
