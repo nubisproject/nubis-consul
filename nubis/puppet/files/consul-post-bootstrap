@@ -4,8 +4,7 @@
 
 export PATH=/usr/local/bin:$PATH
 
-USER_DATA=$(curl -fqs http://169.254.169.254/latest/user-data)
-eval "$USER_DATA"
+eval "$(nubis-metadata)"
 
 # Run puppet manifests dropped in /etc/consul for post-boostrap configuration (ACLs)
 for PUPPET_FILE in /etc/consul/*pp; do
@@ -20,17 +19,13 @@ fi
 # Find out what the platform ACL is
 PLATFORM_ACL=$(curl -fqs "http://localhost:8500/v1/acl/list?token=$MASTER_ACL_TOKEN" | jq -r '.[] | select(.Name=="Nubis Platform").ID')
 if [ "$PLATFORM_ACL" != "" ]; then
-    REGION=$(curl -s http://169.254.169.254/latest/dynamic/instance-identity/document | jq '.region' -r)
-    CURRENT_PLATFORM_ACL=$(unicreds --region "$REGION" get "nubis/$NUBIS_ENVIRONMENT/consul/acl_token" -E "region:$REGION" -E "environment:$NUBIS_ENVIRONMENT" -E "service:nubis")
+    REGION=$(nubis-region)
+    CURRENT_PLATFORM_ACL=$(unicreds --region "$REGION" get "nubis/$NUBIS_ARENA/consul/acl_token" -E "region:$REGION" -E "arena:$NUBIS_ARENA" -E "service:nubis")
     if [ "$CURRENT_PLATFORM_ACL" != "$PLATFORM_ACL" ]; then
       # Store current platform ACL in credstash for others to retrieve
-      unicreds --region "$REGION" put "nubis/$NUBIS_ENVIRONMENT/consul/acl_token" "$PLATFORM_ACL" -E "region:$REGION" -E "environment:$NUBIS_ENVIRONMENT" -E "service:nubis"
+      unicreds --region "$REGION" put "nubis/$NUBIS_ARENA/consul/acl_token" "$PLATFORM_ACL" -E "region:$REGION" -E "arena:$NUBIS_ARENA" -E "service:nubis"
     fi
 fi
-
-#XXX: Kept here to ensure we cleanup the KV store of DataDog things
-DATADOG_API_KEY_PATH="environments/$NUBIS_ENVIRONMENT/global/datadog/config/api_key"
-consulate --token="$MASTER_ACL_TOKEN" kv rm "$DATADOG_API_KEY_PATH"
 
 # Finalize by creating a well-known KV
 consulate --token="$MASTER_ACL_TOKEN" kv set consul-ready "$(date '+%s')"

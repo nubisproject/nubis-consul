@@ -11,10 +11,10 @@ LOGGER_BIN='/usr/bin/logger'
 LOGGER="$LOGGER_BIN --priority local7.info --tag consul-backup"
 
 # Get userdata
-eval "$(curl -s -fq http://169.254.169.254/latest/user-data)"
+eval "$(nubis-metadata)"
 INSTANCE_ID=$(curl -s -fq http://169.254.169.254/latest/meta-data/instance-id)
-REGION=$(curl -s http://169.254.169.254/latest/dynamic/instance-identity/document | jq '.region' -r)
-BACKUP_BUCKET="nubis-${NUBIS_PROJECT}-backup-${NUBIS_ENVIRONMENT}-${REGION}-${NUBIS_ACCOUNT}"
+REGION=$(nubis-region)
+BACKUP_BUCKET="nubis-${NUBIS_PROJECT}-backup-${NUBIS_ARENA}-${REGION}-${NUBIS_ACCOUNT}"
 CONSUL_ACL_TOKEN=$(jq -r .acl_master_token < /etc/consul/zzz-acl.json)
 
 # How do we want to represent the backup file
@@ -24,7 +24,7 @@ BACKUP_FILE_NAME="$DATE_PATH/consul_backup.${INSTANCE_ID}.${DATE_STAMP}.dump"
 
 # Only 1 member of the cluster needs to run this
 # if you are not the leader then just forget about it
-consul-do "${NUBIS_ENVIRONMENT}/${NUBIS_PROJECT}-backup" "${INSTANCE_ID}" || exit 0
+consul-do "${NUBIS_PROJECT}/${NUBIS_ARENA}/backup" "${INSTANCE_ID}" || exit 0
 
 # Backup to temporary file
 BACKUP_FILE=$(mktemp)

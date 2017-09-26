@@ -3,22 +3,11 @@
 # /usr/local/bin isn't set yet in our PATH
 export PATH=/usr/local/bin:$PATH
 
-USER_DATA=$(curl -fqs http://169.254.169.254/latest/user-data)
-eval "$USER_DATA"
+eval "$(nubis-metadata)"
 
-REGION=$(curl -s http://169.254.169.254/latest/dynamic/instance-identity/document | jq '.region' -r)
+REGION=$(nubis-region)
 
-CONSUL_DC="${NUBIS_ENVIRONMENT}-${REGION}-${NUBIS_ACCOUNT}"
-
-# If we were not told an explicit cluster size via user-data, find it via our ASG
-if [ ! "$CONSUL_BOOTSTRAP_EXPECT" ]; then
-  MY_INSTANCE_ID=$(curl -s http://169.254.169.254/latest/meta-data/instance-id)
-  ASG_NAME=$(aws autoscaling describe-auto-scaling-instances --region "$REGION" --instance "$MY_INSTANCE_ID" --query 'AutoScalingInstances[0].AutoScalingGroupName' --output text)
-  if [ "$ASG_NAME" ]; then
-    # Figure out what the ASG desired capacity (i.e. cluster size) is set at
-    CONSUL_BOOTSTRAP_EXPECT=$(aws autoscaling describe-auto-scaling-groups --region "$REGION" --auto-scaling-group-name "$ASG_NAME" --query 'AutoScalingGroups[0].DesiredCapacity')
-  fi
-fi
+CONSUL_DC="${NUBIS_ARENA}-${REGION}-${NUBIS_ACCOUNT}"
 
 if [ "$CONSUL_BOOTSTRAP_EXPECT" ]; then
 cat <<EOF > /etc/consul/zzz-bootstrap.json
@@ -32,7 +21,7 @@ cat <<EOF > /etc/consul/ec2_join.json
 {
   "retry_join_ec2": {
     "tag_key": "ConsulClusterName",
-    "tag_value": "consul-server-${NUBIS_ENVIRONMENT}"
+    "tag_value": "consul-server-${NUBIS_ARENA}"
   }
 }
 EOF
@@ -83,13 +72,10 @@ consul_acl { "Anonymous Token":
       "_rexec/" => {
         "policy" => "deny"
       },
-      "environments/" => {
-        "policy" => "read"
-      },
       "arenas/" => {
         "policy" => "read"
       },
-      "jumphost" => {
+      "deploy/" => {
         "policy" => "deny"
       },
       "fluent" => {
@@ -130,12 +116,12 @@ consul_acl { "Anonymous Token":
       "es" => {
         "policy" => "read"
       },
-      "kv" => {
-        "policy" => "read"
-      },
       "grafana" => {
         "policy" => "read"
-      }
+      },
+      "sso" => {
+        "policy" => "read"
+      }    
     }
   },
   type   => 'client',

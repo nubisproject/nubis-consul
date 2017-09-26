@@ -3,7 +3,7 @@
 export PATH=/usr/local/bin:$PATH
 
 eval "$(nubis-metadata)"
-KV_PREFIX="environments/$NUBIS_ENVIRONMENT/global/instance_mfa/config"
+KV_PREFIX="arenas/$NUBIS_ARENA/global/instance_mfa/config"
 
 # We need the Consul ACL token
 CONSUL_ACL_TOKEN=$(jq -r .acl_master_token < /etc/consul/zzz-acl.json)

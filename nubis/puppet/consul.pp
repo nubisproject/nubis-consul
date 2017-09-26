@@ -93,6 +93,21 @@ file { '/usr/local/bin/consul-aws-join':
     source => 'puppet:///nubis/files/consul-aws-join',
 }
 
+file { '/usr/local/bin/consul-dns-update':
+    ensure => file,
+    owner  => root,
+    group  => root,
+    mode   => '0755',
+    source => 'puppet:///nubis/files/consul-dns-update',
+}
+
+cron::hourly { 'consul_dns':
+    user        => 'root',
+    command     => 'nubis-cron consul_dns /usr/local/bin/consul-dns-update',
+    environment => [ 'PATH="/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin"', 'SHELL=/bin/bash' ],
+    require     => File['/usr/local/bin/consul-dns-update'],
+}
+
 # Install consul backup script and create cron for it
 file { '/usr/local/sbin/consul-backup':
     ensure => file,
@@ -109,3 +124,5 @@ cron::hourly { 'consul_backup':
     environment => [ 'PATH="/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin"', 'SHELL=/bin/bash' ],
     require     => File['/usr/local/sbin/consul-backup']
 }
+
+

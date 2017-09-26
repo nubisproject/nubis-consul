@@ -2,8 +2,8 @@
 
 export PATH=/usr/local/bin:$PATH
 
-USER_DATA=$(curl -fqs http://169.254.169.254/latest/user-data)
-eval "$USER_DATA"
+eval "$(nubis-metadata)"
+NUBIS_REGION=$(nubis-region)
 
 echo "Attempting to find initial peers"
 /usr/local/bin/consul-aws-join
@@ -19,12 +19,21 @@ done
 
 echo "Finally, leader is '$LEADER'"
 
-KEY_PREFIX="/environments/$NUBIS_ENVIRONMENT/global/$NUBIS_PROJECT"
+KEY_PREFIX="/arenas/$NUBIS_ARENA/global/$NUBIS_PROJECT"
 
-/usr/local/bin/consul-get-or-set "$KEY_PREFIX/cert"   "cat /etc/consul/consul.pem"
-/usr/local/bin/consul-get-or-set "$KEY_PREFIX/key"    "cat /etc/consul/consul.key"
-/usr/local/bin/consul-get-or-set "$KEY_PREFIX/secret" "cat /etc/consul/zzz-tls.json | jq -r .encrypt"
+# XXX: At this point, there could be a platform ACL from a previous cluster, so make sure
+if [ -r /etc/consul/zzz-acl.json ]; then
+    MASTER_ACL_TOKEN=$(jq -r .acl_master_token < /etc/consul/zzz-acl.json)
+else
+    MASTER_ACL_TOKEN="anonymous"
+fi
 
+/usr/local/bin/consul-get-or-set "$MASTER_ACL_TOKEN" "$KEY_PREFIX/cert"   "cat /etc/consul/consul.pem"
+/usr/local/bin/consul-get-or-set "$MASTER_ACL_TOKEN" "$KEY_PREFIX/key"    "cat /etc/consul/consul.key"
+/usr/local/bin/consul-get-or-set "$MASTER_ACL_TOKEN" "$KEY_PREFIX/secret" "cat /etc/consul/zzz-tls.json | jq -r .encrypt"
 
 # Perform global post-boostrap operations, with exclusive lock
-/usr/local/bin/consul lock "consul-$NUBIS_ENVIRONMENT-post-bootstrap" /usr/local/bin/consul-post-bootstrap
+/usr/local/bin/consul lock "consul-$NUBIS_ARENA-post-bootstrap" /usr/local/bin/consul-post-bootstrap
+
+# Register our ASG membership in DNS
+/usr/local/bin/consul-dns-update

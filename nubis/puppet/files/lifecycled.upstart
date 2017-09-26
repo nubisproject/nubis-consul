@@ -1,0 +1,12 @@
+start on filesystem and net-device-up IFACE!=lo
+respawn
+script
+    set -a
+    . /etc/lifecycled
+    mkfifo /tmp/lifecycled-log-fifo
+    ( logger -t lifecycled </tmp/lifecycled-log-fifo & )
+    exec >/tmp/lifecycled-log-fifo
+    exec 2>&1
+    rm /tmp/lifecycled-log-fifo
+    exec /usr/local/bin/lifecycled --sns-topic "$SNS_TOPIC" --debug --handler=/usr/local/bin/nubis-consul-shutdown
+end script
