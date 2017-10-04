@@ -1,12 +1,12 @@
 class { 'consul':
-  version          => '0.8.5',
-  purge_config_dir => false,
+  version           => '0.8.5',
+  purge_config_dir  => false,
   manage_service    => false,
   service_enable    => false,
   service_ensure    => 'stopped',
   restart_on_change => false,
 
-  config_hash      => {
+  config_hash       => {
       'data_dir'              => '/var/lib/consul',
       'log_level'             => 'INFO',
       'ui_dir'                => '/var/lib/consul/ui',

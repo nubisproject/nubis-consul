@@ -3,7 +3,6 @@
 export PATH=/usr/local/bin:$PATH
 
 eval "$(nubis-metadata)"
-NUBIS_REGION=$(nubis-region)
 
 echo "Attempting to find initial peers"
 /usr/local/bin/consul-aws-join

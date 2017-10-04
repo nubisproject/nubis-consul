@@ -7,8 +7,8 @@ staging::file { "lifecycled.${lifecycled_version}":
   source => $lifecycled_url,
   target => $lifecycled_bin,
 }->
-exec { "chmod $lifecycled_bin":
-  command => "chmod 755 $lifecycled_bin",
+exec { "chmod ${lifecycled_bin}":
+  command => "chmod 755 ${lifecycled_bin}",
   path    => ['/sbin','/bin','/usr/sbin','/usr/bin','/usr/local/sbin','/usr/local/bin'],
 }
 
