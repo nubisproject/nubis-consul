@@ -1,5 +1,28 @@
 # Change Log
 
+## [v2.0.0](https://github.com/nubisproject/nubis-consul/tree/v2.0.0) (2017-10-05)
+[Full Changelog](https://github.com/nubisproject/nubis-consul/compare/v1.5.1...v2.0.0)
+
+**Merged pull requests:**
+
+- Fix module path [\#309](https://github.com/nubisproject/nubis-consul/pull/309) ([gozer](https://github.com/gozer))
+- Arena work [\#308](https://github.com/nubisproject/nubis-consul/pull/308) ([gozer](https://github.com/gozer))
+- Replace atlas with our own module [\#307](https://github.com/nubisproject/nubis-consul/pull/307) ([limed](https://github.com/limed))
+- Update nubis-travis to v1.4.2 [\#305](https://github.com/nubisproject/nubis-consul/pull/305) ([tinnightcap](https://github.com/tinnightcap))
+- Migrate to mozilla slack [\#304](https://github.com/nubisproject/nubis-consul/pull/304) ([tinnightcap](https://github.com/tinnightcap))
+
+## [v1.5.1](https://github.com/nubisproject/nubis-consul/tree/v1.5.1) (2017-08-18)
+[Full Changelog](https://github.com/nubisproject/nubis-consul/compare/v1.5.0...v1.5.1)
+
+**Closed issues:**
+
+- Tag v1.5.1 release [\#298](https://github.com/nubisproject/nubis-consul/issues/298)
+
+**Merged pull requests:**
+
+- Merge v1.5.1 release into develop. \[skip ci\] [\#300](https://github.com/nubisproject/nubis-consul/pull/300) ([tinnightcap](https://github.com/tinnightcap))
+- Update CHANGELOG for v1.5.1 release \[skip ci\] [\#299](https://github.com/nubisproject/nubis-consul/pull/299) ([tinnightcap](https://github.com/tinnightcap))
+
 ## [v1.5.0](https://github.com/nubisproject/nubis-consul/tree/v1.5.0) (2017-06-24)
 [Full Changelog](https://github.com/nubisproject/nubis-consul/compare/v1.4.2...v1.5.0)
 
