@@ -185,12 +185,6 @@ resource "aws_autoscaling_group" "consul" {
     value               = "consul-server-${element(var.arenas, count.index)}"
     propagate_at_launch = true
   }
-
-  tag {
-    key                 = "spot-enabled"
-    value               = "true"
-    propagate_at_launch = false
-  }
 }
 
 resource "aws_security_group" "consul" {
