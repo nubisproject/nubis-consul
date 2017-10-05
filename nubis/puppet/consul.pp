@@ -124,5 +124,3 @@ cron::hourly { 'consul_backup':
     environment => [ 'PATH="/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin"', 'SHELL=/bin/bash' ],
     require     => File['/usr/local/sbin/consul-backup']
 }
-
-
