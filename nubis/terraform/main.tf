@@ -9,7 +9,7 @@ provider "random" {
 }
 
 module "image" {
-  source = "github.com/gozer/nubis-deploy//modules/images?ref=feature%2Farena"
+  source = "github.com/nubisproject/nubis-deploy//modules/images?ref=v1.6.0-dev"
 
   region = "${var.aws_region}"
   version = "${var.nubis_version}"
