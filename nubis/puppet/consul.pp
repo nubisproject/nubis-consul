@@ -1,11 +1,12 @@
 class { 'consul':
-  version          => '0.8.3',
-  purge_config_dir => false,
-  manage_service   => false,
-  service_enable   => false,
-  service_ensure   => 'stopped',
+  version           => '0.8.5',
+  purge_config_dir  => false,
+  manage_service    => false,
+  service_enable    => false,
+  service_ensure    => 'stopped',
+  restart_on_change => false,
 
-  config_hash      => {
+  config_hash       => {
       'data_dir'              => '/var/lib/consul',
       'log_level'             => 'INFO',
       'ui_dir'                => '/var/lib/consul/ui',
@@ -90,6 +91,21 @@ file { '/usr/local/bin/consul-aws-join':
     group  => root,
     mode   => '0755',
     source => 'puppet:///nubis/files/consul-aws-join',
+}
+
+file { '/usr/local/bin/consul-dns-update':
+    ensure => file,
+    owner  => root,
+    group  => root,
+    mode   => '0755',
+    source => 'puppet:///nubis/files/consul-dns-update',
+}
+
+cron::hourly { 'consul_dns':
+    user        => 'root',
+    command     => 'nubis-cron consul_dns /usr/local/bin/consul-dns-update',
+    environment => [ 'PATH="/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin"', 'SHELL=/bin/bash' ],
+    require     => File['/usr/local/bin/consul-dns-update'],
 }
 
 # Install consul backup script and create cron for it

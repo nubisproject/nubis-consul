@@ -63,7 +63,7 @@ consul_peers_enough () {
   peer_count=$(curl -fqs http://localhost:8500/v1/status/peers | jq '. | length')
   peer_wanted=$(jq -r .bootstrap_expect /etc/consul/zzz-bootstrap.json)
 
-  if [ "$peer_count" -ge "$peer_wanted" ]; then
+  if [ "${peer_count:=0}" -ge "$peer_wanted" ]; then
     return 0
   else
     return 1

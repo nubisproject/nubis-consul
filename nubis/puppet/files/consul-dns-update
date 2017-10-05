@@ -1,0 +1,22 @@
+#!/bin/bash -l
+
+# /usr/local/bin isn't set yet in our PATH
+export PATH=/usr/local/bin:$PATH
+
+# Only 1 member of the cluster needs to run this
+# if you are not the leader then just forget about it
+INSTANCE_ID=$(curl -s -fq http://169.254.169.254/latest/meta-data/instance-id)
+consul-do "${NUBIS_PROJECT}/${NUBIS_ARENA}/dns" "${INSTANCE_ID}" || exit 0
+
+REGION=$(nubis-region)
+NUBIS_PROJECT=$(nubis-metadata NUBIS_PROJECT)
+NUBIS_ARENA=$(nubis-metadata NUBIS_ARENA)
+NUBIS_ACCOUNT=$(nubis-metadata NUBIS_ACCOUNT)
+NUBIS_DOMAIN=$(nubis-metadata NUBIS_DOMAIN)
+
+CONSUL_ZONE_ID=$(nubis-metadata CONSUL_ZONE_ID)
+
+DNS_ENDPOINT="discovery.$NUBIS_PROJECT.$NUBIS_ARENA.$REGION.$NUBIS_ACCOUNT.$NUBIS_DOMAIN"
+
+echo "Registering our ASG members in DNS for $DNS_ENDPOINT"
+AWS_REGION="$REGION" /usr/local/bin/asg-route53 -ttl 30 -type A -zoneid "$CONSUL_ZONE_ID" "$DNS_ENDPOINT"
