@@ -152,6 +152,10 @@ resource "aws_autoscaling_group" "consul" {
     "GroupMaxSize",
     "GroupDesiredCapacity",
     "GroupInServiceInstances",
+    "GroupPendingInstances",
+    "GroupStandbyInstances",
+    "GroupTerminatingInstances",
+    "GroupTotalInstances",
   ]
 
   load_balancers = [
