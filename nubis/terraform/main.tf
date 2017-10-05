@@ -663,13 +663,6 @@ resource "aws_iam_server_certificate" "consul_web_ui" {
   certificate_body = "${element(tls_self_signed_cert.consul_web_ui.*.cert_pem, count.index)}"
   private_key      = "${tls_private_key.consul_web.private_key_pem}"
 
-  # Amazon lies about key creation and availability
-
-  #provisioner "local-exec" {
-
-  #  command = "sleep 10"
-
-  #}
 }
 
 resource "tls_private_key" "gossip" {
