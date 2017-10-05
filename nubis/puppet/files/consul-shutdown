@@ -1,0 +1,5 @@
+#!/bin/bash
+
+echo "Gracefully terminating Consul prior to shutdown"
+
+stop consul

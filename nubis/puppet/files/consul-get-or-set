@@ -8,6 +8,7 @@ use MIME::Base64 qw(decode_base64);
 use LWP::UserAgent::Determined;
 my $ua =  LWP::UserAgent::Determined->new();
 
+my $token = shift @ARGV;
 my $path = shift @ARGV;
 
 my $url = URI->new($path);
@@ -31,7 +32,7 @@ sub set_value {
   my ($u, $value) = @_;
   my $url = $u->clone;
   
-  $url->query_form(cas => 0);
+  $url->query_form(cas => 0, token => $token);
   
   my $resp = $ua->put($url, Content => $value);
   
