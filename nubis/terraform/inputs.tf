@@ -120,3 +120,7 @@ variable instance_mfa {
     failmode = "secure"
   }
 }
+
+variable secret {
+  default = ""
+}

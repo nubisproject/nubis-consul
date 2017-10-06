@@ -757,7 +757,7 @@ resource "null_resource" "secrets" {
 
   # Important to list here every variable that affects what needs to be put into KMS
   triggers {
-    secret           = "${random_id.secret.b64_std}"
+    secret           = "${coalesce(var.secret, random_id.secret.b64_std)}"
     master_acl_token = "${random_id.acl_token.hex}"
     version          = "${var.nubis_version}"
     mig_ca_cert      = "${var.mig["ca_cert"]}"
@@ -780,7 +780,7 @@ resource "null_resource" "secrets" {
 
   # Consul gossip secret
   provisioner "local-exec" {
-    command = "${self.triggers.unicreds}/secret ${random_id.secret.b64_std} ${self.triggers.context}"
+    command = "${self.triggers.unicreds}/secret ${self.triggers.secret} ${self.triggers.context}"
   }
 
   provisioner "local-exec" {
