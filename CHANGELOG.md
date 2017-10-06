@@ -1,16 +1,26 @@
 # Change Log
 
 ## [v2.0.0](https://github.com/nubisproject/nubis-consul/tree/v2.0.0) (2017-10-06)
+[Full Changelog](https://github.com/nubisproject/nubis-consul/compare/v2.0.0...v2.0.0)
+
+**Merged pull requests:**
+
+- Keep it possible to specify the Consul gossip secret [\#321](https://github.com/nubisproject/nubis-consul/pull/321) ([gozer](https://github.com/gozer))
+
+## [v2.0.0](https://github.com/nubisproject/nubis-consul/tree/v2.0.0) (2017-10-06)
 [Full Changelog](https://github.com/nubisproject/nubis-consul/compare/v1.5.1...v2.0.0)
 
 **Closed issues:**
 
 - \[unicreds\] Cleanup resources on destruction [\#313](https://github.com/nubisproject/nubis-consul/issues/313)
+- Tag v2.0.0 release [\#318](https://github.com/nubisproject/nubis-consul/issues/318)
 - Tag v2.0.0 release [\#315](https://github.com/nubisproject/nubis-consul/issues/315)
 - Tag v2.0.0 release [\#310](https://github.com/nubisproject/nubis-consul/issues/310)
 
 **Merged pull requests:**
 
+- Merge v2.0.0 release into develop. \[skip ci\] [\#320](https://github.com/nubisproject/nubis-consul/pull/320) ([tinnightcap](https://github.com/tinnightcap))
+- Update CHANGELOG for v2.0.0 release \[skip ci\] [\#319](https://github.com/nubisproject/nubis-consul/pull/319) ([tinnightcap](https://github.com/tinnightcap))
 - Merge v2.0.0 release into develop. \[skip ci\] [\#317](https://github.com/nubisproject/nubis-consul/pull/317) ([tinnightcap](https://github.com/tinnightcap))
 - Update CHANGELOG for v2.0.0 release \[skip ci\] [\#316](https://github.com/nubisproject/nubis-consul/pull/316) ([tinnightcap](https://github.com/tinnightcap))
 - Cleanup unicreds secrets on destruction [\#314](https://github.com/nubisproject/nubis-consul/pull/314) ([gozer](https://github.com/gozer))
