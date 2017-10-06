@@ -733,11 +733,17 @@ resource "null_resource" "secrets-public" {
     version   = "${var.nubis_version}"
     context   = "-E region:${var.aws_region} -E arena:${element(var.arenas, count.index)} -E service:nubis"
     unicreds_file = "unicreds -r ${var.aws_region} put-file -k ${var.credstash_key} nubis/${element(var.arenas, count.index)}"
+    unicreds_rm = "unicreds -r ${var.aws_region} delete -k ${var.credstash_key} nubis/${element(var.arenas, count.index)}"
   }
 
   # Consul Internal UI SSL Certificate
   provisioner "local-exec" {
     command = "echo '${element(tls_self_signed_cert.consul_web_ui.*.cert_pem, count.index)}' | ${self.triggers.unicreds_file}/ssl/cacert /dev/stdin ${self.triggers.context}"
+  }
+
+  provisioner "local-exec" {
+    when    = "destroy"
+    command = "${self.triggers.unicreds_rm}/ssl/cacert"
   }
 }
 
@@ -777,9 +783,19 @@ resource "null_resource" "secrets" {
     command = "${self.triggers.unicreds}/secret ${random_id.secret.b64_std} ${self.triggers.context}"
   }
 
+  provisioner "local-exec" {
+    when    = "destroy"
+    command = "${self.triggers.unicreds_rm}/secret"
+  }
+
   # Consul Master ACL Token
   provisioner "local-exec" {
     command = "${self.triggers.unicreds}/master_acl_token ${random_id.acl_token.hex} ${self.triggers.context}"
+  }
+
+  provisioner "local-exec" {
+    when    = "destroy"
+    command = "${self.triggers.unicreds_rm}/master_acl_token"
   }
 
   # Consul SSL key
@@ -787,9 +803,19 @@ resource "null_resource" "secrets" {
     command = "echo '${element(tls_private_key.gossip.*.private_key_pem, count.index)}' | ${self.triggers.unicreds_file}/ssl/key /dev/stdin ${self.triggers.context}"
   }
 
+  provisioner "local-exec" {
+    when    = "destroy"
+    command = "${self.triggers.unicreds_rm}/ssl/key"
+  }
+
   # Consul SSL Certificate
   provisioner "local-exec" {
     command = "echo '${element(tls_self_signed_cert.gossip.*.cert_pem, count.index)}' | ${self.triggers.unicreds_file}/ssl/cert /dev/stdin ${self.triggers.context}"
+  }
+
+  provisioner "local-exec" {
+    when    = "destroy"
+    command = "${self.triggers.unicreds_rm}/ssl/cert"
   }
 
   # MiG
@@ -799,7 +825,17 @@ resource "null_resource" "secrets" {
   }
 
   provisioner "local-exec" {
+    when    = "destroy"
+    command = "${self.triggers.unicreds_rm}/mig/relay/user"
+  }
+
+  provisioner "local-exec" {
     command = "${self.triggers.unicreds}/mig/relay/password '${var.mig["relay_password"]}' ${self.triggers.context}"
+  }
+
+  provisioner "local-exec" {
+    when    = "destroy"
+    command = "${self.triggers.unicreds_rm}/mig/relay/password"
   }
 
   provisioner "local-exec" {
@@ -807,11 +843,26 @@ resource "null_resource" "secrets" {
   }
 
   provisioner "local-exec" {
+    when    = "destroy"
+    command = "${self.triggers.unicreds_rm}/mig/ca/cert"
+  }
+
+  provisioner "local-exec" {
     command = "echo '${file(var.mig["agent_cert"])}' | ${self.triggers.unicreds_file}/mig/agent/cert /dev/stdin ${self.triggers.context}"
   }
 
   provisioner "local-exec" {
+    when    = "destroy"
+    command = "${self.triggers.unicreds_rm}/mig/agent/cert"
+  }
+
+  provisioner "local-exec" {
     command = "echo '${file(var.mig["agent_key"])}' | ${self.triggers.unicreds_file}/mig/agent/key /dev/stdin ${self.triggers.context}"
+  }
+
+  provisioner "local-exec" {
+    when    = "destroy"
+    command = "${self.triggers.unicreds_rm}/mig/agent/key"
   }
 
   # Instance MFA (DUO)
@@ -821,7 +872,17 @@ resource "null_resource" "secrets" {
   }
 
   provisioner "local-exec" {
+    when    = "destroy"
+    command = "${self.triggers.unicreds_rm}/instance_mfa/ikey"
+  }
+
+  provisioner "local-exec" {
     command = "${self.triggers.unicreds}/instance_mfa/skey '${var.instance_mfa["skey"]}' ${self.triggers.context}"
+  }
+
+  provisioner "local-exec" {
+    when    = "destroy"
+    command = "${self.triggers.unicreds_rm}/instance_mfa/skey"
   }
 
   provisioner "local-exec" {
@@ -829,7 +890,16 @@ resource "null_resource" "secrets" {
   }
 
   provisioner "local-exec" {
+    when    = "destroy"
+    command = "${self.triggers.unicreds_rm}/instance_mfa/host"
+  }
+
+  provisioner "local-exec" {
     command = "${self.triggers.unicreds}/instance_mfa/failmode '${var.instance_mfa["failmode"]}' ${self.triggers.context}"
   }
 
+  provisioner "local-exec" {
+    when    = "destroy"
+    command = "${self.triggers.unicreds_rm}/instance_mfa/failmode"
+  }
 }
