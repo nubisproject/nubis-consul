@@ -3,16 +3,17 @@
 # /usr/local/bin isn't set yet in our PATH
 export PATH=/usr/local/bin:$PATH
 
-# Only 1 member of the cluster needs to run this
-# if you are not the leader then just forget about it
 INSTANCE_ID=$(curl -s -fq http://169.254.169.254/latest/meta-data/instance-id)
-consul-do "${NUBIS_PROJECT}/${NUBIS_ARENA}/dns" "${INSTANCE_ID}" || exit 0
 
 REGION=$(nubis-region)
 NUBIS_PROJECT=$(nubis-metadata NUBIS_PROJECT)
 NUBIS_ARENA=$(nubis-metadata NUBIS_ARENA)
 NUBIS_ACCOUNT=$(nubis-metadata NUBIS_ACCOUNT)
 NUBIS_DOMAIN=$(nubis-metadata NUBIS_DOMAIN)
+
+# Only 1 member of the cluster needs to run this
+# if you are not the leader then just forget about it
+consul-do "${NUBIS_PROJECT}/${NUBIS_ARENA}/dns" "${INSTANCE_ID}" || exit 0
 
 CONSUL_ZONE_ID=$(nubis-metadata CONSUL_ZONE_ID)
 
