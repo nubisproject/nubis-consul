@@ -1,11 +1,22 @@
 # Change Log
 
-## [v2.0.0](https://github.com/nubisproject/nubis-consul/tree/v2.0.0) (2017-10-06)
-[Full Changelog](https://github.com/nubisproject/nubis-consul/compare/v2.0.0...v2.0.0)
+## [v2.0.1](https://github.com/nubisproject/nubis-consul/tree/v2.0.1) (2017-10-13)
+[Full Changelog](https://github.com/nubisproject/nubis-consul/compare/v2.0.0...v2.0.1)
+
+**Implemented enhancements:**
+
+- \#gossipsecretavailable - The gossip secret for a given product is more broadly available than it needs to be [\#86](https://github.com/nubisproject/nubis-consul/issues/86)
+
+**Closed issues:**
+
+- \[bug\] DNS script doesn't run consul-do proprely [\#325](https://github.com/nubisproject/nubis-consul/issues/325)
+- Replace atlas search with our own module [\#306](https://github.com/nubisproject/nubis-consul/issues/306)
+- Get rid of DataDog cleanup code [\#292](https://github.com/nubisproject/nubis-consul/issues/292)
+- Backup bucket name should be passed in, not constructed by the instance. [\#82](https://github.com/nubisproject/nubis-consul/issues/82)
 
 **Merged pull requests:**
 
-- Keep it possible to specify the Consul gossip secret [\#321](https://github.com/nubisproject/nubis-consul/pull/321) ([gozer](https://github.com/gozer))
+- Define variables we use before using them [\#326](https://github.com/nubisproject/nubis-consul/pull/326) ([gozer](https://github.com/gozer))
 
 ## [v2.0.0](https://github.com/nubisproject/nubis-consul/tree/v2.0.0) (2017-10-06)
 [Full Changelog](https://github.com/nubisproject/nubis-consul/compare/v1.5.1...v2.0.0)
@@ -13,12 +24,16 @@
 **Closed issues:**
 
 - \[unicreds\] Cleanup resources on destruction [\#313](https://github.com/nubisproject/nubis-consul/issues/313)
+- Tag v2.0.0 release [\#322](https://github.com/nubisproject/nubis-consul/issues/322)
 - Tag v2.0.0 release [\#318](https://github.com/nubisproject/nubis-consul/issues/318)
 - Tag v2.0.0 release [\#315](https://github.com/nubisproject/nubis-consul/issues/315)
 - Tag v2.0.0 release [\#310](https://github.com/nubisproject/nubis-consul/issues/310)
 
 **Merged pull requests:**
 
+- Merge v2.0.0 release into develop. \[skip ci\] [\#324](https://github.com/nubisproject/nubis-consul/pull/324) ([tinnightcap](https://github.com/tinnightcap))
+- Update CHANGELOG for v2.0.0 release \[skip ci\] [\#323](https://github.com/nubisproject/nubis-consul/pull/323) ([tinnightcap](https://github.com/tinnightcap))
+- Keep it possible to specify the Consul gossip secret [\#321](https://github.com/nubisproject/nubis-consul/pull/321) ([gozer](https://github.com/gozer))
 - Merge v2.0.0 release into develop. \[skip ci\] [\#320](https://github.com/nubisproject/nubis-consul/pull/320) ([tinnightcap](https://github.com/tinnightcap))
 - Update CHANGELOG for v2.0.0 release \[skip ci\] [\#319](https://github.com/nubisproject/nubis-consul/pull/319) ([tinnightcap](https://github.com/tinnightcap))
 - Merge v2.0.0 release into develop. \[skip ci\] [\#317](https://github.com/nubisproject/nubis-consul/pull/317) ([tinnightcap](https://github.com/tinnightcap))
