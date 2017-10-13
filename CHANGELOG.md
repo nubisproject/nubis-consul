@@ -16,6 +16,7 @@
 
 **Merged pull requests:**
 
+- Update CHANGELOG for v2.0.1 release \[skip ci\] [\#328](https://github.com/nubisproject/nubis-consul/pull/328) ([tinnightcap](https://github.com/tinnightcap))
 - Define variables we use before using them [\#326](https://github.com/nubisproject/nubis-consul/pull/326) ([gozer](https://github.com/gozer))
 
 ## [v2.0.0](https://github.com/nubisproject/nubis-consul/tree/v2.0.0) (2017-10-06)
