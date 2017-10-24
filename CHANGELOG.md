@@ -13,9 +13,12 @@
 - Replace atlas search with our own module [\#306](https://github.com/nubisproject/nubis-consul/issues/306)
 - Get rid of DataDog cleanup code [\#292](https://github.com/nubisproject/nubis-consul/issues/292)
 - Backup bucket name should be passed in, not constructed by the instance. [\#82](https://github.com/nubisproject/nubis-consul/issues/82)
+- Tag v2.0.1 release [\#327](https://github.com/nubisproject/nubis-consul/issues/327)
 
 **Merged pull requests:**
 
+- Merge v2.0.1 release into develop. \[skip ci\] [\#330](https://github.com/nubisproject/nubis-consul/pull/330) ([tinnightcap](https://github.com/tinnightcap))
+- Update CHANGELOG for v2.0.1 release \[skip ci\] [\#329](https://github.com/nubisproject/nubis-consul/pull/329) ([tinnightcap](https://github.com/tinnightcap))
 - Update CHANGELOG for v2.0.1 release \[skip ci\] [\#328](https://github.com/nubisproject/nubis-consul/pull/328) ([tinnightcap](https://github.com/tinnightcap))
 - Define variables we use before using them [\#326](https://github.com/nubisproject/nubis-consul/pull/326) ([gozer](https://github.com/gozer))
 
