@@ -11,7 +11,7 @@ staging::extract { "consul_exporter.${consul_exporter_version}.tar.gz":
   creates => '/usr/local/bin/consul_exporter',
 }
 
-file { '/usr/local/bin/consul-exporter':
+file { '/usr/local/bin/consul_exporter':
   ensure  => file,
   owner   => root,
   group   => root,
