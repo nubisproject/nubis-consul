@@ -1,0 +1,13 @@
+[Unit]
+Description=Consul Lifecycle Manager
+Wants=basic.target
+After=basic.target network.target
+
+[Service]
+Restart=on-failure
+RestartSec=10s
+
+ExecStart=/bin/bash -c '. /etc/lifecycled && /usr/local/bin/lifecycled --sns-topic "$SNS_TOPIC" --debug --handler=/usr/local/bin/nubis-consul-shutdown'
+
+[Install]
+WantedBy=multi-user.target

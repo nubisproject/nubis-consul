@@ -1,0 +1,13 @@
+[Unit]
+Description=Consul Statsd Exporter
+Wants=basic.target
+After=basic.target network.target
+
+[Service]
+Restart=on-failure
+RestartSec=10s
+
+ExecStart=/usr/local/bin/statsd_exporter -statsd.listen-address="127.0.0.1:9125" -web.listen-address=":9102" -log.level info -log.format 'logger:syslog?appname=statsd_exporter&local=7'
+
+[Install]
+WantedBy=multi-user.target

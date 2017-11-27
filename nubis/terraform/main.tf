@@ -461,8 +461,7 @@ resource "aws_iam_role_policy" "consul" {
             "Action": [
                 "elasticloadbalancing:DescribeLoadBalancers"
             ],
-            "Resource": [ "arn:aws:elasticloadbalancing:${var.aws_region}:${data.aws_caller_identity.current.account_id}:loadbalancer/${element(aws_elb.consul.*.name, count.index)}"
-	    ],
+            "Resource": "*",
             "Effect": "Allow"
         },
         {
