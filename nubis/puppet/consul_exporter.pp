@@ -18,7 +18,7 @@ file { '/usr/local/bin/consul_exporter':
 }
 
 systemd::unit_file { 'consul_exporter.service':
- source => "puppet:///nubis/files/consul_exporter.systemd",
+  source => 'puppet:///nubis/files/consul_exporter.systemd',
 }
 
 file { '/etc/confd/conf.d/consul_exporter.toml':

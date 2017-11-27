@@ -21,11 +21,11 @@ file { '/etc/lifecycled':
 }
 
 file { '/usr/local/bin/nubis-consul-shutdown':
-     ensure => file,
-     owner  => root,
-     group  => root,
-     mode   => '0755',
-    source => 'puppet:///nubis/files/consul-shutdown',
+  ensure => file,
+  owner  => root,
+  group  => root,
+  mode   => '0755',
+  source => 'puppet:///nubis/files/consul-shutdown',
 }
 
 file { '/lib/systemd/system/lifecycled.service':

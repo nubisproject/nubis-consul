@@ -30,7 +30,7 @@ class { 'consul':
 
 # Ensure Consul is aware of our proxies
 ::systemd::dropin_file { 'proxy.conf':
-  unit   => 'consul.service',
+  unit    => 'consul.service',
   content => @(END)
 [Service]
 ExecStart=

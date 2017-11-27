@@ -12,5 +12,5 @@ staging::extract { "statsd_exporter.${statsd_exporter_version}.tar.gz":
 }
 
 systemd::unit_file { 'statsd_exporter.service':
- source => "puppet:///nubis/files/statsd_exporter.systemd",
+  source => 'puppet:///nubis/files/statsd_exporter.systemd',
 }
