@@ -17,20 +17,8 @@ file { '/usr/local/bin/consul_exporter':
   mode   => '0755',
 }
 
-file { '/etc/init/consul_exporter.conf':
-  ensure => file,
-  owner  => root,
-  group  => root,
-  mode   => '0644',
-  source => 'puppet:///nubis/files/consul_exporter.upstart',
-}
-
-file { '/etc/init/consul_exporter.override':
-  ensure  => file,
-  owner   => root,
-  group   => root,
-  mode    => '0644',
-  content => 'manual',
+systemd::unit_file { 'consul_exporter.service':
+  source => 'puppet:///nubis/files/consul_exporter.systemd',
 }
 
 file { '/etc/confd/conf.d/consul_exporter.toml':

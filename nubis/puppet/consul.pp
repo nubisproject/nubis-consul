@@ -28,6 +28,16 @@ class { 'consul':
   }
 }
 
+# Ensure Consul is aware of our proxies
+::systemd::dropin_file { 'proxy.conf':
+  unit    => 'consul.service',
+  content => @(END)
+[Service]
+ExecStart=
+ExecStart=/bin/bash -c '. /etc/profile.d/proxy.sh && exec /usr/local/bin/consul agent -config-dir /etc/consul'
+END
+}
+
 package { 'libwww-perl':
   ensure => present,
 }
