@@ -110,6 +110,7 @@ CONSUL_ZONE_ID="${element(aws_route53_zone.consul.*.zone_id, count.index)}"
 CONSUL_ACL_DEFAULT_POLICY=${var.acl_default_policy}
 CONSUL_ACL_DOWN_POLICY=${var.acl_down_policy}
 CONSUL_BOOTSTRAP_EXPECT=${var.servers}
+CONSUL_BACKUP_BUCKET=${element(aws_s3_bucket.consul_backups.*.id, count.index)}
 CONSUL_TERMINATION_TOPIC=${element(aws_sns_topic.graceful_termination.*.id, count.index)}
 NUBIS_BUMP=${md5("${var.mig["ca_cert"]}${var.mig["agent_cert"]}${var.mig["agent_key"]}${var.mig["relay_user"]}${var.mig["relay_password"]}${var.instance_mfa["ikey"]}${var.instance_mfa["skey"]}${var.instance_mfa["host"]}${var.instance_mfa["failmode"]}")}
 NUBIS_SUDO_GROUPS="${var.nubis_sudo_groups}"
@@ -366,7 +367,6 @@ resource "aws_route53_record" "ui" {
   records = ["${element(aws_elb.consul.*.dns_name, count.index)}"]
 }
 
-#XXX: Need UUID bucket
 resource "aws_s3_bucket" "consul_backups" {
   count = "${var.enabled * length(var.arenas)}"
 
@@ -375,7 +375,7 @@ resource "aws_s3_bucket" "consul_backups" {
     create_before_destroy = true
   }
 
-  bucket = "nubis-${var.project}-backup-${element(var.arenas, count.index)}-${var.aws_region}-${var.service_name}"
+  bucket_prefix = "nubis-${var.project}-backup-${element(var.arenas, count.index)}-"
   acl    = "private"
 
   # Nuke the bucket content on deletion
@@ -386,7 +386,7 @@ resource "aws_s3_bucket" "consul_backups" {
   }
 
   tags = {
-    Name        = "nubis-${var.project}-backup-${element(var.arenas, count.index)}-${var.aws_region}-${var.service_name}"
+    Name        = "nubis-${var.project}-backup-${element(var.arenas, count.index)}"
     Region      = "${var.aws_region}"
     Arena       = "${element(var.arenas, count.index)}"
   }
