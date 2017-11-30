@@ -11,19 +11,20 @@ provider "random" {
 module "image" {
   source = "github.com/nubisproject/nubis-deploy//modules/images?ref=develop"
 
-  region = "${var.aws_region}"
+  region  = "${var.aws_region}"
   version = "${var.nubis_version}"
   project = "nubis-consul"
 }
 
 resource "aws_sns_topic" "graceful_termination" {
   count = "${var.enabled * length(var.arenas)}"
-  name = "${var.project}-${element(var.arenas, count.index)}-${var.aws_region}-termination"
+  name  = "${var.project}-${element(var.arenas, count.index)}-${var.aws_region}-termination"
 }
 
 resource "aws_iam_role" "autoscaling_role" {
   count = "${var.enabled * length(var.arenas)}"
-  name = "${var.project}-termination-${element(var.arenas, count.index)}-${var.aws_region}"
+  name  = "${var.project}-termination-${element(var.arenas, count.index)}-${var.aws_region}"
+
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -42,20 +43,21 @@ EOF
 }
 
 resource "aws_autoscaling_lifecycle_hook" "graceful_shutdown_asg_hook" {
-    count = "${var.enabled * length(var.arenas)}"
-    name = "${var.project}-termination-${element(var.arenas, count.index)}-${var.aws_region}"
-    autoscaling_group_name = "${element(aws_autoscaling_group.consul.*.name, count.index)}"
-    default_result = "CONTINUE"
-    heartbeat_timeout = 60
-    lifecycle_transition = "autoscaling:EC2_INSTANCE_TERMINATING"
-    notification_target_arn = "${element(aws_sns_topic.graceful_termination.*.arn, count.index)}"
-    role_arn = "${element(aws_iam_role.autoscaling_role.*.arn, count.index)}"
+  count                   = "${var.enabled * length(var.arenas)}"
+  name                    = "${var.project}-termination-${element(var.arenas, count.index)}-${var.aws_region}"
+  autoscaling_group_name  = "${element(aws_autoscaling_group.consul.*.name, count.index)}"
+  default_result          = "CONTINUE"
+  heartbeat_timeout       = 60
+  lifecycle_transition    = "autoscaling:EC2_INSTANCE_TERMINATING"
+  notification_target_arn = "${element(aws_sns_topic.graceful_termination.*.arn, count.index)}"
+  role_arn                = "${element(aws_iam_role.autoscaling_role.*.arn, count.index)}"
 }
 
 resource "aws_iam_role_policy" "lifecycle_hook_autoscaling_policy" {
   count = "${var.enabled * length(var.arenas)}"
-  name = "${var.project}-termination-${element(var.arenas, count.index)}-${var.aws_region}"
-  role = "${element(aws_iam_role.autoscaling_role.*.id, count.index)}"
+  name  = "${var.project}-termination-${element(var.arenas, count.index)}-${var.aws_region}"
+  role  = "${element(aws_iam_role.autoscaling_role.*.id, count.index)}"
+
   policy = <<POLICY
 {
     "Version": "2012-10-17",
@@ -88,7 +90,7 @@ resource "aws_launch_configuration" "consul" {
   }
 
   name_prefix = "${var.project}-${element(var.arenas, count.index)}-${var.aws_region}-"
-  image_id = "${module.image.image_id}"
+  image_id    = "${module.image.image_id}"
 
   instance_type        = "t2.small"
   key_name             = "${var.key_name}"
@@ -110,6 +112,7 @@ CONSUL_ZONE_ID="${element(aws_route53_zone.consul.*.zone_id, count.index)}"
 CONSUL_ACL_DEFAULT_POLICY=${var.acl_default_policy}
 CONSUL_ACL_DOWN_POLICY=${var.acl_down_policy}
 CONSUL_BOOTSTRAP_EXPECT=${var.servers}
+CONSUL_BACKUP_BUCKET=${element(aws_s3_bucket.consul_backups.*.id, count.index)}
 CONSUL_TERMINATION_TOPIC=${element(aws_sns_topic.graceful_termination.*.id, count.index)}
 NUBIS_BUMP=${md5("${var.mig["ca_cert"]}${var.mig["agent_cert"]}${var.mig["agent_key"]}${var.mig["relay_user"]}${var.mig["relay_password"]}${var.instance_mfa["ikey"]}${var.instance_mfa["skey"]}${var.instance_mfa["host"]}${var.instance_mfa["failmode"]}")}
 NUBIS_SUDO_GROUPS="${var.nubis_sudo_groups}"
@@ -246,9 +249,9 @@ resource "aws_security_group" "consul" {
   }
 
   tags = {
-    Name        = "${var.project}-${element(var.arenas, count.index)}"
-    Region      = "${var.aws_region}"
-    Arena       = "${element(var.arenas, count.index)}"
+    Name   = "${var.project}-${element(var.arenas, count.index)}"
+    Region = "${var.aws_region}"
+    Arena  = "${element(var.arenas, count.index)}"
   }
 }
 
@@ -303,9 +306,9 @@ resource "aws_elb" "consul" {
   ]
 
   tags = {
-    Name        = "elb-${var.project}-${element(var.arenas, count.index)}"
-    Region      = "${var.aws_region}"
-    Arena       = "${element(var.arenas, count.index)}"
+    Name   = "elb-${var.project}-${element(var.arenas, count.index)}"
+    Region = "${var.aws_region}"
+    Arena  = "${element(var.arenas, count.index)}"
   }
 }
 
@@ -345,9 +348,9 @@ resource "aws_security_group" "elb" {
   }
 
   tags = {
-    Name        = "elb-${var.project}-${element(var.arenas, count.index)}"
-    Region      = "${var.aws_region}"
-    Arena       = "${element(var.arenas, count.index)}"
+    Name   = "elb-${var.project}-${element(var.arenas, count.index)}"
+    Region = "${var.aws_region}"
+    Arena  = "${element(var.arenas, count.index)}"
   }
 }
 
@@ -366,7 +369,6 @@ resource "aws_route53_record" "ui" {
   records = ["${element(aws_elb.consul.*.dns_name, count.index)}"]
 }
 
-#XXX: Need UUID bucket
 resource "aws_s3_bucket" "consul_backups" {
   count = "${var.enabled * length(var.arenas)}"
 
@@ -375,8 +377,8 @@ resource "aws_s3_bucket" "consul_backups" {
     create_before_destroy = true
   }
 
-  bucket = "nubis-${var.project}-backup-${element(var.arenas, count.index)}-${var.aws_region}-${var.service_name}"
-  acl    = "private"
+  bucket_prefix = "nubis-${var.project}-backup-${element(var.arenas, count.index)}-"
+  acl           = "private"
 
   # Nuke the bucket content on deletion
   force_destroy = true
@@ -386,9 +388,9 @@ resource "aws_s3_bucket" "consul_backups" {
   }
 
   tags = {
-    Name        = "nubis-${var.project}-backup-${element(var.arenas, count.index)}-${var.aws_region}-${var.service_name}"
-    Region      = "${var.aws_region}"
-    Arena       = "${element(var.arenas, count.index)}"
+    Name   = "nubis-${var.project}-backup-${element(var.arenas, count.index)}"
+    Region = "${var.aws_region}"
+    Arena  = "${element(var.arenas, count.index)}"
   }
 }
 
@@ -400,7 +402,7 @@ resource "aws_iam_instance_profile" "consul" {
     create_before_destroy = true
   }
 
-  name  = "${var.project}-${element(var.arenas, count.index)}-${var.aws_region}"
+  name = "${var.project}-${element(var.arenas, count.index)}-${var.aws_region}"
   role = "${element(aws_iam_role.consul.*.name, count.index)}"
 }
 
@@ -661,7 +663,6 @@ resource "aws_iam_server_certificate" "consul_web_ui" {
   name_prefix      = "${var.project}-${element(var.arenas, count.index)}-${var.aws_region}-ui-"
   certificate_body = "${element(tls_self_signed_cert.consul_web_ui.*.cert_pem, count.index)}"
   private_key      = "${tls_private_key.consul_web.private_key_pem}"
-
 }
 
 resource "tls_private_key" "gossip" {
@@ -726,13 +727,13 @@ resource "null_resource" "secrets-public" {
 
   # Important to list here every variable that affects what needs to be put into KMS
   triggers {
-    credstash_key    = "${var.credstash_key}"
-    cacert    = "${element(tls_self_signed_cert.consul_web_ui.*.cert_pem, count.index)}"
-    region    = "${var.aws_region}"
-    version   = "${var.nubis_version}"
-    context   = "-E region:${var.aws_region} -E arena:${element(var.arenas, count.index)} -E service:nubis"
+    credstash_key = "${var.credstash_key}"
+    cacert        = "${element(tls_self_signed_cert.consul_web_ui.*.cert_pem, count.index)}"
+    region        = "${var.aws_region}"
+    version       = "${var.nubis_version}"
+    context       = "-E region:${var.aws_region} -E arena:${element(var.arenas, count.index)} -E service:nubis"
     unicreds_file = "unicreds -r ${var.aws_region} put-file -k ${var.credstash_key} nubis/${element(var.arenas, count.index)}"
-    unicreds_rm = "unicreds -r ${var.aws_region} delete -k ${var.credstash_key} nubis/${element(var.arenas, count.index)}"
+    unicreds_rm   = "unicreds -r ${var.aws_region} delete -k ${var.credstash_key} nubis/${element(var.arenas, count.index)}"
   }
 
   # Consul Internal UI SSL Certificate
@@ -756,21 +757,21 @@ resource "null_resource" "secrets" {
 
   # Important to list here every variable that affects what needs to be put into KMS
   triggers {
-    secret           = "${coalesce(var.secret, random_id.secret.b64_std)}"
-    master_acl_token = "${random_id.acl_token.hex}"
-    version          = "${var.nubis_version}"
-    mig_ca_cert      = "${var.mig["ca_cert"]}"
-    mig_agent_cert  = "${var.mig["agent_cert"]}"
-    mig_agent_key   = "${var.mig["agent_key"]}"
-    mig_relay_user   = "${var.mig["relay_user"]}"
-    mig_relay_pass   = "${var.mig["relay_password"]}"
-    ssl_key          = "${element(tls_private_key.gossip.*.private_key_pem, count.index)}"
-    ssl_cert         = "${element(tls_self_signed_cert.gossip.*.cert_pem, count.index)}"
-    region           = "${var.aws_region}"
-    context          = "-E region:${var.aws_region} -E arena:${element(var.arenas, count.index)} -E service:${var.project}"
-    unicreds_rm      = "unicreds -r ${var.aws_region} delete -k ${var.credstash_key} ${var.project}/${element(var.arenas, count.index)}"
-    unicreds         = "unicreds -r ${var.aws_region} put -k ${var.credstash_key} ${var.project}/${element(var.arenas, count.index)}"
-    unicreds_file    = "unicreds -r ${var.aws_region} put-file -k ${var.credstash_key} ${var.project}/${element(var.arenas, count.index)}"
+    secret                = "${coalesce(var.secret, random_id.secret.b64_std)}"
+    master_acl_token      = "${random_id.acl_token.hex}"
+    version               = "${var.nubis_version}"
+    mig_ca_cert           = "${var.mig["ca_cert"]}"
+    mig_agent_cert        = "${var.mig["agent_cert"]}"
+    mig_agent_key         = "${var.mig["agent_key"]}"
+    mig_relay_user        = "${var.mig["relay_user"]}"
+    mig_relay_pass        = "${var.mig["relay_password"]}"
+    ssl_key               = "${element(tls_private_key.gossip.*.private_key_pem, count.index)}"
+    ssl_cert              = "${element(tls_self_signed_cert.gossip.*.cert_pem, count.index)}"
+    region                = "${var.aws_region}"
+    context               = "-E region:${var.aws_region} -E arena:${element(var.arenas, count.index)} -E service:${var.project}"
+    unicreds_rm           = "unicreds -r ${var.aws_region} delete -k ${var.credstash_key} ${var.project}/${element(var.arenas, count.index)}"
+    unicreds              = "unicreds -r ${var.aws_region} put -k ${var.credstash_key} ${var.project}/${element(var.arenas, count.index)}"
+    unicreds_file         = "unicreds -r ${var.aws_region} put-file -k ${var.credstash_key} ${var.project}/${element(var.arenas, count.index)}"
     instance_mfa_ikey     = "${var.instance_mfa["ikey"]}"
     instance_mfa_skey     = "${var.instance_mfa["skey"]}"
     instance_mfa_host     = "${var.instance_mfa["host"]}"
@@ -822,43 +823,34 @@ resource "null_resource" "secrets" {
   provisioner "local-exec" {
     command = "${self.triggers.unicreds}/mig/relay/user '${var.mig["relay_user"]}' ${self.triggers.context}"
   }
-
   provisioner "local-exec" {
     when    = "destroy"
     command = "${self.triggers.unicreds_rm}/mig/relay/user"
   }
-
   provisioner "local-exec" {
     command = "${self.triggers.unicreds}/mig/relay/password '${var.mig["relay_password"]}' ${self.triggers.context}"
   }
-
   provisioner "local-exec" {
     when    = "destroy"
     command = "${self.triggers.unicreds_rm}/mig/relay/password"
   }
-
   provisioner "local-exec" {
     command = "echo '${file(var.mig["ca_cert"])}' | ${self.triggers.unicreds_file}/mig/ca/cert /dev/stdin ${self.triggers.context}"
   }
-
   provisioner "local-exec" {
     when    = "destroy"
     command = "${self.triggers.unicreds_rm}/mig/ca/cert"
   }
-
   provisioner "local-exec" {
     command = "echo '${file(var.mig["agent_cert"])}' | ${self.triggers.unicreds_file}/mig/agent/cert /dev/stdin ${self.triggers.context}"
   }
-
   provisioner "local-exec" {
     when    = "destroy"
     command = "${self.triggers.unicreds_rm}/mig/agent/cert"
   }
-
   provisioner "local-exec" {
     command = "echo '${file(var.mig["agent_key"])}' | ${self.triggers.unicreds_file}/mig/agent/key /dev/stdin ${self.triggers.context}"
   }
-
   provisioner "local-exec" {
     when    = "destroy"
     command = "${self.triggers.unicreds_rm}/mig/agent/key"
@@ -869,34 +861,27 @@ resource "null_resource" "secrets" {
   provisioner "local-exec" {
     command = "${self.triggers.unicreds}/instance_mfa/ikey '${var.instance_mfa["ikey"]}' ${self.triggers.context}"
   }
-
   provisioner "local-exec" {
     when    = "destroy"
     command = "${self.triggers.unicreds_rm}/instance_mfa/ikey"
   }
-
   provisioner "local-exec" {
     command = "${self.triggers.unicreds}/instance_mfa/skey '${var.instance_mfa["skey"]}' ${self.triggers.context}"
   }
-
   provisioner "local-exec" {
     when    = "destroy"
     command = "${self.triggers.unicreds_rm}/instance_mfa/skey"
   }
-
   provisioner "local-exec" {
     command = "${self.triggers.unicreds}/instance_mfa/host '${var.instance_mfa["host"]}' ${self.triggers.context}"
   }
-
   provisioner "local-exec" {
     when    = "destroy"
     command = "${self.triggers.unicreds_rm}/instance_mfa/host"
   }
-
   provisioner "local-exec" {
     command = "${self.triggers.unicreds}/instance_mfa/failmode '${var.instance_mfa["failmode"]}' ${self.triggers.context}"
   }
-
   provisioner "local-exec" {
     when    = "destroy"
     command = "${self.triggers.unicreds_rm}/instance_mfa/failmode"
