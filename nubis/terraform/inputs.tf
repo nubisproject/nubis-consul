@@ -1,7 +1,6 @@
 # nubis-consul release 10
 
-variable "nubis_version" {
-}
+variable "nubis_version" {}
 
 variable "key_name" {
   description = "SSH key name in your AWS account for AWS instances."
@@ -87,8 +86,7 @@ variable "credstash_key" {
   description = "KMS Key ID used for Credstash (aaaabbbb-cccc-dddd-1111-222233334444)"
 }
 
-variable "credstash_dynamodb_table" {
-}
+variable "credstash_dynamodb_table" {}
 
 variable "enabled" {
   default = "1"

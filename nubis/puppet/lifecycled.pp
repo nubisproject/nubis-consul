@@ -12,14 +12,6 @@ exec { "chmod ${lifecycled_bin}":
   path    => ['/sbin','/bin','/usr/sbin','/usr/bin','/usr/local/sbin','/usr/local/bin'],
 }
 
-file { '/etc/init/lifecycled.conf':
-    ensure => file,
-    owner  => root,
-    group  => root,
-    mode   => '0644',
-    source => 'puppet:///nubis/files/lifecycled.upstart',
-}
-
 file { '/etc/lifecycled':
     ensure => file,
     owner  => root,
@@ -29,10 +21,21 @@ file { '/etc/lifecycled':
 }
 
 file { '/usr/local/bin/nubis-consul-shutdown':
+  ensure => file,
+  owner  => root,
+  group  => root,
+  mode   => '0755',
+  source => 'puppet:///nubis/files/consul-shutdown',
+}
+
+file { '/lib/systemd/system/lifecycled.service':
     ensure => file,
     owner  => root,
     group  => root,
     mode   => '0755',
-    source => 'puppet:///nubis/files/consul-shutdown',
+    source => 'puppet:///nubis/files/lifecycled.systemd',
+}->
+service { 'lifecycled':
+  enable => true,
 }
 

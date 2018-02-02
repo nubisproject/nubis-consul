@@ -14,7 +14,7 @@ LOGGER="$LOGGER_BIN --priority local7.info --tag consul-backup"
 eval "$(nubis-metadata)"
 INSTANCE_ID=$(curl -s -fq http://169.254.169.254/latest/meta-data/instance-id)
 REGION=$(nubis-region)
-BACKUP_BUCKET="nubis-${NUBIS_PROJECT}-backup-${NUBIS_ARENA}-${REGION}-${NUBIS_ACCOUNT}"
+BACKUP_BUCKET=$(nubis-metadata CONSUL_BACKUP_BUCKET)
 CONSUL_ACL_TOKEN=$(jq -r .acl_master_token < /etc/consul/zzz-acl.json)
 
 # How do we want to represent the backup file
