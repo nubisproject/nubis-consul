@@ -1,10 +1,35 @@
 # Change Log
 
-## [v2.0.3](https://github.com/nubisproject/nubis-consul/tree/v2.0.3) (2017-11-02)
-[Full Changelog](https://github.com/nubisproject/nubis-consul/compare/v2.0.2...v2.0.3)
+## [v2.0.4](https://github.com/nubisproject/nubis-consul/tree/v2.0.4) (2017-12-08)
+[Full Changelog](https://github.com/nubisproject/nubis-consul/compare/v2.0.3...v2.0.4)
+
+**Implemented enhancements:**
+
+- Update consul\_exporter to version 0.3.0 [\#302](https://github.com/nubisproject/nubis-consul/issues/302)
+
+**Closed issues:**
+
+- Remove consul-replicate [\#336](https://github.com/nubisproject/nubis-consul/issues/336)
+- Don't create random\_id resources when enabled=false [\#332](https://github.com/nubisproject/nubis-consul/issues/332)
+- Use a generated unique bucket name [\#81](https://github.com/nubisproject/nubis-consul/issues/81)
+- Tag v2.0.4 release [\#344](https://github.com/nubisproject/nubis-consul/issues/344)
 
 **Merged pull requests:**
 
+- Use a generated bucket name for backups [\#343](https://github.com/nubisproject/nubis-consul/pull/343) ([gozer](https://github.com/gozer))
+- \[Centennial\] [\#342](https://github.com/nubisproject/nubis-consul/pull/342) ([gozer](https://github.com/gozer))
+
+## [v2.0.3](https://github.com/nubisproject/nubis-consul/tree/v2.0.3) (2017-11-02)
+[Full Changelog](https://github.com/nubisproject/nubis-consul/compare/v2.0.2...v2.0.3)
+
+**Closed issues:**
+
+- Tag v2.0.3 release [\#339](https://github.com/nubisproject/nubis-consul/issues/339)
+
+**Merged pull requests:**
+
+- Merge v2.0.3 release into develop. \[skip ci\] [\#341](https://github.com/nubisproject/nubis-consul/pull/341) ([tinnightcap](https://github.com/tinnightcap))
+- Update CHANGELOG for v2.0.3 release \[skip ci\] [\#340](https://github.com/nubisproject/nubis-consul/pull/340) ([tinnightcap](https://github.com/tinnightcap))
 - Remove consul-replicate [\#338](https://github.com/nubisproject/nubis-consul/pull/338) ([limed](https://github.com/limed))
 - Update consul exporter [\#337](https://github.com/nubisproject/nubis-consul/pull/337) ([limed](https://github.com/limed))
 
