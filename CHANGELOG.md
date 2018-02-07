@@ -1,7 +1,7 @@
 # Change Log
 
-## [v2.0.4](https://github.com/nubisproject/nubis-consul/tree/v2.0.4) (2017-12-08)
-[Full Changelog](https://github.com/nubisproject/nubis-consul/compare/v2.0.3...v2.0.4)
+## [v2.1.0](https://github.com/nubisproject/nubis-consul/tree/v2.1.0) (2018-02-02)
+[Full Changelog](https://github.com/nubisproject/nubis-consul/compare/v2.0.4...v2.1.0)
 
 **Implemented enhancements:**
 
@@ -9,9 +9,21 @@
 
 **Closed issues:**
 
+- Tag v2.1.0 release [\#345](https://github.com/nubisproject/nubis-consul/issues/345)
+- Use a generated unique bucket name [\#81](https://github.com/nubisproject/nubis-consul/issues/81)
+
+**Merged pull requests:**
+
+- Update CHANGELOG for v2.1.0 release \[skip ci\] [\#347](https://github.com/nubisproject/nubis-consul/pull/347) ([nubis-automation](https://github.com/nubis-automation))
+- Update CHANGELOG for v2.1.0 release \[skip ci\] [\#346](https://github.com/nubisproject/nubis-consul/pull/346) ([nubis-automation](https://github.com/nubis-automation))
+
+## [v2.0.4](https://github.com/nubisproject/nubis-consul/tree/v2.0.4) (2017-12-08)
+[Full Changelog](https://github.com/nubisproject/nubis-consul/compare/v2.0.3...v2.0.4)
+
+**Closed issues:**
+
 - Remove consul-replicate [\#336](https://github.com/nubisproject/nubis-consul/issues/336)
 - Don't create random\_id resources when enabled=false [\#332](https://github.com/nubisproject/nubis-consul/issues/332)
-- Use a generated unique bucket name [\#81](https://github.com/nubisproject/nubis-consul/issues/81)
 - Tag v2.0.4 release [\#344](https://github.com/nubisproject/nubis-consul/issues/344)
 
 **Merged pull requests:**
