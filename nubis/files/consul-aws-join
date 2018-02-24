@@ -42,6 +42,7 @@ consul_join () {
   fi
 
   # shellcheck disable=SC2034
+  # shellcheck disable=SC2207
   known_peers=($(echo "$consul_peers" | jq -r .[] | cut -d: -f1))
 
   if [[ $peer =~ ^i-[0-9a-f]+ ]]; then
