@@ -4,13 +4,13 @@ $consul_exporter_url = "https://github.com/prometheus/consul_exporter/releases/d
 notice ("Grabbing consul_exporter ${consul_exporter_version}")
 staging::file { "consul_exporter.${consul_exporter_version}.tar.gz":
   source => $consul_exporter_url,
-}->
-staging::extract { "consul_exporter.${consul_exporter_version}.tar.gz":
+}
+->staging::extract { "consul_exporter.${consul_exporter_version}.tar.gz":
   strip   => 1,
   target  => '/usr/local/bin',
   creates => '/usr/local/bin/consul_exporter',
-}->
-file { '/usr/local/bin/consul_exporter':
+}
+->file { '/usr/local/bin/consul_exporter':
   ensure => file,
   owner  => root,
   group  => root,
