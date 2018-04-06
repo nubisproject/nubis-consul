@@ -1,6 +1,23 @@
 # Change Log
 
-## [v2.1.0](https://github.com/nubisproject/nubis-consul/tree/v2.1.0) (2018-02-02)
+## [v2.2.0](https://github.com/nubisproject/nubis-consul/tree/v2.2.0) (2018-04-06)
+[Full Changelog](https://github.com/nubisproject/nubis-consul/compare/v2.1.0...v2.2.0)
+
+**Closed issues:**
+
+- \[TF\] Cleanup for 0.11.x [\#358](https://github.com/nubisproject/nubis-consul/issues/358)
+- Tag project as platform [\#354](https://github.com/nubisproject/nubis-consul/issues/354)
+- Image search location [\#352](https://github.com/nubisproject/nubis-consul/issues/352)
+
+**Merged pull requests:**
+
+- Fix \#358 [\#359](https://github.com/nubisproject/nubis-consul/pull/359) ([gozer](https://github.com/gozer))
+- Tag this as a platform component [\#357](https://github.com/nubisproject/nubis-consul/pull/357) ([limed](https://github.com/limed))
+- Linting nubis-ci [\#356](https://github.com/nubisproject/nubis-consul/pull/356) ([limed](https://github.com/limed))
+- Point image search to nubis-terraform [\#353](https://github.com/nubisproject/nubis-consul/pull/353) ([limed](https://github.com/limed))
+- Update nubis-travis [\#351](https://github.com/nubisproject/nubis-consul/pull/351) ([tinnightcap](https://github.com/tinnightcap))
+
+## [v2.1.0](https://github.com/nubisproject/nubis-consul/tree/v2.1.0) (2018-02-07)
 [Full Changelog](https://github.com/nubisproject/nubis-consul/compare/v2.0.4...v2.1.0)
 
 **Implemented enhancements:**
@@ -9,11 +26,14 @@
 
 **Closed issues:**
 
+- Tag v2.1.0 release [\#348](https://github.com/nubisproject/nubis-consul/issues/348)
 - Tag v2.1.0 release [\#345](https://github.com/nubisproject/nubis-consul/issues/345)
 - Use a generated unique bucket name [\#81](https://github.com/nubisproject/nubis-consul/issues/81)
 
 **Merged pull requests:**
 
+- Update CHANGELOG for v2.1.0 release \[skip ci\] [\#350](https://github.com/nubisproject/nubis-consul/pull/350) ([nubis-automation](https://github.com/nubis-automation))
+- Update CHANGELOG for v2.1.0 release \[skip ci\] [\#349](https://github.com/nubisproject/nubis-consul/pull/349) ([nubis-automation](https://github.com/nubis-automation))
 - Update CHANGELOG for v2.1.0 release \[skip ci\] [\#347](https://github.com/nubisproject/nubis-consul/pull/347) ([nubis-automation](https://github.com/nubis-automation))
 - Update CHANGELOG for v2.1.0 release \[skip ci\] [\#346](https://github.com/nubisproject/nubis-consul/pull/346) ([nubis-automation](https://github.com/nubis-automation))
 

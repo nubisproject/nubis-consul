@@ -9,11 +9,11 @@ provider "random" {
 }
 
 module "image" {
-  source = "github.com/nubisproject/nubis-deploy//modules/images?ref=develop"
+  source = "github.com/nubisproject/nubis-terraform///images?ref=develop"
 
-  region  = "${var.aws_region}"
-  version = "${var.nubis_version}"
-  project = "nubis-consul"
+  region        = "${var.aws_region}"
+  image_version = "${var.nubis_version}"
+  project       = "nubis-consul"
 }
 
 resource "aws_sns_topic" "graceful_termination" {
