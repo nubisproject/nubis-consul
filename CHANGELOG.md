@@ -8,9 +8,12 @@
 - \[TF\] Cleanup for 0.11.x [\#358](https://github.com/nubisproject/nubis-consul/issues/358)
 - Tag project as platform [\#354](https://github.com/nubisproject/nubis-consul/issues/354)
 - Image search location [\#352](https://github.com/nubisproject/nubis-consul/issues/352)
+- Tag v2.2.0 release [\#360](https://github.com/nubisproject/nubis-consul/issues/360)
 
 **Merged pull requests:**
 
+- Update CHANGELOG for v2.2.0 release \[skip ci\] [\#362](https://github.com/nubisproject/nubis-consul/pull/362) ([nubis-automation](https://github.com/nubis-automation))
+- Update CHANGELOG for v2.2.0 release \[skip ci\] [\#361](https://github.com/nubisproject/nubis-consul/pull/361) ([nubis-automation](https://github.com/nubis-automation))
 - Fix \#358 [\#359](https://github.com/nubisproject/nubis-consul/pull/359) ([gozer](https://github.com/gozer))
 - Tag this as a platform component [\#357](https://github.com/nubisproject/nubis-consul/pull/357) ([limed](https://github.com/limed))
 - Linting nubis-ci [\#356](https://github.com/nubisproject/nubis-consul/pull/356) ([limed](https://github.com/limed))
