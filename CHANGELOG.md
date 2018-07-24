@@ -1,16 +1,19 @@
 # Change Log
 
-## [v2.3.0](https://github.com/nubisproject/nubis-consul/tree/v2.3.0) (2018-07-20)
+## [v2.3.0](https://github.com/nubisproject/nubis-consul/tree/v2.3.0) (2018-07-24)
 [Full Changelog](https://github.com/nubisproject/nubis-consul/compare/v2.2.0...v2.3.0)
 
 **Closed issues:**
 
 - Tag v2.2.0 release [\#360](https://github.com/nubisproject/nubis-consul/issues/360)
+- Tag v2.3.0 release [\#371](https://github.com/nubisproject/nubis-consul/issues/371)
 - Tag v2.3.0 release [\#368](https://github.com/nubisproject/nubis-consul/issues/368)
 - Tag v2.3.0 release [\#365](https://github.com/nubisproject/nubis-consul/issues/365)
 
 **Merged pull requests:**
 
+- Update CHANGELOG for v2.3.0 release \[skip ci\] [\#373](https://github.com/nubisproject/nubis-consul/pull/373) ([nubis-automation](https://github.com/nubis-automation))
+- Update CHANGELOG for v2.3.0 release \[skip ci\] [\#372](https://github.com/nubisproject/nubis-consul/pull/372) ([nubis-automation](https://github.com/nubis-automation))
 - Update CHANGELOG for v2.3.0 release \[skip ci\] [\#370](https://github.com/nubisproject/nubis-consul/pull/370) ([nubis-automation](https://github.com/nubis-automation))
 - Update CHANGELOG for v2.3.0 release \[skip ci\] [\#369](https://github.com/nubisproject/nubis-consul/pull/369) ([nubis-automation](https://github.com/nubis-automation))
 - Update CHANGELOG for v2.3.0 release \[skip ci\] [\#367](https://github.com/nubisproject/nubis-consul/pull/367) ([nubis-automation](https://github.com/nubis-automation))
