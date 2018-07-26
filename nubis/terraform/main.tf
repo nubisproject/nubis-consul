@@ -1,11 +1,11 @@
 #Configure the AWS Provider
 provider "aws" {
   region  = "${var.aws_region}"
-  version = "~> 0.1"
+  version = "~> 1"
 }
 
 provider "random" {
-  version = "~> 0.1"
+  version = "~> 1"
 }
 
 module "image" {
