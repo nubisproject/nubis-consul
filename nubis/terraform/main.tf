@@ -9,7 +9,7 @@ provider "random" {
 }
 
 module "image" {
-  source = "github.com/nubisproject/nubis-terraform//images?ref=v2.3.1"
+  source = "github.com/nubisproject/nubis-terraform//images?ref=v2.4.0"
 
   region        = "${var.aws_region}"
   image_version = "${var.nubis_version}"
