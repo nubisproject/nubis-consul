@@ -62,10 +62,10 @@ package { 'binutils':
   ensure => '2.26.1-1ubuntu1~16.04.8',
 }
 package { 'boto3':
-  ensure => '1.9.101',
+  ensure => '1.9.108',
 }
 package { 'botocore':
-  ensure => '1.12.101',
+  ensure => '1.12.108',
 }
 package { 'bsd-mailx':
   ensure => '8.1.2-0.20160123cvs-2',
@@ -101,7 +101,7 @@ package { 'certifi':
   ensure => '2018.11.29',
 }
 package { 'cffi':
-  ensure => '1.12.1',
+  ensure => '1.12.2',
 }
 package { 'chardet':
   ensure => '3.0.4',
@@ -464,7 +464,7 @@ package { 'javascript-common':
   ensure => '11',
 }
 package { 'jmespath':
-  ensure => '0.9.3',
+  ensure => '0.9.4',
 }
 package { 'jq':
   ensure => '1.5+dfsg-1ubuntu0.1',
@@ -1127,13 +1127,13 @@ package { 'libsmartcols1':
   ensure => '2.27.1-6ubuntu3.6',
 }
 package { 'libsqlite3-0':
-  ensure => '3.11.0-1ubuntu1',
+  ensure => '3.11.0-1ubuntu1.1',
 }
 package { 'libss2':
   ensure => '1.42.13-1ubuntu1',
 }
 package { 'libssl1.0.0':
-  ensure => '1.0.2g-1ubuntu4.14',
+  ensure => '1.0.2g-1ubuntu4.15',
 }
 package { 'libstdc++-5-dev':
   ensure => '5.4.0-6ubuntu1~16.04.11',
@@ -1418,16 +1418,16 @@ package { 'open-vm-tools':
   ensure => '2:10.2.0-3~ubuntu0.16.04.1',
 }
 package { 'openssh-client':
-  ensure => '1:7.2p2-4ubuntu2.7',
+  ensure => '1:7.2p2-4ubuntu2.8',
 }
 package { 'openssh-server':
-  ensure => '1:7.2p2-4ubuntu2.7',
+  ensure => '1:7.2p2-4ubuntu2.8',
 }
 package { 'openssh-sftp-server':
-  ensure => '1:7.2p2-4ubuntu2.7',
+  ensure => '1:7.2p2-4ubuntu2.8',
 }
 package { 'openssl':
-  ensure => '1.0.2g-1ubuntu4.14',
+  ensure => '1.0.2g-1ubuntu4.15',
 }
 package { 'os-prober':
   ensure => '1.70ubuntu3.3',
